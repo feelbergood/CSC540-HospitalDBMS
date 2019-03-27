@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.Scanner;
 
 public class WolfHospital {
 	// Update your user info alone here
@@ -7,49 +8,100 @@ public class WolfHospital {
 	// Update your user and password info here!
 	private static final String user = "yrao3";
 	private static final String password = "200204773";
-
-	private static final int CMD_MAIN = 1;
-	private static final int CMD_OPERATORS = 2;
-	private static final int CMD_BILLING = 3;
-	private static final int CMD_DOCTORS = 4;
-	private static final int CMD_PATIENTS = 5;
-	private static final int CMD_ADMIN = 6;
-
-//	Operators: responsible for admitting patients, processing patient information and assigning beds.
-//	Billing staff: responsible for creating billing information.
-//	Doctors: treat, test patients and log medical records.
-//	Administrators: manage all operations of users above and process staff and hospital information.
-//	Patients: Retrieve own billing account, medical records, patient info
-
-	private static final int CMD_ADD_STAFF = 7;
-	private static final int CMD_GET_STAFF = 8;
-	private static final int CMD_UPDATE_STAFF = 9;
-	private static final int CMD_DELETE_STAFF = 10;
 	
-	private static final int CMD_ADD_PATIENT = 11;
-	private static final int CMD_GET_PATIENT = 12;
-	private static final int CMD_UPDATE_PATIENT = 13;
-	private static final int CMD_DELETE_PATIENT = 14;
-	
-	private static final int CMD_ADD_WARD = 15;
-	private static final int CMD_GET_WARD = 16;
-	private static final int CMD_UPDATE_WARD = 17;
-	private static final int CMD_DELETE_WARD = 18;
+	// Commands
+	// Operators: responsible for admitting patients, processing patient information and assigning beds.
+	// Billing staff: responsible for creating billing information.
+	// Doctors: treat, test patients and log medical records.
+	// Administrators: manage all operations of users above and process staff and hospital information.
+	// Patients: Retrieve own billing account, medical records, patient info
+	private static final String CMD_MAIN = 						"MAIN";
+	private static final String CMD_OPERATORS = 				"OPERATORS";
+	private static final String CMD_BILLING = 					"BILLING STAFF";
+	private static final String CMD_DOCTORS = 					"DOCTORS";
+	private static final String CMD_PATIENTS = 					"PATIENTS";
+	private static final String CMD_ADMIN = 					"ADMINISTRATORS";
+	private static final String CMD_QUIT = 						"QUIT";
 
-	private static final int CMD_ADD_BED = 19;
-	private static final int CMD_GET_BED = 20;
-	private static final int CMD_UPDATE_BED = 21;
-	private static final int CMD_DELETE_BED = 22;
+	private static final String CMD_STAFF_ADD = 				"ADD STAFF";
+	private static final String CMD_STAFF_GET = 				"RETRIEVE STAFF";
+	private static final String CMD_STAFF_UPDATE = 				"UPDATE STAFF";
+	private static final String CMD_STAFF_DELETE = 				"DELETE STAFF";
+	
+	private static final String CMD_PATIENT_ADD = 				"ADD PATIENT";
+	private static final String CMD_PATIENT_GET = 				"RETRIEVE PATIENT";
+	private static final String CMD_PATIENT_UPDATE = 			"UPDATE PATIENT";
+	private static final String CMD_PATIENT_DELETE = 			"DELETE PATIENT";
+	
+	private static final String CMD_WARD_ADD = 					"ADD WARD";
+	private static final String CMD_WARD_GET = 					"RETRIEVE WARD";
+	private static final String CMD_WARD_UPDATE = 				"UPDATE WARD";
+	private static final String CMD_WARD_DELETE = 				"DELETE WARD";
+	private static final String CMD_WARD_CHECK = 					"CHECK AVAILABLE WARD";
+	private static final String CMD_WARD_ASSIGN = 				"ASSIGN WARD";
+	private static final String CMD_WARD_RESERVE = 				"RESERVE WARD";
+	private static final String CMD_WARD_RELEASE = 				"RELEASE WARD";
+
+	private static final String CMD_BED_CHECK = 				"CHECK AVAILABLE BED";
+	private static final String CMD_BED_ASSIGN = 				"ASSIGN BED";
+	private static final String CMD_BED_RESERVE = 				"RESERVE BED";
+	private static final String CMD_BED_RELEASE = 				"RELEASE BED";
+
+	private static final String CMD_TREATMENT_ADD = 			"ADD TREATMENT";
+	private static final String CMD_TREATMENT_GETALL = 			"GET ALL TREATMENTS";
+	private static final String CMD_TREATMENT_GET = 			"GET A TREATMENT";
+	private static final String CMD_TREATMENT_UPDATE = 			"UPDATE TREATMENT";
+	private static final String CMD_TEST_ADD = 					"ADD TEST";
+	private static final String CMD_TEST_GETALL = 				"GET ALL TESTS";
+	private static final String CMD_TEST_GET = 					"GET A TEST";
+	private static final String CMD_TEST_UPDATE = 				"UPDATE TEST";
+	private static final String CMD_CHECKIN_ADD = 				"ADD CHECK-IN";
+	private static final String CMD_CHECKIN_GETALL = 			"GET ALL CHECK-INS";
+	private static final String CMD_CHECKIN_GET = 				"GET A CHECK-IN";
+	private static final String CMD_CHECKIN_UPDATE = 			"UPDATE CHECK-IN";
+	
+	private static final String CMD_MEDICAL_HISTORY_REPORT = 	"REPORT MEDICAL HISTORY";
+	private static final String CMD_USAGE_STATUS_REPORT = 		"REPORT USAGE STATUS";
+	private static final String CMD_PATIENT_NUMBER_REPORT = 	"REPORT PATIENT NUMBER";
+	private static final String CMD_WARD_USAGE_PERCENT_REPORT = "REPORT WARD USAGE PERCENTAGE";
+	private static final String CMD_DOCTOR_RESPONS_REPORT = 	"REPORT DOCTOR REPONSIBLITIES";
+
+	private static final String CMD_BILLING_ACCT_ADD = 			"ADD BILLING ACCOUNT";
+	private static final String CMD_BILLING_ACCT_GET = 			"RETRIEVE BILLING ACCOUNT";
+	private static final String CMD_BILLING_ACCT_UPDATE = 		"UPDATE BILLING ACCOUNT";
+	private static final String CMD_BILLING_ACCT_DELETE = 		"DELETE BILLING ACCOUNT";
+
+	private static Scanner scanner;
+	private static String currentMenu;
+
+	private static Connection connection;
+	private static Statement statement;
+	private static ResultSet result;
 	
 	
-	public static void main(String[] args) {
+	// Prepared Statements pre-declared
+	// STAFF
+	private static PreparedStatement prep_addStaff;
+	private static PreparedStatement prep_getStaff;
+	private static PreparedStatement prep_updateStaffName;
+	private static PreparedStatement prep_updateStaffJobTitle;
+	private static PreparedStatement prep_updateStaffProfTitle;
+	private static PreparedStatement prep_updateStaffDepart;
+	private static PreparedStatement prep_updateStaffPhone;
+	private static PreparedStatement prep_updateStaffAddress;
+	private static PreparedStatement prep_deleteStaff;
+	
+	// ... Remaining statements
+
+	// Establish connection
+	public static void connectToDatabase() {
 		try {
 	    	// Loading the driver. This creates an instance of the driver
 	    	// and calls the registerDriver method to make MySql(MariaDB) Thin available to clients.
 		    Class.forName("org.mariadb.jdbc.Driver");
-		    Connection connection = null;
-		    Statement statement = null;
-		    ResultSet result = null;
+		    connection = null;
+		    statement = null;
+		    result = null;
 
 		    try {
 		        // Get a connection instance from the first driver in the
@@ -67,6 +119,40 @@ public class WolfHospital {
 		} catch(Throwable oops) {
 			oops.printStackTrace();
 		}
+	}
+
+	public static void printCommands(String menu) {
+		System.out.println(menu);
+		System.out.println("Available Commands:");
+		switch (menu) {
+			case CMD_MAIN:
+				System.out.println(CMD_OPERATORS);
+				System.out.println(CMD_BILLING);
+				System.out.println(CMD_DOCTORS);
+				System.out.println(CMD_PATIENTS);
+				System.out.println(CMD_ADMIN);
+				System.out.println(CMD_QUIT);
+				break;
+			case CMD_OPERATORS:
+				System.out.println();
+				break;
+			case CMD_BILLING:
+				System.out.println();
+				break;
+			case CMD_DOCTORS:
+				System.out.println();
+				break;
+			case CMD_PATIENTS:
+				System.out.println();
+				break;
+			case CMD_ADMIN:
+				System.out.println();
+				break;
+		}
+	}
+
+	public static void main(String[] args) {
+		printCommands(CMD_MAIN);
 	}
 	
 	static void close(Connection connection) {
