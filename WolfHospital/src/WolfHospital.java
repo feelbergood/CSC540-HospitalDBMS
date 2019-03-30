@@ -80,6 +80,7 @@ public class WolfHospital {
 	
 	
 	// Prepared Statements pre-declared
+	// TO-DO 1: instantiate preparedStatements
 	// STAFF
 	private static PreparedStatement prep_addStaff;
 	private static PreparedStatement prep_getStaff;
@@ -150,6 +151,81 @@ public class WolfHospital {
 				break;
 		}
 	}
+
+	// TO-DO 2: assign instantiated prepared statements
+	public static void generatePreparedStatements() {
+		try {
+			String sql;
+
+			sql = "INSERT INTO Staff";
+			prep_addStaff = connection.prepareStatement(sql);
+			sql = "SELECT * FROM Staff";
+			prep_getStaff = connection.prepareStatement(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// TO-DO 3: create tables
+	public static void generateTables() {
+		try {
+			connection.setAutoCommit(false);
+			try {
+				// Staff: 
+				statement.executeUpdate("CREATE TABLE Staff");
+				// Other tables...
+								
+
+				connection.commit();
+				System.out.println("Tables created!");
+			} catch (SQLException e) {
+				connection.rollback();
+				e.printStackTrace();
+			} finally {
+				connection.setAutoCommit(true);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	// TO-DO 4: define and implement table population tables
+	public static void populateTables(String tableName) {
+		try {
+			connection.setAutoCommit(false);
+			try {
+				switch(tableName) {
+					// Staff:
+					case "Staff":
+						prep_addStaff.setString(1, "xxx");
+						break;
+					// Other tables...
+
+					default:
+						break;
+				}
+
+				connection.commit();
+				System.out.println("Tables populated!");
+			} catch (SQLException e) {
+				connection.rollback();
+				e.printStackTrace();
+			} finally {
+				connection.setAutoCommit(true);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+	}
+	
+	// TO-DO 5: define and implement other functions
+	// To get staff info
+	public static void getStaff(String staffID) {
+		
+	}
+	
+	// Other functions...
 
 	public static void main(String[] args) {
 		printCommands(CMD_MAIN);
