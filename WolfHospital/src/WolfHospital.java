@@ -658,7 +658,7 @@ public class WolfHospital {
 		return success;
 	}
 
-		public static void main(String[] args) {
+	public static void main(String[] args) {
 		printCommands(CMD_MAIN);
 	}
 	
