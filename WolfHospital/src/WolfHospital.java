@@ -91,6 +91,28 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffPhone;
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
+
+	//fhy 按表格中的顺序：
+	private static PreparedStatement prep_getAllTreatmentRecords;
+	private static PreparedStatement prep_getTreatmentRecord;
+
+	//private static PreparedStatement prep_updateTreatmentRecord;
+	private static PreparedStatement prep_updateTreatmentEndDate;
+	private static PreparedStatement prep_updateTreatmentPrescription;
+	private static PreparedStatement prep_updateTreatmentDiagnosisDetails;
+
+	private static PreparedStatement prep_addTestRecord;
+	private static PreparedStatement prep_getAllTestRecords;
+	private static PreparedStatement prep_getTestRecord;
+
+	//private static PreparedStatement prep_updateTestRecord;
+	private static PreparedStatement prep_updateTestEndDate;
+	private static PreparedStatement prep_updateTestTestType;
+	private static PreparedStatement prep_updateTestTestResult;
+
+	private static PreparedStatement prep_addCheckinRecord;
+	private static PreparedStatement prep_getAllCheckinRecords;
+	private static PreparedStatement prep_getCheckinRecord;
 	
 	// ... Remaining statements
 
@@ -161,7 +183,89 @@ public class WolfHospital {
 			prep_addStaff = connection.prepareStatement(sql);
 			sql = "SELECT * FROM Staff";
 			prep_getStaff = connection.prepareStatement(sql);
-			
+
+			//fhy
+			//	1
+			//	SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE patientID=1;
+			sql = "SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE patientID=?;";
+			prep_getAllTreatmentRecords = connection.prepareStatement(sql);
+			//	2
+			//	SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE t.recordID=1;
+			sql = "SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE t.recordID=?;";
+			prep_getTreatmentRecord = connection.prepareStatement(sql);
+			//	3
+			//	UPDATE `Medical Records` SET `end date` = '2020-01-01' WHERE recordID = 13;
+			//	UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle' WHERE recordID = '13';
+			sql =
+				"UPDATE `Medical Records`"+
+				"SET `end date` = ?"+
+				"WHERE recordID = ?;"+;
+			prep_updateTreatmentEndDate = connection.prepareStatement(sql);
+
+			sql =
+				"UPDATE `Treatment`"+
+				"SET `prescription` = ?"+
+				"WHERE recordID = ?;";
+			prep_updateTreatmentPrescription = connection.prepareStatement(sql);
+
+			sql =
+				"UPDATE `Treatment`"+
+				"SET `diagnosisDetails` = ?"+
+				"WHERE recordID = ?;";
+			prep_updateTreatmentDiagnosisDetails = connection.prepareStatement(sql);
+
+			//	4
+			//	INSERT INTO `Test` (`recordID`, `testType`, `testResult`)VALUES ('14', 'testType5', 'testResult5');
+			//	INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) VALUES ('14', '5', '2019-07-01', '2019-07-02', '3');
+			sql =
+				"INSERT INTO `Test` (`recordID`, `testType`, `testResult`)"+
+				"VALUES (?, ?, ?);"+
+				"INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"+
+				"VALUES (?, ?, ?, ?, ?);";
+			prep_addTestRecord = connection.prepareStatement(sql);
+			//	5
+			//	SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE patientID=1;
+			sql = "SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE patientID=?;";
+			prep_getAllTestRecords = connection.prepareStatement(sql);
+			//	6
+			//	SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE t.recordID=1;
+			sql = "SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE t.recordID=?;";
+			prep_getTestRecord = connection.prepareStatement(sql);
+			//	7
+			//	UPDATE `Medical Records` SET `end date` = '2020-01-01' WHERE recordID=14;
+			// 	UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` = 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID = '14';
+			sql =
+					"UPDATE `Medical Records`"+
+					"SET `end date` = ?"+
+					"WHERE recordID= ?;";
+			prep_updateTestEndDate = connection.prepareStatement(sql);
+			sql =
+					"UPDATE `Test`"+
+					"SET `testType` = ?"+
+					"WHERE recordID = ?;"
+			prep_updateTestTestType = connection.prepareStatement(sql);
+			sql =
+					"UPDATE `Test`"+
+					"SET `testResult` = ?"+
+					"WHERE recordID = ?;"
+			prep_updateTestTestResult = connection.prepareStatement(sql);
+			//	8
+			//	INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)VALUES ('15', NULL, NULL);
+			//	INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	) VALUES ('15', '5', '2019-07-01', '2019-07-07', '4');
+			sql =
+					"INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)"+
+					"VALUES (?, ?, ?);"+
+					"INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"+
+					"VALUES (?, ?, ?, ?, ?);";
+			prep_addCheckinRecord = connection.prepareStatement(sql);
+			//	9
+			//	SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE patientID=1;
+			sql ="SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE patientID=?;";
+			prep_getAllCheckinRecords = connection.prepareStatement(sql);
+			//	10
+			//	SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE c.recordID=1;
+			sql ="SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE c.recordID=?;";
+			prep_getCheckinRecord = connection.prepareStatement(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -175,7 +279,37 @@ public class WolfHospital {
 				// Staff: 
 				statement.executeUpdate("CREATE TABLE Staff");
 				// Other tables...
-								
+
+				//fhy: Medical Records, Treatment, Test, Check-ins
+				statement.executeUpdate(
+						"CREATE TABLE `Medical Records` ("+
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE,"+
+						"`patientID` VARCHAR(255) NOT NULL,"+
+						"`startDate` DATETIME NOT NULL,"+
+						"`endDate` DATETIME DEFAULT NULL,"+
+						"`responsibleDoctor` VARCHAR(255) NOT NULL,"+
+						"PRIMARY KEY (`recordID`)"+
+						");");
+				statement.executeUpdate(
+						"CREATE TABLE `Treatment` ("+
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE,"+
+						"`prescription` VARCHAR(255) NOT NULL,"+
+						"`diagnosisDetails` VARCHAR(255) NOT NULL,"+"PRIMARY KEY (`recordID`)"
+						+");");
+				statement.executeUpdate(
+						"CREATE TABLE `Test` (" +
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`testType` VARCHAR(255) NOT NULL," +
+						"`testResult` VARCHAR(255) NOT NULL," +
+						"PRIMARY KEY (`recordID`)" +
+						");");
+				statement.executeUpdate(
+						"CREATE TABLE `Check-ins` (" +
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`wardNumber` VARCHAR(255) DEFAULT NULL," +
+						"`bedNumber` VARCHAR(255) DEFAULT NULL," +
+						"PRIMARY KEY (`recordID`)" +
+						");");
 
 				connection.commit();
 				System.out.println("Tables created!");
@@ -201,6 +335,24 @@ public class WolfHospital {
 						prep_addStaff.setString(1, "xxx");
 						break;
 					// Other tables...
+					//fhy: Medical Records（与其他table一起）, Treatment, Test, Check-ins
+					case "Treatment":
+						//manageTreatmentRecordAdd()函数由其他组员实现
+						break;
+					case "Test":
+						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
+						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
+						//INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
+						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+, ref range:negative');
+						manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+						break;
+					case "Check-ins":
+						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
+						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
+						//INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
+						// VALUES ('9', '1', '2');
+						manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+						break;
 
 					default:
 						break;
@@ -227,7 +379,286 @@ public class WolfHospital {
 	
 	// Other functions...
 
-	public static void main(String[] args) {
+	//fhy support_printQueryResultSet以及error_handler都还未实现
+	//1
+	public static boolean showAllTreatmentRecords(int patientID){
+		boolean success = false;
+
+		try {
+			prep_getAllTreatmentRecords.setInt(1, patientID);
+			result = prep_getAllTreatmentRecords.executeQuery();
+
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+
+			System.out.println("\nshowAllTreatmentRecords\n");
+//			support_printQueryResultSet(result);
+
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+
+		return success;
+	}
+	//2
+	public static boolean showTreatmentRecord(int recordID){
+		boolean success = false;
+
+		try {
+			prep_getTreatmentRecord.setInt(1, recordID);
+			result = prep_getTreatmentRecord.executeQuery();
+
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+
+			System.out.println("\nshowTreatmentRecord\n");
+//			support_printQueryResultSet(result);
+
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+
+		return success;
+	}
+	//3
+	public static void manageTreatmentUpdate(int recordID, String attributeToChange, String valueToChange){
+		try {
+			connection.setAutoCommit(true);
+			switch (attributeToChange.toUpperCase()){
+
+				case "END DATE":
+				//中间有空格 不知道这样写对不对
+					prep_updateTreatmentEndDate.setString(1, valueToChange);
+					prep_updateTreatmentEndDate.setInt(2, recordID);
+					prep_updateTreatmentEndDate.executeUpdate();
+					break;
+				case "PRESCRIPTION":
+					prep_updateTreatmentPrescription.setString(1, valueToChange);
+					prep_updateTreatmentPrescription.setInt(2, recordID);
+					prep_updateTreatmentPrescription.executeUpdate();
+					break;
+				case "DIAGNOSISDETAILS":
+					prep_updateTreatmentDiagnosisDetails.setString(1, valueToChange);
+					prep_updateTreatmentDiagnosisDetails.setInt(2, recordID);
+					prep_updateTreatmentDiagnosisDetails.executeUpdate();
+					break;
+				default:
+					System.out.println("\nCannot update the '" + attributeToChange);
+					break;
+			}
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+	}
+	//4
+	public static void manageTestRecordAdd(int recordID, String testType, String testResult, int patientID, String startDate, String endDate, int responsibleDoctor){
+		//目前没有成功/失败报告
+		try {
+
+			// Start transaction
+			connection.setAutoCommit(false);
+
+			try {
+				prep_addTestRecord.setInt(1, recordID);
+				prep_addTestRecord.setString(2, testType);
+				prep_addTestRecord.setString(3, testResult);
+				prep_addTestRecord.setInt(4, recordID);
+				prep_addTestRecord.setInt(5, patientID);
+				prep_addTestRecord.setString(6, startDate);
+				prep_addTestRecord.setString(7, endDate);
+				prep_addTestRecord.setString(8, responsibleDoctor);
+				prep_addTestRecord.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+
+				// Handle error
+//				error_handler(err);
+
+				// Roll back the entire transaction
+				connection.rollback();
+
+			}
+			finally {
+				// Restore normal auto-commit mode
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+	}
+	//5
+	public static boolean showAllTestRecords(int patientID){
+		boolean success = false;
+
+		try {
+			prep_getAllTestRecords.setInt(1, patientID);
+			result = prep_getAllTestRecords.executeQuery();
+
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+
+			System.out.println("\nshowAllTestRecords\n");
+//			support_printQueryResultSet(result);
+
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+
+		return success;
+	}
+	//6
+	public static boolean showTestRecord(int recordID){
+		boolean success = false;
+
+		try {
+			prep_getTestRecord.setInt(1, recordID);
+			result = prep_getTestRecord.executeQuery();
+
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+
+			System.out.println("\nshowTestRecord\n");
+//			support_printQueryResultSet(result);
+
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+
+		return success;
+	}
+	//7
+	public static void manageTestUpdate(int recordID, String attributeToChange, String valueToChange){
+		try {
+			connection.setAutoCommit(true);
+			switch (attributeToChange.toUpperCase()){
+
+				case "END DATE":
+					//中间有空格 不知道这样写对不对
+					prep_updateTestEndDate.setString(1, valueToChange);
+					prep_updateTestEndDate.setInt(2, recordID);
+					prep_updateTestEndDate.executeUpdate();
+					break;
+				case "TESTTYPE":
+					prep_updateTestTestType.setString(1, valueToChange);
+					prep_updateTestTestType.setInt(2, recordID);
+					prep_updateTestTestType.executeUpdate();
+					break;
+				case "TESTRESULT":
+					prep_updateTestTestResult.setString(1, valueToChange);
+					prep_updateTestTestResult.setInt(2, recordID);
+					prep_updateTestTestResult.executeUpdate();
+					break;
+				default:
+					System.out.println("\nCannot update the '" + attributeToChange);
+					break;
+			}
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+	}
+	//8
+	public static void manageCheckinRecordAdd(int recordID, int wardNumber, int bedNumber, int patientID, String startDate, String endDate, int responsibleDoctor){
+		//目前没有成功/失败报告
+		try {
+
+			// Start transaction
+			connection.setAutoCommit(false);
+
+			try {
+				prep_addCheckinRecord.setInt(1, recordID);
+				prep_addCheckinRecord.setInt(2, wardNumber);
+				prep_addCheckinRecord.setInt(3, bedNumber);
+				prep_addCheckinRecord.setInt(4, recordID);
+				prep_addCheckinRecord.setInt(5, patientID);
+				prep_addCheckinRecord.setInt(6, patientID);
+				prep_addCheckinRecord.setString(6, startDate);
+				prep_addCheckinRecord.setString(7, endDate);
+				prep_addCheckinRecord.setInt(8, responsibleDoctor);
+				prep_addCheckinRecord.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+
+				// Handle error
+//				error_handler(err);
+
+				// Roll back the entire transaction
+				connection.rollback();
+
+			}
+			finally {
+				// Restore normal auto-commit mode
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+	}
+	//9
+	public static boolean showAllCheckinRecords(int patientID){
+		boolean success = false;
+
+		try {
+			prep_getAllCheckinRecords.setInt(1, patientID);
+			result = prep_getAllCheckinRecords.executeQuery();
+
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+
+			System.out.println("\nshowAllCheckinRecords\n");
+//			support_printQueryResultSet(result);
+
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+
+		return success;
+	}
+	//10
+	public static boolean showCheckinRecord(int recordID){
+		boolean success = false;
+
+		try {
+			prep_getCheckinRecord.setInt(1, recordID);
+			result = prep_getCheckinRecord.executeQuery();
+
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+
+			System.out.println("\nshowCheckinRecord\n");
+//			support_printQueryResultSet(result);
+
+		}
+		catch (Throwable err) {
+//			error_handler(err);
+		}
+
+		return success;
+	}
+
+		public static void main(String[] args) {
 		printCommands(CMD_MAIN);
 	}
 	
