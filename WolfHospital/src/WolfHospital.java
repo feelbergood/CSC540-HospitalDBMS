@@ -92,7 +92,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
 
-	//fhy 按表格中的顺序：
+	//fhy
 	private static PreparedStatement prep_getAllTreatmentRecords;
 	private static PreparedStatement prep_getTreatmentRecord;
 
@@ -335,9 +335,9 @@ public class WolfHospital {
 						prep_addStaff.setString(1, "xxx");
 						break;
 					// Other tables...
-					//fhy: Medical Records（与其他table一起）, Treatment, Test, Check-ins
+					//fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
 					case "Treatment":
-						//manageTreatmentRecordAdd()函数由其他组员实现
+						//manageTreatmentRecordAdd() should be done by other teammates
 						break;
 					case "Test":
 						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
@@ -379,7 +379,7 @@ public class WolfHospital {
 	
 	// Other functions...
 
-	//fhy support_printQueryResultSet以及error_handler都还未实现
+	//fhy support_printQueryResultSet, error_handler not yet implemented
 	//1
 	public static boolean showAllTreatmentRecords(int patientID){
 		boolean success = false;
@@ -433,7 +433,7 @@ public class WolfHospital {
 			switch (attributeToChange.toUpperCase()){
 
 				case "END DATE":
-				//中间有空格 不知道这样写对不对
+				//should it be "`END DATE`"?
 					prep_updateTreatmentEndDate.setString(1, valueToChange);
 					prep_updateTreatmentEndDate.setInt(2, recordID);
 					prep_updateTreatmentEndDate.executeUpdate();
@@ -459,7 +459,7 @@ public class WolfHospital {
 	}
 	//4
 	public static void manageTestRecordAdd(int recordID, String testType, String testResult, int patientID, String startDate, String endDate, int responsibleDoctor){
-		//目前没有成功/失败报告
+		//to be done: check success or not and report
 		try {
 
 			// Start transaction
@@ -548,7 +548,7 @@ public class WolfHospital {
 			switch (attributeToChange.toUpperCase()){
 
 				case "END DATE":
-					//中间有空格 不知道这样写对不对
+					//should it be "`END DATE`"?
 					prep_updateTestEndDate.setString(1, valueToChange);
 					prep_updateTestEndDate.setInt(2, recordID);
 					prep_updateTestEndDate.executeUpdate();
@@ -574,7 +574,7 @@ public class WolfHospital {
 	}
 	//8
 	public static void manageCheckinRecordAdd(int recordID, int wardNumber, int bedNumber, int patientID, String startDate, String endDate, int responsibleDoctor){
-		//目前没有成功/失败报告
+		//to be done: check success or not and report
 		try {
 
 			// Start transaction
@@ -658,7 +658,7 @@ public class WolfHospital {
 		return success;
 	}
 
-		public static void main(String[] args) {
+	public static void main(String[] args) {
 		printCommands(CMD_MAIN);
 	}
 	
