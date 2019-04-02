@@ -468,6 +468,9 @@ public class WolfHospital {
 						manageCheckinRecordAdd(4, 003, 1, 1004,"2019-03-17", "2019-03-21", 104);
 						break;
 					case "Billing Accounts":
+						manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", 
+												"Credit Card", "4044987612349123", "100",
+												"yes", "400");
 						break;
 
 					default:
