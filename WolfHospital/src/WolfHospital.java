@@ -81,7 +81,7 @@ public class WolfHospital {
 	
 	// Prepared Statements pre-declared
 	// TO-DO 1: instantiate preparedStatements
-	// STAFF
+	// Staff
 	private static PreparedStatement prep_addStaff;
 	private static PreparedStatement prep_getStaff;
 	private static PreparedStatement prep_updateStaffName;
@@ -92,29 +92,52 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
 
-	//fhy
+	// fhy
+	// Medical Records - Treatment
 	private static PreparedStatement prep_getAllTreatmentRecords;
 	private static PreparedStatement prep_getTreatmentRecord;
 
-	//private static PreparedStatement prep_updateTreatmentRecord;
+	// private static PreparedStatement prep_updateTreatmentRecord;
 	private static PreparedStatement prep_updateTreatmentEndDate;
 	private static PreparedStatement prep_updateTreatmentPrescription;
 	private static PreparedStatement prep_updateTreatmentDiagnosisDetails;
 
+	// Medical Records - Test
 	private static PreparedStatement prep_addTestRecord;
 	private static PreparedStatement prep_getAllTestRecords;
 	private static PreparedStatement prep_getTestRecord;
 
-	//private static PreparedStatement prep_updateTestRecord;
+	// private static PreparedStatement prep_updateTestRecord;
 	private static PreparedStatement prep_updateTestEndDate;
 	private static PreparedStatement prep_updateTestTestType;
 	private static PreparedStatement prep_updateTestTestResult;
 
+	// Medical Records - Check-in
 	private static PreparedStatement prep_addCheckinRecord;
 	private static PreparedStatement prep_getAllCheckinRecords;
 	private static PreparedStatement prep_getCheckinRecord;
 	
-	// ... Remaining statements
+	// Yudong RAO
+	private static PreparedStatement prep_updateCheckinEndDate;
+	private static PreparedStatement prep_updateCheckinWard;
+	private static PreparedStatement prep_updateCheckinBed;
+
+	// Reports
+	private static PreparedStatement prep_reportPatientMedicalHistory;
+	private static PreparedStatement prep_reportCurrentUsageStatus;
+	private static PreparedStatement prep_reportNumberOfPatients;
+	private static PreparedStatement prep_reportWardUsagePercentage;
+	private static PreparedStatement prep_reportDoctorResponsiblity;
+
+	// Billing Accounts
+	private static PreparedStatement prep_addBillingAccount;
+	private static PreparedStatement prep_getBillingAccount;
+	private static PreparedStatement prep_updateBillingAccountSSN;
+	private static PreparedStatement prep_updateBillingAccountAddress;
+	private static PreparedStatement prep_updateBillingAccountPaymentInfo;
+	private static PreparedStatement prep_updateBillingAccountBillingRecords;
+	private static PreparedStatement prep_updateBillingAccountVisitDate;
+	private static PreparedStatement prep_deleteBillingAccount;
 
 	// Establish connection
 	public static void connectToDatabase() {
@@ -179,93 +202,150 @@ public class WolfHospital {
 		try {
 			String sql;
 
-			sql = "INSERT INTO Staff";
-			prep_addStaff = connection.prepareStatement(sql);
-			sql = "SELECT * FROM Staff";
-			prep_getStaff = connection.prepareStatement(sql);
-
 			//fhy
-			//	1
+			//	Get all treatment records
 			//	SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE patientID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE patientID=?;";
 			prep_getAllTreatmentRecords = connection.prepareStatement(sql);
-			//	2
+
+			//	Get treatment record
 			//	SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE t.recordID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE t.recordID=?;";
 			prep_getTreatmentRecord = connection.prepareStatement(sql);
-			//	3
+
+			//	Update treatment record
 			//	UPDATE `Medical Records` SET `end date` = '2020-01-01' WHERE recordID = 13;
 			//	UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle' WHERE recordID = '13';
-			sql =
-				"UPDATE `Medical Records`"+
+			sql = "UPDATE `Medical Records`"+
 				"SET `end date` = ?"+
-				"WHERE recordID = ?;"+;
+				"WHERE recordID = ?;";
 			prep_updateTreatmentEndDate = connection.prepareStatement(sql);
 
-			sql =
-				"UPDATE `Treatment`"+
+			sql = "UPDATE `Treatment`"+
 				"SET `prescription` = ?"+
 				"WHERE recordID = ?;";
 			prep_updateTreatmentPrescription = connection.prepareStatement(sql);
 
-			sql =
-				"UPDATE `Treatment`"+
+			sql = "UPDATE `Treatment`"+
 				"SET `diagnosisDetails` = ?"+
 				"WHERE recordID = ?;";
 			prep_updateTreatmentDiagnosisDetails = connection.prepareStatement(sql);
 
-			//	4
+			//	Create new test record
 			//	INSERT INTO `Test` (`recordID`, `testType`, `testResult`)VALUES ('14', 'testType5', 'testResult5');
 			//	INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) VALUES ('14', '5', '2019-07-01', '2019-07-02', '3');
-			sql =
-				"INSERT INTO `Test` (`recordID`, `testType`, `testResult`)"+
+			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`)"+
 				"VALUES (?, ?, ?);"+
 				"INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"+
 				"VALUES (?, ?, ?, ?, ?);";
 			prep_addTestRecord = connection.prepareStatement(sql);
-			//	5
+
+			//	Get all test records
 			//	SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE patientID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE patientID=?;";
 			prep_getAllTestRecords = connection.prepareStatement(sql);
-			//	6
+
+			//	Get test record
 			//	SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE t.recordID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE t.recordID=?;";
 			prep_getTestRecord = connection.prepareStatement(sql);
-			//	7
+
+			//	Update test record
 			//	UPDATE `Medical Records` SET `end date` = '2020-01-01' WHERE recordID=14;
 			// 	UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` = 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID = '14';
-			sql =
-					"UPDATE `Medical Records`"+
-					"SET `end date` = ?"+
-					"WHERE recordID= ?;";
+			sql = "UPDATE `Medical Records`"+
+				"SET `end date` = ?"+
+				"WHERE recordID= ?;";
 			prep_updateTestEndDate = connection.prepareStatement(sql);
-			sql =
-					"UPDATE `Test`"+
-					"SET `testType` = ?"+
-					"WHERE recordID = ?;"
+
+			sql = "UPDATE `Test`"+
+				"SET `testType` = ?"+
+				"WHERE recordID = ?;";
 			prep_updateTestTestType = connection.prepareStatement(sql);
-			sql =
-					"UPDATE `Test`"+
-					"SET `testResult` = ?"+
-					"WHERE recordID = ?;"
+
+			sql = "UPDATE `Test`"+
+				"SET `testResult` = ?"+
+				"WHERE recordID = ?;";
 			prep_updateTestTestResult = connection.prepareStatement(sql);
-			//	8
+
+			//	Create check-in record
 			//	INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)VALUES ('15', NULL, NULL);
 			//	INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	) VALUES ('15', '5', '2019-07-01', '2019-07-07', '4');
-			sql =
-					"INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)"+
-					"VALUES (?, ?, ?);"+
-					"INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"+
-					"VALUES (?, ?, ?, ?, ?);";
+			sql = "INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)"+
+				"VALUES (?, ?, ?);"+
+				"INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"+
+				"VALUES (?, ?, ?, ?, ?);";
 			prep_addCheckinRecord = connection.prepareStatement(sql);
-			//	9
+
+			//	Get all check-in records
 			//	SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE patientID=1;
-			sql ="SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE patientID=?;";
+			sql = "SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE patientID=?;";
 			prep_getAllCheckinRecords = connection.prepareStatement(sql);
-			//	10
+
+			//	Get check-in record
 			//	SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE c.recordID=1;
-			sql ="SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE c.recordID=?;";
+			sql = "SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE c.recordID=?;";
 			prep_getCheckinRecord = connection.prepareStatement(sql);
+			
+			// Yudong
+			// Update check-in records
+			sql = "";
+			prep_updateCheckinEndDate = connection.prepareStatement(sql);
+
+			sql = "";
+			prep_updateCheckinWard = connection.prepareStatement(sql);
+
+			sql = "";
+			prep_updateCheckinBed = connection.prepareStatement(sql);
+
+			// Report patient history
+			sql = "";
+			prep_reportPatientMedicalHistory = connection.prepareStatement(sql);
+
+			// Report usage status
+			sql = "";
+			prep_reportCurrentUsageStatus = connection.prepareStatement(sql);
+
+			// Report number of patients per month
+			sql = "";
+			prep_reportNumberOfPatients = connection.prepareStatement(sql);
+
+			// Report ward usage percentage
+			sql = "";
+			prep_reportWardUsagePercentage = connection.prepareStatement(sql);
+
+			// Report doctor responsibility
+			sql = "";
+			prep_reportDoctorResponsiblity = connection.prepareStatement(sql);
+
+			// Create billing account
+			sql = "";
+			prep_addBillingAccount = connection.prepareStatement(sql);
+
+			// Get billing account
+			sql = "";
+			prep_getBillingAccount = connection.prepareStatement(sql);
+
+			// Update billing account
+			sql = "";
+			prep_updateBillingAccountSSN = connection.prepareStatement(sql);
+
+			sql = "";
+			prep_updateBillingAccountAddress = connection.prepareStatement(sql);
+
+			sql = "";
+			prep_updateBillingAccountPaymentInfo = connection.prepareStatement(sql);
+
+			sql = "";
+			prep_updateBillingAccountBillingRecords = connection.prepareStatement(sql);
+
+			sql = "";
+			prep_updateBillingAccountVisitDate = connection.prepareStatement(sql);
+
+			// Delete billing account
+			sql = "";
+			prep_deleteBillingAccount = connection.prepareStatement(sql);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -311,6 +391,21 @@ public class WolfHospital {
 						"PRIMARY KEY (`recordID`)" +
 						");");
 
+				// Yudong
+				// Billing accounts
+				statement.executeUpdate(
+						"CREATE TABLE `Billing Accounts` (" +
+						"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`patientID` VARCHAR(255) NOT NULL," +
+						"`visitDate` datetime NOT NULL," +
+						"`payerSSN` VARCHAR(9) NOT NULL," +
+						"`paymentInfo` VARCHAR(255) DEFAULT NULL," +
+						"`billingRecord` VARCHAR(255) DEFAULT NULL," +
+						"PRIMARY KEY (`accountID`)" +
+						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
+						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" +
+						");");
+
 				connection.commit();
 				System.out.println("Tables created!");
 			} catch (SQLException e) {
@@ -353,6 +448,8 @@ public class WolfHospital {
 						// VALUES ('9', '1', '2');
 						manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
 						break;
+					case "Billing Accounts":
+						break;
 
 					default:
 						break;
@@ -394,7 +491,7 @@ public class WolfHospital {
 			}
 
 			System.out.println("\nshowAllTreatmentRecords\n");
-//			support_printQueryResultSet(result);
+			// support_printQueryResultSet(result);
 
 		}
 		catch (Throwable err) {
@@ -417,7 +514,7 @@ public class WolfHospital {
 			}
 
 			System.out.println("\nshowTreatmentRecord\n");
-//			support_printQueryResultSet(result);
+			// support_printQueryResultSet(result);
 
 		}
 		catch (Throwable err) {
@@ -454,7 +551,7 @@ public class WolfHospital {
 			}
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 	}
 	//4
@@ -473,14 +570,14 @@ public class WolfHospital {
 				prep_addTestRecord.setInt(5, patientID);
 				prep_addTestRecord.setString(6, startDate);
 				prep_addTestRecord.setString(7, endDate);
-				prep_addTestRecord.setString(8, responsibleDoctor);
+				prep_addTestRecord.setInt(8, responsibleDoctor);
 				prep_addTestRecord.executeUpdate();
 				connection.commit();
 			}
 			catch (Throwable err) {
 
 				// Handle error
-//				error_handler(err);
+				// error_handler(err);
 
 				// Roll back the entire transaction
 				connection.rollback();
@@ -492,7 +589,7 @@ public class WolfHospital {
 			}
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 	}
 	//5
@@ -509,11 +606,11 @@ public class WolfHospital {
 			}
 
 			System.out.println("\nshowAllTestRecords\n");
-//			support_printQueryResultSet(result);
+			// support_printQueryResultSet(result);
 
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 
 		return success;
@@ -532,11 +629,11 @@ public class WolfHospital {
 			}
 
 			System.out.println("\nshowTestRecord\n");
-//			support_printQueryResultSet(result);
+			// support_printQueryResultSet(result);
 
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+		// error_handler(err);
 		}
 
 		return success;
@@ -569,7 +666,7 @@ public class WolfHospital {
 			}
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 	}
 	//8
@@ -596,7 +693,7 @@ public class WolfHospital {
 			catch (Throwable err) {
 
 				// Handle error
-//				error_handler(err);
+				// error_handler(err);
 
 				// Roll back the entire transaction
 				connection.rollback();
@@ -608,7 +705,7 @@ public class WolfHospital {
 			}
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 	}
 	//9
@@ -625,11 +722,11 @@ public class WolfHospital {
 			}
 
 			System.out.println("\nshowAllCheckinRecords\n");
-//			support_printQueryResultSet(result);
+			// support_printQueryResultSet(result);
 
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 
 		return success;
@@ -648,14 +745,84 @@ public class WolfHospital {
 			}
 
 			System.out.println("\nshowCheckinRecord\n");
-//			support_printQueryResultSet(result);
+			// support_printQueryResultSet(result);
 
 		}
 		catch (Throwable err) {
-//			error_handler(err);
+			// error_handler(err);
 		}
 
 		return success;
+	}
+
+	// Yudong
+	// Update Check-in
+	public static void manageCheckinUpdate(int recordID, String attributeToChange, String valueToChange){
+		try {
+			connection.setAutoCommit(true);
+			switch (attributeToChange.toUpperCase()){
+				case "END DATE":
+					//should it be "`END DATE`"?
+					prep_updateCheckinEndDate.setString(1, valueToChange);
+					prep_updateCheckinEndDate.setInt(2, recordID);
+					prep_updateTestEndDate.executeUpdate();
+					break;
+				case "WARD":
+					break;
+				case "BED":
+					break;
+				default:
+					System.out.println("\nCannot update the '" + attributeToChange);
+					break;
+			}
+		}
+		catch (Throwable err) {
+			// error_handler(err);
+		}
+	}
+
+	// Report current usage status
+	public static void reportCurrentUsageStatus() {
+
+	}
+
+	// Report number of patients
+	public static void reportNumberOfPatients() {
+
+	}
+
+	// Report ward usage percentage
+	public static void reportWardUsagePercentage() {
+
+	}
+
+	// Report doctor responsibility
+	public static void reportDoctorResponsibility() {
+
+	}
+
+	// Create billing accounts
+	public static boolean manageBillingAccountAdd() {
+		return false;
+	}
+
+	// Get billing record
+	public static void showBillingAccount() {
+
+	}
+
+	// Update billing accounts
+	public static boolean manageBillingAccountUpdate() {
+		return false;
+	}
+
+	// Delete billing account
+	public static boolean deleteBillingAccount() {
+		return false;
+	}
+
+	public static void error_handler(Throwable error) {
+
 	}
 
 	public static void main(String[] args) {
