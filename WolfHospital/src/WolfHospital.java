@@ -369,12 +369,16 @@ public class WolfHospital {
 						"`endDate` DATETIME DEFAULT NULL,"+
 						"`responsibleDoctor` VARCHAR(255) NOT NULL,"+
 						"PRIMARY KEY (`recordID`)"+
+						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)"+
+						"FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`)"
 						");");
 				statement.executeUpdate(
 						"CREATE TABLE `Treatment` ("+
 						"`recordID` VARCHAR(255) NOT NULL UNIQUE,"+
 						"`prescription` VARCHAR(255) NOT NULL,"+
-						"`diagnosisDetails` VARCHAR(255) NOT NULL,"+"PRIMARY KEY (`recordID`)"
+						"`diagnosisDetails` VARCHAR(255) NOT NULL,"+
+						"PRIMARY KEY (`recordID`)"+
+						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)"
 						+");");
 				statement.executeUpdate(
 						"CREATE TABLE `Test` (" +
@@ -382,6 +386,7 @@ public class WolfHospital {
 						"`testType` VARCHAR(255) NOT NULL," +
 						"`testResult` VARCHAR(255) NOT NULL," +
 						"PRIMARY KEY (`recordID`)" +
+						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)"
 						");");
 				statement.executeUpdate(
 						"CREATE TABLE `Check-ins` (" +
@@ -389,6 +394,8 @@ public class WolfHospital {
 						"`wardNumber` VARCHAR(255) DEFAULT NULL," +
 						"`bedNumber` VARCHAR(255) DEFAULT NULL," +
 						"PRIMARY KEY (`recordID`)" +
+						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)"+
+						"FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)"
 						");");
 
 				// Yudong
@@ -431,6 +438,9 @@ public class WolfHospital {
 						break;
 					// Other tables...
 					//fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
+					//demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with 2 different doctors, consist of one test(by 103) and one treatment(by 105)
+					//the only front desk staff is 104, so all check-ins are assumed to be done by 104
+					//question: is empty string the correct way to deal with empty value of endDate?
 					case "Treatment":
 						//manageTreatmentRecordAdd() should be done by other teammates
 						break;
@@ -439,14 +449,20 @@ public class WolfHospital {
 						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
 						//INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
 						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+, ref range:negative');
-						manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+						//manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+						manageTestRecordAdd(3, "test", "prescription nervine, diagnosis details Hospitalization", 1003, "2019-03-15", "", 100);
+						manageTestRecordAdd(4, "test", "prescription analgesic, diagnosis details Surgeon, Hospitalization", 1004, "2019-03-17", "2019-03-21", 103);
 						break;
 					case "Check-ins":
 						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
 						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
 						//INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
 						// VALUES ('9', '1', '2');
-						manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+						//manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+						manageCheckinRecordAdd(1, 001, 1, 1001,"2019-03-01", "", 104);
+						manageCheckinRecordAdd(2, 002, 1, 1002,"2019-03-10", "", 104);
+						manageCheckinRecordAdd(3, 001, 2, 1003,"2019-03-15", "", 104);
+						manageCheckinRecordAdd(4, 003, 1, 1004,"2019-03-17", "2019-03-21", 104);
 						break;
 					case "Billing Accounts":
 						break;
