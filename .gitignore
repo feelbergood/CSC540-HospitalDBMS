@@ -1,3 +1,9 @@
 /.metadata/
 .vscode
 /WolfHospital/bin/WolfHospital.class
+.idea/CSC540Project.iml
+.idea/encodings.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
