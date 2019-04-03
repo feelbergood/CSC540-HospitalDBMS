@@ -134,10 +134,18 @@ public class WolfHospital {
 	private static PreparedStatement prep_getBillingAccount;
 	private static PreparedStatement prep_updateBillingAccountSSN;
 	private static PreparedStatement prep_updateBillingAccountAddress;
+	// Update payment method and card number
 	private static PreparedStatement prep_updateBillingAccountPaymentInfo;
+	// Update registration fee and accommandation fee
 	private static PreparedStatement prep_updateBillingAccountBillingRecords;
+	private static PreparedStatement prep_updateBillingAccountMedicationPrescribed;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
+
+	// Payer Info
+	private static PreparedStatement prep_addPayerInfo;
+	private static PreparedStatement prep_updatePayerAddress;
+	private static PreparedStatement prep_deletePayerInfo;
 
 	// Establish connection
 	public static void connectToDatabase() {
@@ -319,11 +327,22 @@ public class WolfHospital {
 			prep_reportDoctorResponsiblity = connection.prepareStatement(sql);
 
 			// Create billing account
-			sql = "";
+			sql = "INSERT INTO `Billing Accounts` (`accountID`, `patientID`, `visitDate`," +
+				"`payerSSN`, `paymentMethod`, `cardNumber`, `registrationFee`" +
+				"`medicationPrescribed`, `accommandationFee`)" +
+				"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			prep_addBillingAccount = connection.prepareStatement(sql);
 
+			sql = "INSERT INTO `PayerInfo` (`SSN`, `billingAddress`)" +
+				"VALUES (?, ?);";
+
 			// Get billing account
-			sql = "";
+			sql = "SELECT b.accountID, b.patientID, b.visitDate," +
+				"b.payerSSN, b.paymentMethod, b.cardNumber, b.registrationFee" +
+				"b.medicationPrescribed, b.accommandationFee, p.billingAddress" + 
+				"FROM `Billing Accounts` b JOIN `PayerInfo` p" +
+				"ON m.payerSSN=b.SSN" +
+				"WHERE `accountID` = ?";
 			prep_getBillingAccount = connection.prepareStatement(sql);
 
 			// Update billing account
@@ -362,59 +381,66 @@ public class WolfHospital {
 
 				//fhy: Medical Records, Treatment, Test, Check-ins
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Medical Records` (" +
-						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
-						"`patientID` VARCHAR(255) NOT NULL," +
-						"`startDate` DATETIME NOT NULL," +
-						"`endDate` DATETIME DEFAULT NULL," +
-						"`responsibleDoctor` VARCHAR(255) NOT NULL," +
-						"PRIMARY KEY (`recordID`)" +
-						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
-						"FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`)" +
-						");");
+					"CREATE TABLE IF NOT EXISTS `Medical Records` (" +
+					"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+					"`patientID` VARCHAR(255) NOT NULL," +
+					"`startDate` DATETIME NOT NULL," +
+					"`endDate` DATETIME DEFAULT NULL," +
+					"`responsibleDoctor` VARCHAR(255) NOT NULL," +
+					"PRIMARY KEY (`recordID`)" +
+					"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
+					"FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`)" +
+					");");
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Treatment` (" +
-						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
-						"`prescription` VARCHAR(255) NOT NULL," +
-						"`diagnosisDetails` VARCHAR(255) NOT NULL," +
-						"PRIMARY KEY (`recordID`)" +
-						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
-						");");
+					"CREATE TABLE IF NOT EXISTS `Treatment` (" +
+					"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+					"`prescription` VARCHAR(255) NOT NULL," +
+					"`diagnosisDetails` VARCHAR(255) NOT NULL," +
+					"PRIMARY KEY (`recordID`)" +
+					"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
+					");");
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Test` (" +
-						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
-						"`testType` VARCHAR(255) NOT NULL," +
-						"`testResult` VARCHAR(255) NOT NULL," +
-						"PRIMARY KEY (`recordID`)" +
-						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
-						");");
+					"CREATE TABLE IF NOT EXISTS `Test` (" +
+					"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+					"`testType` VARCHAR(255) NOT NULL," +
+					"`testResult` VARCHAR(255) NOT NULL," +
+					"PRIMARY KEY (`recordID`)" +
+					"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
+					");");
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Check-ins` (" +
-						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
-						"`wardNumber` VARCHAR(255) DEFAULT NULL," +
-						"`bedNumber` VARCHAR(255) DEFAULT NULL," +
-						"PRIMARY KEY (`recordID`)" +
-						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
-						"FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)" +
-						");");
+					"CREATE TABLE IF NOT EXISTS `Check-ins` (" +
+					"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+					"`wardNumber` VARCHAR(255) DEFAULT NULL," +
+					"`bedNumber` VARCHAR(255) DEFAULT NULL," +
+					"PRIMARY KEY (`recordID`)" +
+					"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
+					"FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)" +
+					");");
 
 				// Yudong
-				// Billing accounts
+				// Billing accounts && PayerInfo
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" +
-						"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
-						"`patientID` VARCHAR(255) NOT NULL," +
-						"`visitDate` datetime NOT NULL," +
-						"`payerSSN` VARCHAR(255) NOT NULL," +
-						"`paymentMethod` VARCHAR(255) NOT NULL," +
-						"`cardNumber` VARCHAR(255) DEFAULT NULL" +
-						"`registrationFee` DOUBLE NOT NULL" +
-						"`medicationPrescribed` BIT DEFAULT NULL" +
-						"`accommandation fee` DOUBLE NOT NULL" +
-						"PRIMARY KEY (`accountID`)" +
-						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
-						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" +
-						");");
+					"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `PayerInfo` (" +
+					"`SSN` VARCHAR(255) NOT NULL UNIQUE," +
+					"`billingAddress` VARCHAR(255) NOT NULL," +
+					"PRIMARY KEY (`SSN`)" +
+					");");
+
+				statement.executeUpdate(
+					"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" +
+					"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
+					"`patientID` VARCHAR(255) NOT NULL," +
+					"`visitDate` datetime NOT NULL," +
+					"`payerSSN` VARCHAR(255) NOT NULL," +
+					"`paymentMethod` VARCHAR(255) NOT NULL," +
+					"`cardNumber` VARCHAR(255) DEFAULT NULL" +
+					"`registrationFee` DOUBLE NOT NULL" +
+					"`medicationPrescribed` BIT DEFAULT NULL" +
+					"`accommandationFee` DOUBLE NOT NULL" +
+					"PRIMARY KEY (`accountID`)" +
+					"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
+					"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" +
+					");");
 
 				connection.commit();
 				System.out.println("Tables created!");
@@ -470,19 +496,18 @@ public class WolfHospital {
 					case "Billing Accounts":
 						manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", 
 												"Credit Card", "4044987612349123", "100",
-												"yes", "400");
+												"yes", "400", "10 TBC St. Raleigh NC 27730");
 						break;
 
 					default:
 						break;
 				}
-
 				connection.commit();
-				System.out.println("Tables populated!");
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
+				System.out.println("Tables populated!");
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e1) {
@@ -698,7 +723,6 @@ public class WolfHospital {
 
 			// Start transaction
 			connection.setAutoCommit(false);
-
 			try {
 				prep_addCheckinRecord.setInt(1, recordID);
 				prep_addCheckinRecord.setInt(2, wardNumber);
@@ -824,14 +848,17 @@ public class WolfHospital {
 	}
 
 	// Create billing accounts
-	public static boolean manageBillingAccountAdd(String accountID, String patientID, String visitDate, 
+	public static void manageBillingAccountAdd(String accountID, String patientID, String visitDate, 
 												String payerSSN, String paymentMethod, String cardNumber,
 												String registrationFee, String medicationPrescribed,
-												String acconmmandationFee) {
+												String acconmmandationFee, String address) {
 		try {
 			// Start transaction
 			connection.setAutoCommit(false);
 			try {
+				prep_addPayerInfo.setString(1, payerSSN);
+				prep_addPayerInfo.setString(2, address);
+				prep_addPayerInfo.executeUpdate();
 				prep_addBillingAccount.setString(1, accountID);
 				prep_addBillingAccount.setString(2, patientID);
 				prep_addBillingAccount.setDate(3, java.sql.Date.valueOf(visitDate));
@@ -847,18 +874,14 @@ public class WolfHospital {
 			catch (Throwable err) {
 				// Roll back the entire transaction
 				connection.rollback();
-				return false;
 			} finally {
 				// Restore normal auto-commit mode
 				connection.setAutoCommit(true);
-				return true;
 			}
 		}
 		catch (Throwable err) {
 			error_handler(err);
-			return false;
 		}
-		
 	}
 
 	// Get billing record
