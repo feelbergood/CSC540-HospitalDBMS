@@ -549,7 +549,7 @@ public class WolfHospital {
 								"`charges per day` varchar(255) NOT NULL, " +
 								"`responsible nurse` varchar(255) NOT NULL, " +
 								"PRIMARY KEY (`ward number`)" +
-								"FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)"
+								"FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)" +
 								");");
 				//fhy: Medical Records, Treatment, Test, Check-ins
 				statement.executeUpdate(
