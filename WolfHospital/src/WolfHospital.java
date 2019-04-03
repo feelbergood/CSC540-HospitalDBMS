@@ -344,7 +344,7 @@ public class WolfHospital {
 				"ON m.payerSSN=b.SSN" +
 				"WHERE `accountID` = ?";
 			prep_getBillingAccount = connection.prepareStatement(sql);
-
+ 
 			// Update billing account
 			sql = "";
 			prep_updateBillingAccountSSN = connection.prepareStatement(sql);
