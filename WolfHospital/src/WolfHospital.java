@@ -37,7 +37,7 @@ public class WolfHospital {
 	private static final String CMD_WARD_GET = 					"RETRIEVE WARD";
 	private static final String CMD_WARD_UPDATE = 				"UPDATE WARD";
 	private static final String CMD_WARD_DELETE = 				"DELETE WARD";
-	private static final String CMD_WARD_CHECK = 					"CHECK AVAILABLE WARD";
+	private static final String CMD_WARD_CHECK = 				"CHECK AVAILABLE WARD";
 	private static final String CMD_WARD_ASSIGN = 				"ASSIGN WARD";
 	private static final String CMD_WARD_RESERVE = 				"RESERVE WARD";
 	private static final String CMD_WARD_RELEASE = 				"RELEASE WARD";
@@ -93,6 +93,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffPhone;
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
+
 	// Wards
 	private static PreparedStatement prep_addWards;
 	private static PreparedStatement prep_getWards;
@@ -109,11 +110,15 @@ public class WolfHospital {
 	private static PreparedStatement prep_updatePatientsAddress;
 	private static PreparedStatement prep_updatePatientsStatus;
 	private static PreparedStatement prep_deletePatients;
-	// fhy
+
+  // fhy
 	// Medical Records - Treatment
+	// GG
+	private static PreparedStatement prep_addTreatmentRecord;
+	// fhy
 	private static PreparedStatement prep_getAllTreatmentRecords;
 	private static PreparedStatement prep_getTreatmentRecord;
-
+	
 	// private static PreparedStatement prep_updateTreatmentRecord;
 	private static PreparedStatement prep_updateTreatmentEndDate;
 	private static PreparedStatement prep_updateTreatmentPrescription;
@@ -155,7 +160,21 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateBillingAccountBillingRecords;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
-
+	
+	//GG
+	// Basic Information - Wards
+	private static PreparedStatement prep_deleteWardInformation;
+	private static PreparedStatement prep_checkWardAvailability;
+	private static PreparedStatement prep_assignWard;
+	private static PreparedStatement prep_reserveWard;
+	private static PreparedStatement prep_releaseWard;
+	
+	//Baisic Information - Beds
+	private static PreparedStatement prep_assignBed;
+	private static PreparedStatement prep_checkBedAvailability;
+	private static PreparedStatement prep_reserveBed;
+	private static PreparedStatement prep_releaseBed;
+	
 	// Establish connection
 	public static void connectToDatabase() {
 		try {
@@ -605,8 +624,8 @@ public class WolfHospital {
 						//INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
 						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+, ref range:negative');
 						//manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
-						manageTestRecordAdd(3, "test", "prescription nervine, diagnosis details Hospitalization", 1003, "2019-03-15", "", 100);
-						manageTestRecordAdd(4, "test", "prescription analgesic, diagnosis details Surgeon, Hospitalization", 1004, "2019-03-17", "2019-03-21", 103);
+						manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003", "2019-03-15", "", "100");
+						manageTestRecordAdd("4", "test", "prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17", "2019-03-21", "103");
 						break;
 					case "Check-ins":
 						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
@@ -614,10 +633,10 @@ public class WolfHospital {
 						//INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
 						// VALUES ('9', '1', '2');
 						//manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
-						manageCheckinRecordAdd(1, 001, 1, 1001,"2019-03-01", "", 104);
-						manageCheckinRecordAdd(2, 002, 1, 1002,"2019-03-10", "", 104);
-						manageCheckinRecordAdd(3, 001, 2, 1003,"2019-03-15", "", 104);
-						manageCheckinRecordAdd(4, 003, 1, 1004,"2019-03-17", "2019-03-21", 104);
+						manageCheckinRecordAdd("1", "001", "1", "1001","2019-03-01", "", "104");
+						manageCheckinRecordAdd("2", "002", "1", "1002","2019-03-10", "", "104");
+						manageCheckinRecordAdd("3", "001", "2", "1003","2019-03-15", "", "104");
+						manageCheckinRecordAdd("4", "003", "1", "1004","2019-03-17", "2019-03-21", "104");
 						break;
 					case "Billing Accounts":
 						break;
@@ -649,11 +668,11 @@ public class WolfHospital {
 
 	//fhy support_printQueryResultSet, error_handler not yet implemented
 	//1
-	public static boolean showAllTreatmentRecords(int patientID){
+	public static boolean showAllTreatmentRecords(String patientID){
 		boolean success = false;
 
 		try {
-			prep_getAllTreatmentRecords.setInt(1, patientID);
+			prep_getAllTreatmentRecords.setString(1, patientID);
 			result = prep_getAllTreatmentRecords.executeQuery();
 
 			if (result.next()) {
@@ -672,11 +691,11 @@ public class WolfHospital {
 		return success;
 	}
 	//2
-	public static boolean showTreatmentRecord(int recordID){
+	public static boolean showTreatmentRecord(String recordID){
 		boolean success = false;
 
 		try {
-			prep_getTreatmentRecord.setInt(1, recordID);
+			prep_getTreatmentRecord.setString(1, recordID);
 			result = prep_getTreatmentRecord.executeQuery();
 
 			if (result.next()) {
@@ -695,7 +714,7 @@ public class WolfHospital {
 		return success;
 	}
 	//3
-	public static void manageTreatmentUpdate(int recordID, String attributeToChange, String valueToChange){
+	public static void manageTreatmentUpdate(String recordID, String attributeToChange, String valueToChange){
 		try {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()){
@@ -703,17 +722,17 @@ public class WolfHospital {
 				case "END DATE":
 				//should it be "`END DATE`"?
 					prep_updateTreatmentEndDate.setString(1, valueToChange);
-					prep_updateTreatmentEndDate.setInt(2, recordID);
+					prep_updateTreatmentEndDate.setString(2, recordID);
 					prep_updateTreatmentEndDate.executeUpdate();
 					break;
 				case "PRESCRIPTION":
 					prep_updateTreatmentPrescription.setString(1, valueToChange);
-					prep_updateTreatmentPrescription.setInt(2, recordID);
+					prep_updateTreatmentPrescription.setString(2, recordID);
 					prep_updateTreatmentPrescription.executeUpdate();
 					break;
 				case "DIAGNOSISDETAILS":
 					prep_updateTreatmentDiagnosisDetails.setString(1, valueToChange);
-					prep_updateTreatmentDiagnosisDetails.setInt(2, recordID);
+					prep_updateTreatmentDiagnosisDetails.setString(2, recordID);
 					prep_updateTreatmentDiagnosisDetails.executeUpdate();
 					break;
 				default:
@@ -726,7 +745,8 @@ public class WolfHospital {
 		}
 	}
 	//4
-	public static void manageTestRecordAdd(int recordID, String testType, String testResult, int patientID, String startDate, String endDate, int responsibleDoctor){
+	public static void manageTestRecordAdd(String  recordID, String testType, String testResult, String  patientID,
+										   String startDate, String endDate, String  responsibleDoctor){
 		//to be done: check success or not and report
 		try {
 
@@ -734,14 +754,14 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 
 			try {
-				prep_addTestRecord.setInt(1, recordID);
+				prep_addTestRecord.setString(1, recordID);
 				prep_addTestRecord.setString(2, testType);
 				prep_addTestRecord.setString(3, testResult);
-				prep_addTestRecord.setInt(4, recordID);
-				prep_addTestRecord.setInt(5, patientID);
-				prep_addTestRecord.setString(6, startDate);
-				prep_addTestRecord.setString(7, endDate);
-				prep_addTestRecord.setInt(8, responsibleDoctor);
+				prep_addTestRecord.setString(4, recordID);
+				prep_addTestRecord.setString(5, patientID);
+				prep_addTestRecord.setDate(6, java.sql.Date.valueOf(startDate));
+				prep_addTestRecord.setDate(7, java.sql.Date.valueOf(endDate));
+				prep_addTestRecord.setString(8, responsibleDoctor);
 				prep_addTestRecord.executeUpdate();
 				connection.commit();
 			}
@@ -764,11 +784,11 @@ public class WolfHospital {
 		}
 	}
 	//5
-	public static boolean showAllTestRecords(int patientID){
+	public static boolean showAllTestRecords(String patientID){
 		boolean success = false;
 
 		try {
-			prep_getAllTestRecords.setInt(1, patientID);
+			prep_getAllTestRecords.setString(1, patientID);
 			result = prep_getAllTestRecords.executeQuery();
 
 			if (result.next()) {
@@ -787,11 +807,11 @@ public class WolfHospital {
 		return success;
 	}
 	//6
-	public static boolean showTestRecord(int recordID){
+	public static boolean showTestRecord(String recordID){
 		boolean success = false;
 
 		try {
-			prep_getTestRecord.setInt(1, recordID);
+			prep_getTestRecord.setString(1, recordID);
 			result = prep_getTestRecord.executeQuery();
 
 			if (result.next()) {
@@ -810,7 +830,7 @@ public class WolfHospital {
 		return success;
 	}
 	//7
-	public static void manageTestUpdate(int recordID, String attributeToChange, String valueToChange){
+	public static void manageTestUpdate(String recordID, String attributeToChange, String valueToChange){
 		try {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()){
@@ -818,17 +838,17 @@ public class WolfHospital {
 				case "END DATE":
 					//should it be "`END DATE`"?
 					prep_updateTestEndDate.setString(1, valueToChange);
-					prep_updateTestEndDate.setInt(2, recordID);
+					prep_updateTestEndDate.setString(2, recordID);
 					prep_updateTestEndDate.executeUpdate();
 					break;
 				case "TESTTYPE":
 					prep_updateTestTestType.setString(1, valueToChange);
-					prep_updateTestTestType.setInt(2, recordID);
+					prep_updateTestTestType.setString(2, recordID);
 					prep_updateTestTestType.executeUpdate();
 					break;
 				case "TESTRESULT":
 					prep_updateTestTestResult.setString(1, valueToChange);
-					prep_updateTestTestResult.setInt(2, recordID);
+					prep_updateTestTestResult.setString(2, recordID);
 					prep_updateTestTestResult.executeUpdate();
 					break;
 				default:
@@ -841,7 +861,8 @@ public class WolfHospital {
 		}
 	}
 	//8
-	public static void manageCheckinRecordAdd(int recordID, int wardNumber, int bedNumber, int patientID, String startDate, String endDate, int responsibleDoctor){
+	public static void manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber, String patientID,
+											  String startDate, String endDate, String responsibleDoctor){
 		//to be done: check success or not and report
 		try {
 
@@ -849,15 +870,14 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 
 			try {
-				prep_addCheckinRecord.setInt(1, recordID);
-				prep_addCheckinRecord.setInt(2, wardNumber);
-				prep_addCheckinRecord.setInt(3, bedNumber);
-				prep_addCheckinRecord.setInt(4, recordID);
-				prep_addCheckinRecord.setInt(5, patientID);
-				prep_addCheckinRecord.setInt(6, patientID);
-				prep_addCheckinRecord.setString(6, startDate);
-				prep_addCheckinRecord.setString(7, endDate);
-				prep_addCheckinRecord.setInt(8, responsibleDoctor);
+				prep_addCheckinRecord.setString(1, recordID);
+				prep_addCheckinRecord.setString(2, wardNumber);
+				prep_addCheckinRecord.setString(3, bedNumber);
+				prep_addCheckinRecord.setString(4, recordID);
+				prep_addCheckinRecord.setString(5, patientID);
+				prep_addCheckinRecord.setDate(6, java.sql.Date.valueOf(startDate));
+				prep_addCheckinRecord.setDate(7, java.sql.Date.valueOf(endDate));
+				prep_addCheckinRecord.setString(8, responsibleDoctor);
 				prep_addCheckinRecord.executeUpdate();
 				connection.commit();
 			}
@@ -880,11 +900,11 @@ public class WolfHospital {
 		}
 	}
 	//9
-	public static boolean showAllCheckinRecords(int patientID){
+	public static boolean showAllCheckinRecords(String patientID){
 		boolean success = false;
 
 		try {
-			prep_getAllCheckinRecords.setInt(1, patientID);
+			prep_getAllCheckinRecords.setString(1, patientID);
 			result = prep_getAllCheckinRecords.executeQuery();
 
 			if (result.next()) {
@@ -903,11 +923,11 @@ public class WolfHospital {
 		return success;
 	}
 	//10
-	public static boolean showCheckinRecord(int recordID){
+	public static boolean showCheckinRecord(String recordID){
 		boolean success = false;
 
 		try {
-			prep_getCheckinRecord.setInt(1, recordID);
+			prep_getCheckinRecord.setString(1, recordID);
 			result = prep_getCheckinRecord.executeQuery();
 
 			if (result.next()) {
