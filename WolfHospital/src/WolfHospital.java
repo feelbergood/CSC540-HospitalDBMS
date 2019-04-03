@@ -81,10 +81,12 @@ public class WolfHospital {
 	
 	// Prepared Statements pre-declared
 	// TO-DO 1: instantiate preparedStatements
+	// cchen31
 	// Staff
 	private static PreparedStatement prep_addStaff;
 	private static PreparedStatement prep_getStaff;
 	private static PreparedStatement prep_updateStaffName;
+	private static PreparedStatement prep_updateStaffAge;
 	private static PreparedStatement prep_updateStaffJobTitle;
 	private static PreparedStatement prep_updateStaffProfTitle;
 	private static PreparedStatement prep_updateStaffDepart;
@@ -92,6 +94,23 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
 
+	// Wards
+	private static PreparedStatement prep_addWards;
+	private static PreparedStatement prep_getWards;
+	private static PreparedStatement prep_updateWardsCapacity;
+	private static PreparedStatement prep_updateWardsCharge;
+	private static PreparedStatement prep_updateWardsNurse;
+	private static PreparedStatement prep_deleteWards;
+	// Patients
+	private static PreparedStatement prep_addPatients;
+	private static PreparedStatement prep_getPatients;
+	private static PreparedStatement prep_updatePatientsName;
+	private static PreparedStatement prep_updatePatientsPhone;
+	private static PreparedStatement prep_updatePatientsAddress;
+	private static PreparedStatement prep_updatePatientsStatus;
+	private static PreparedStatement prep_deletePatients;
+
+  // fhy
 	// Medical Records - Treatment
 	// GG
 	private static PreparedStatement prep_addTreatmentRecord;
@@ -217,7 +236,97 @@ public class WolfHospital {
 	public static void generatePreparedStatements() {
 		try {
 			String sql;
-
+			// cchen31
+			// Enter basic information about staff
+			sql = "INSERT INTO `Staff` (`staffID`, `name`, `age`, `gender`, `jobTitle`, `profTitle`, `department`, `phone`, `address`)" +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+			prep_addStaff = connection.prepareStatement(sql);
+			// Retrieve basic information about staff
+			sql = "SELECT * FROM `Staff`" +
+					"WHERE staffID = ?;";
+		    prep_getStaff = connection.prepareStatement(sql);
+			// Update basic information about staff
+			sql = "UPDATE `Staff`" +
+					"SET `name` = ?" +
+					"WHERE staffID = ?;";
+			prep_updateStaffName = connection.prepareStatement(sql);
+			sql = "UPDATE `Staff`" +
+					"SET `jobTitle` = ?" +
+					"WHERE staffID = ?;";
+			prep_updateStaffJobTitle = connection.prepareStatement(sql);
+			sql = "UPDATE `Staff`" +
+					"SET `profTitle` = ?" +
+					"WHERE staffID = ?;";
+			prep_updateStaffProfTitle = connection.prepareStatement(sql);
+			sql = "UPDATE `Staff`" +
+					"SET `department` = ?" +
+					"WHERE staffID = ?;";
+			prep_updateStaffDepart = connection.prepareStatement(sql);
+			sql = "UPDATE `Staff`" +
+					"SET `phone` = ?" +
+					"WHERE staffID = ?;";
+			prep_updateStaffPhone = connection.prepareStatement(sql);
+			sql = "UPDATE `Staff`" +
+					"SET `address` = ?" +
+					"WHERE staffID = ?;";
+			prep_updateStaffAddress = connection.prepareStatement(sql);
+			// Delete basic information about staff
+			sql = "DELETE FROM `Staff`" +
+					" WHERE staffID = ?;";
+			prep_deleteStaff = connection.prepareStatement(sql);
+			// Enter basic information about patients
+			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" +
+					"VALUES (?, ?);" +
+					"INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `gender`, `age`, `phone`, `address`, `status`)" +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+			prep_addPatients = connection.prepareStatement(sql);
+			// Retrieve basic information about patients
+			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
+			prep_getPatients = connection.prepareStatement(sql);
+			// Update basic information about patients
+			sql = "UPDATE `PersonInfo`" +
+					"SET `name` = ?" +
+					"WHERE SSN = ?;";
+			prep_updatePatientsName = connection.prepareStatement(sql);
+			sql = "UPDATE `PersonInfo`" +
+					"SET `phone` = ?" +
+					"WHERE SSN = ?;";
+			prep_updatePatientsPhone = connection.prepareStatement(sql);
+			sql = "UPDATE `PersonInfo`" +
+					"SET `address` = ?" +
+					"WHERE SSN = ?;";
+			prep_updatePatientsAddress = connection.prepareStatement(sql);
+			sql = "UPDATE `PersonInfo`" +
+					"SET `status` = ?" +
+					"WHERE SSN = ?;";
+			prep_updatePatientsStatus = connection.prepareStatement(sql);
+			// Delete basic information about patients
+			sql = "DELETE FROM `Patients` p, `PersonInfo` i" +
+					"USING p" +
+					"INNER JOIN i" +
+					"WHERE p.patientID = ? AND p.SSN = i.SSN;";
+			prep_deletePatients = connection.prepareStatement(sql);
+			// Enter basic information about wards
+			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)" +
+					"VALUES (?, ?, ?, ?);";
+			prep_addWards = connection.prepareStatement(sql);
+			// Retrieve basic information about wards
+			sql = "SELECT * FROM `Wards`" +
+					"WHERE ward number = ?;";
+			prep_getWards = connection.prepareStatement(sql);
+			// Update basic information about wards
+			sql = "UPDATE `Wards`" +
+					"SET `capacity` = ?" +
+					"WHERE ward number = ?;";
+			prep_updateWardsCapacity = connection.prepareStatement(sql);
+			sql = "UPDATE `Wards`" +
+					"SET `charges per day` = ?" +
+					"WHERE ward number = ?;";
+			prep_updateWardsCharge = connection.prepareStatement(sql);
+			sql = "UPDATE `Wards`" +
+					"SET `responsible nurse` = ?" +
+					"WHERE ward number = ?;";
+			prep_updateWardsNurse = connection.prepareStatement(sql);
 			//fhy
 			//	Get all treatment records
 			//	SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE patientID=1;
