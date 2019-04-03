@@ -37,7 +37,7 @@ public class WolfHospital {
 	private static final String CMD_WARD_GET = 					"RETRIEVE WARD";
 	private static final String CMD_WARD_UPDATE = 				"UPDATE WARD";
 	private static final String CMD_WARD_DELETE = 				"DELETE WARD";
-	private static final String CMD_WARD_CHECK = 					"CHECK AVAILABLE WARD";
+	private static final String CMD_WARD_CHECK = 				"CHECK AVAILABLE WARD";
 	private static final String CMD_WARD_ASSIGN = 				"ASSIGN WARD";
 	private static final String CMD_WARD_RESERVE = 				"RESERVE WARD";
 	private static final String CMD_WARD_RELEASE = 				"RELEASE WARD";
@@ -92,11 +92,13 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
 
-	// fhy
 	// Medical Records - Treatment
+	// GG
+	private static PreparedStatement prep_addTreatmentRecord;
+	// fhy
 	private static PreparedStatement prep_getAllTreatmentRecords;
 	private static PreparedStatement prep_getTreatmentRecord;
-
+	
 	// private static PreparedStatement prep_updateTreatmentRecord;
 	private static PreparedStatement prep_updateTreatmentEndDate;
 	private static PreparedStatement prep_updateTreatmentPrescription;
@@ -138,7 +140,21 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateBillingAccountBillingRecords;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
-
+	
+	//GG
+	// Basic Information - Wards
+	private static PreparedStatement prep_deleteWardInformation;
+	private static PreparedStatement prep_checkWardAvailability;
+	private static PreparedStatement prep_assignWard;
+	private static PreparedStatement prep_reserveWard;
+	private static PreparedStatement prep_releaseWard;
+	
+	//Baisic Information - Beds
+	private static PreparedStatement prep_assignBed;
+	private static PreparedStatement prep_checkBedAvailability;
+	private static PreparedStatement prep_reserveBed;
+	private static PreparedStatement prep_releaseBed;
+	
 	// Establish connection
 	public static void connectToDatabase() {
 		try {
