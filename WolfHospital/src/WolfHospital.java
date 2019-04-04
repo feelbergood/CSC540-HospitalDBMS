@@ -628,14 +628,14 @@ public class WolfHospital {
 				// Yudong
 				// Billing accounts && PayerInfo
 				statement.executeUpdate(
-					"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `PayerInfo` (" +
+					"CREATE TABLE IF NOT EXISTS`PayerInfo` (" +
 					"`SSN` VARCHAR(255) NOT NULL UNIQUE," +
 					"`billingAddress` VARCHAR(255) NOT NULL," +
 					"PRIMARY KEY (`SSN`)" +
 					");");
 
 				statement.executeUpdate(
-					"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" +
+					"CREATE TABLE IF NOT EXISTS`Billing Accounts` (" +
 					"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
 					"`patientID` VARCHAR(255) NOT NULL," +
 					"`visitDate` datetime NOT NULL," +
