@@ -154,12 +154,13 @@ public class WolfHospital {
 	// Billing Accounts
 	private static PreparedStatement prep_addBillingAccount;
 	private static PreparedStatement prep_getBillingAccount;
-	private static PreparedStatement prep_updateBillingAccountSSN;
 	private static PreparedStatement prep_updateBillingAccountAddress;
 	// Update payment method and card number
-	private static PreparedStatement prep_updateBillingAccountPaymentInfo;
+	private static PreparedStatement prep_updateBillingAccountPaymentType;
+	private static PreparedStatement prep_updateBillingAccountCardNumber;
 	// Update registration fee and accommandation fee
-	private static PreparedStatement prep_updateBillingAccountBillingRecords;
+	private static PreparedStatement prep_updateBillingAccountRegistrationFee;
+	private static PreparedStatement prep_updateBillingAccountAccommandationFee;
 	private static PreparedStatement prep_updateBillingAccountMedicationPrescribed;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
@@ -183,7 +184,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_checkBedAvailability;
 	private static PreparedStatement prep_reserveBed;
 	private static PreparedStatement prep_releaseBed;
-	
+
 	// Establish connection
 	public static void connectToDatabase() {
 		try {
@@ -437,13 +438,17 @@ public class WolfHospital {
 				"WHERE recordID = ?" +
 				"AND EXISTS" +
 				"(SELECT * FROM `Check-ins`"+
-				"WHERE recordID = ?)";
+				"WHERE recordID = ?);";
 			prep_updateCheckinEndDate = connection.prepareStatement(sql);
 
-			sql = "";
+			sql = "UPDATE `Check-ins`" +
+				"SET `wardNumber` = ?" +
+				"WHERE recordID = ?;";
 			prep_updateCheckinWard = connection.prepareStatement(sql);
 
-			sql = "";
+			sql = "UPDATE `Check-ins`" +
+				"SET `bedNumber` = ?" +
+				"WHERE recordID = ?;";
 			prep_updateCheckinBed = connection.prepareStatement(sql);
 
 			// Report patient history
@@ -482,27 +487,53 @@ public class WolfHospital {
 				"b.medicationPrescribed, b.accommandationFee, p.billingAddress" + 
 				"FROM `Billing Accounts` b JOIN `PayerInfo` p" +
 				"ON m.payerSSN=b.SSN" +
-				"WHERE `accountID` = ?";
+				"WHERE `accountID` = ?;";
 			prep_getBillingAccount = connection.prepareStatement(sql);
  
 			// Update billing account
-			sql = "";
-			prep_updateBillingAccountSSN = connection.prepareStatement(sql);
-
-			sql = "";
+			sql = "UPDATE `PayerInfo`" +
+				"SET `billingAddress` = ?" +
+				"WHERE payerSSN IN (" +
+				"SELECT b.SSN" +
+				"FROM `Billing Accounts` b JOIN `PayerInfo` p" +
+				"ON m.payerSSN=b.SSN" +
+				"WHERE accountID = ?);";
 			prep_updateBillingAccountAddress = connection.prepareStatement(sql);
 
-			sql = "";
-			prep_updateBillingAccountPaymentInfo = connection.prepareStatement(sql);
+			sql = "UPDATE `Billing Accounts`" +
+				"SET `paymentMethod` = ?" +
+				"WHERE accountID = ?;";
+			prep_updateBillingAccountPaymentType = connection.prepareStatement(sql);
 
-			sql = "";
-			prep_updateBillingAccountBillingRecords = connection.prepareStatement(sql);
+			sql = "UPDATE `Billing Accounts`" +
+				"SET `cardNumber` = ?" +
+				"WHERE accountID = ?" +
+				"AND paymentMethod = `Credit Card`;";
+			prep_updateBillingAccountCardNumber = connection.prepareStatement(sql);
 
-			sql = "";
+			sql = "UPDATE `Billing Accounts`" +
+				"SET `registrationFee` = ?" +
+				"WHERE accountID = ?;";
+			prep_updateBillingAccountRegistrationFee= connection.prepareStatement(sql);
+
+			sql = "UPDATE `Billing Accounts`" +
+				"SET `accommandationFee` = ?" +
+				"WHERE accountID = ?;";
+			prep_updateBillingAccountAccommandationFee= connection.prepareStatement(sql);
+
+			sql = "UPDATE `Billing Accounts`" +
+				"SET `medicationPrescribed` = ?" +
+				"WHERE accountID = ?;";
+			prep_updateBillingAccountMedicationPrescribed = connection.prepareStatement(sql);
+
+			sql = "UPDATE `Billing Accounts`" +
+				"SET `visitDate` = ?" +
+				"WHERE accountID = ?;";
 			prep_updateBillingAccountVisitDate = connection.prepareStatement(sql);
 
 			// Delete billing account
-			sql = "";
+			sql = "DELETE FROM `Billing Accounts`" +
+				"WHERE accountID = ?;";
 			prep_deleteBillingAccount = connection.prepareStatement(sql);
 
 		} catch (SQLException e) {
@@ -866,9 +897,7 @@ public class WolfHospital {
 		try {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()){
-
-				case "END DATE":
-					//should it be "`END DATE`"?
+				case "ENDDATE":
 					prep_updateTestEndDate.setString(1, valueToChange);
 					prep_updateTestEndDate.setString(2, recordID);
 					prep_updateTestEndDate.executeUpdate();
@@ -986,14 +1015,15 @@ public class WolfHospital {
 				case "ENDDATE":
 					prep_updateCheckinEndDate.setString(1, valueToChange);
 					prep_updateCheckinEndDate.setString(2, recordID);
-					prep_updateTestEndDate.executeUpdate();
+					prep_updateCheckinEndDate.setString(3, recordID);
+					prep_updateCheckinEndDate.executeUpdate();
 					break;
-				case "WARD":
+				case "WARDNUMBER":
 					prep_updateCheckinWard.setString(1, valueToChange);
 					prep_updateCheckinWard.setString(2, recordID);
 					prep_updateCheckinWard.executeUpdate();
 					break;
-				case "BED":
+				case "BEDNUMBER":
 					prep_updateCheckinBed.setString(1, valueToChange);
 					prep_updateCheckinBed.setString(2, recordID);
 					prep_updateCheckinBed.executeUpdate();
@@ -1066,18 +1096,94 @@ public class WolfHospital {
 	}
 
 	// Get billing record
-	public static void showBillingAccount() {
-
+	public static boolean showBillingAccount(String accountID) {
+		boolean success = false;
+		try {
+			prep_getBillingAccount.setString(1, accountID);
+			result = prep_getBillingAccount.executeQuery();
+			// Process resultSet
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+			System.out.println("\nshowBillingAccount\n");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return success;
 	}
 
 	// Update billing accounts
-	public static boolean manageBillingAccountUpdate() {
-		return false;
+	public static void manageBillingAccountUpdate(String accountID, String attributeToChange, String valueToChange) {
+		try {
+			connection.setAutoCommit(true);
+			switch (attributeToChange.toUpperCase()){
+				case "BILLINGADDRESS":
+					prep_updateCheckinEndDate.setString(1, valueToChange);
+					prep_updateCheckinEndDate.setString(2, accountID);
+					prep_updateTestEndDate.executeUpdate();
+					break;
+				case "PAYMENTTYPE":
+					prep_updateBillingAccountPaymentType.setString(1, valueToChange);
+					prep_updateBillingAccountPaymentType.setString(2, accountID);
+					prep_updateBillingAccountPaymentType.executeUpdate();
+					break;
+				case "CARDNUMBER":
+					prep_updateBillingAccountCardNumber.setString(1, valueToChange);
+					prep_updateBillingAccountCardNumber.setString(2, accountID);
+					prep_updateBillingAccountCardNumber.executeUpdate();
+					break;
+				case "REGISTRATIONFEE":
+					prep_updateBillingAccountRegistrationFee.setDouble(1, Double.parseDouble(valueToChange));
+					prep_updateBillingAccountRegistrationFee.setString(2, accountID);
+					prep_updateBillingAccountRegistrationFee.executeUpdate();
+				case "ACCOMMANDATIONFEE":
+					prep_updateBillingAccountAccommandationFee.setDouble(1, Double.parseDouble(valueToChange));
+					prep_updateBillingAccountAccommandationFee.setString(2, accountID);
+					prep_updateBillingAccountAccommandationFee.executeUpdate();
+				case "MEDICATIONPRESCRIBED":
+					prep_updateBillingAccountMedicationPrescribed.setBoolean(1, Boolean.parseBoolean(valueToChange));
+					prep_updateBillingAccountMedicationPrescribed.setString(2, accountID);
+					prep_updateBillingAccountMedicationPrescribed.executeUpdate();
+				case "VISITDATE":
+					prep_updateBillingAccountVisitDate.setDate(1, java.sql.Date.valueOf(valueToChange));
+					prep_updateBillingAccountVisitDate.setString(2, accountID);
+					prep_updateBillingAccountVisitDate.executeUpdate();
+				default:
+					System.out.println("\nCannot update the '" + attributeToChange);
+					break;
+			}
+		}
+		catch (Throwable err) {
+			// error_handler(err);
+		}
+		
 	}
 
 	// Delete billing account
-	public static boolean deleteBillingAccount() {
-		return false;
+	public static void deleteBillingAccount(String accountID) {
+		try {
+			// Start transaction
+			connection.setAutoCommit(false);
+			try {
+				prep_deleteBillingAccount.setString(1, accountID);
+				prep_deleteBillingAccount.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+				// Handle error
+				// error_handler(err);
+				// Roll back the entire transaction
+				connection.rollback();
+			}
+			finally {
+				// Restore normal auto-commit mode
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+			// error_handler(err);
+		}
 	}
 
 	public static void error_handler(Throwable error) {
