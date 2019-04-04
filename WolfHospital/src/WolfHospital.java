@@ -357,10 +357,10 @@ public class WolfHospital {
 			prep_getTreatmentRecord = connection.prepareStatement(sql);
 
 			//	Update treatment record
-			//	UPDATE `Medical Records` SET `end date` = '2020-01-01' WHERE recordID = 13;
+			//	UPDATE `Medical Records` SET `endDate` = '2020-01-01' WHERE recordID = 13;
 			//	UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle' WHERE recordID = '13';
 			sql = "UPDATE `Medical Records`" +
-				"SET `end date` = ?" +
+				"SET `endDate` = ?" +
 				"WHERE recordID = ?;";
 			prep_updateTreatmentEndDate = connection.prepareStatement(sql);
 
@@ -394,10 +394,10 @@ public class WolfHospital {
 			prep_getTestRecord = connection.prepareStatement(sql);
 
 			//	Update test record
-			//	UPDATE `Medical Records` SET `end date` = '2020-01-01' WHERE recordID=14;
+			//	UPDATE `Medical Records` SET `endDate` = '2020-01-01' WHERE recordID=14;
 			// 	UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` = 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID = '14';
 			sql = "UPDATE `Medical Records`" +
-				"SET `end date` = ?" +
+				"SET `endDate` = ?" +
 				"WHERE recordID= ?;";
 			prep_updateTestEndDate = connection.prepareStatement(sql);
 
@@ -432,7 +432,12 @@ public class WolfHospital {
 			
 			// Yudong
 			// Update check-in records
-			sql = "";
+			sql = "UPDATE `Medical Records`" +
+				"SET `endDate` = ?" +
+				"WHERE recordID = ?" +
+				"AND EXISTS" +
+				"(SELECT * FROM `Check-ins`"+
+				"WHERE recordID = ?)";
 			prep_updateCheckinEndDate = connection.prepareStatement(sql);
 
 			sql = "";
@@ -747,9 +752,7 @@ public class WolfHospital {
 		try {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()){
-
-				case "END DATE":
-				//should it be "`END DATE`"?
+				case "ENDDATE":
 					prep_updateTreatmentEndDate.setString(1, valueToChange);
 					prep_updateTreatmentEndDate.setString(2, recordID);
 					prep_updateTreatmentEndDate.executeUpdate();
@@ -976,19 +979,24 @@ public class WolfHospital {
 
 	// Yudong
 	// Update Check-in
-	public static void manageCheckinUpdate(int recordID, String attributeToChange, String valueToChange){
+	public static void manageCheckinUpdate(String recordID, String attributeToChange, String valueToChange){
 		try {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()){
-				case "END DATE":
-					//should it be "`END DATE`"?
+				case "ENDDATE":
 					prep_updateCheckinEndDate.setString(1, valueToChange);
-					prep_updateCheckinEndDate.setInt(2, recordID);
+					prep_updateCheckinEndDate.setString(2, recordID);
 					prep_updateTestEndDate.executeUpdate();
 					break;
 				case "WARD":
+					prep_updateCheckinWard.setString(1, valueToChange);
+					prep_updateCheckinWard.setString(2, recordID);
+					prep_updateCheckinWard.executeUpdate();
 					break;
 				case "BED":
+					prep_updateCheckinBed.setString(1, valueToChange);
+					prep_updateCheckinBed.setString(2, recordID);
+					prep_updateCheckinBed.executeUpdate();
 					break;
 				default:
 					System.out.println("\nCannot update the '" + attributeToChange);
