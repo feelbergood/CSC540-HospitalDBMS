@@ -316,14 +316,11 @@ public class WolfHospital {
 					"WHERE SSN = ?;";
 			prep_updatePatientsAddress = connection.prepareStatement(sql);
 			sql = "UPDATE `PersonInfo`" +
-					"SET `status` = ?" +
+					"SET `completing treatment` = ?" +
 					"WHERE SSN = ?;";
 			prep_updatePatientsStatus = connection.prepareStatement(sql);
 			// Delete basic information about patients
-			sql = "DELETE FROM `Patients` p, `PersonInfo` i" +
-					"USING p" +
-					"INNER JOIN i" +
-					"WHERE p.patientID = ? AND p.SSN = i.SSN;";
+			sql = "DELETE FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
 			prep_deletePatients = connection.prepareStatement(sql);
 			// Enter basic information about wards
 			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)" +
@@ -558,7 +555,7 @@ public class WolfHospital {
 								"`staffID` VARCHAR(255) NOT NULL UNIQUE, " +
 								"`name` VARCHAR(255) NOT NULL," +
 								"`age` INT(3) NOT NULL," +
-								"`gender` CHAR(1) NOT NULL," +
+								"`gender` VARCHAR(255) NOT NULL," +
 								"`jobTitle` VARCHAR(255) NOT NULL," +
 								"`profTitle` VARCHAR(255) NULL," +
 								"`department` VARCHAR(255) NOT NULL," +
@@ -578,10 +575,11 @@ public class WolfHospital {
 								"`SSN` varchar(255) NOT NULL, " +
 								"`name` varchar(255) NOT NULL, " +
 								"`DOB` datetime NOT NULL, " +
-								"`gender` char(1) NOT NULL, " +
-    							"`age` int(11) NOT NULL, " +
-    							"`contactInfo` varchar(255) NOT NULL, " +
-								"`status` varchar(255) NOT NULL, " +
+								"`gender` VARCHAR(255) NOT NULL, " +
+    							"`age` int(3) NOT NULL, " +
+								"`phone` VARCHAR(255) NOT NULL," +
+								"`address` VARCHAR(255) NOT NULL," +
+								"`completing treatment` varchar(255) NOT NULL, " +
 								"PRIMARY KEY (`SSN`)" +
 								");");
 				statement.executeUpdate(
