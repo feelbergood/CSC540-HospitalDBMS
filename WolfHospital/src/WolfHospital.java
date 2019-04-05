@@ -362,7 +362,10 @@ public class WolfHospital {
 			//	UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle' WHERE recordID = '13';
 			sql = "UPDATE `Medical Records`" +
 				"SET `endDate` = ?" +
-				"WHERE recordID = ?;";
+				"WHERE recordID = ?;"+
+				"AND EXISTS" +
+				"(SELECT * FROM `Treatment`"+
+				"WHERE recordID = ?)";
 			prep_updateTreatmentEndDate = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Treatment`" +
@@ -399,7 +402,10 @@ public class WolfHospital {
 			// 	UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` = 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID = '14';
 			sql = "UPDATE `Medical Records`" +
 				"SET `endDate` = ?" +
-				"WHERE recordID= ?;";
+				"WHERE recordID= ?;"+
+				"AND EXISTS" +
+				"(SELECT * FROM `Test`"+
+				"WHERE recordID = ?)";
 			prep_updateTestEndDate = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Test`" +
@@ -786,6 +792,7 @@ public class WolfHospital {
 				case "ENDDATE":
 					prep_updateTreatmentEndDate.setString(1, valueToChange);
 					prep_updateTreatmentEndDate.setString(2, recordID);
+					prep_updateTreatmentEndDate.setString(3, recordID);
 					prep_updateTreatmentEndDate.executeUpdate();
 					break;
 				case "PRESCRIPTION":
@@ -900,6 +907,7 @@ public class WolfHospital {
 				case "ENDDATE":
 					prep_updateTestEndDate.setString(1, valueToChange);
 					prep_updateTestEndDate.setString(2, recordID);
+					prep_updateTestEndDate.setString(3, recordID);
 					prep_updateTestEndDate.executeUpdate();
 					break;
 				case "TESTTYPE":
