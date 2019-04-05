@@ -328,14 +328,14 @@ public class WolfHospital {
 			// UPDATE `Medical Records` SET `endDate` = '2020-01-01' WHERE recordID = 13;
 			// UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle'
 			// WHERE recordID = '13';
-			sql = "UPDATE `Medical Records`" + "SET `endDate` = ?" + "WHERE recordID = ?;" + "AND EXISTS"
-					+ "(SELECT * FROM `Treatment`" + "WHERE recordID = ?)";
+			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID = ? " + "AND EXISTS "
+					+ "(SELECT * FROM `Treatment` " + "WHERE recordID = ?;)";
 			prep_updateTreatmentEndDate = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Treatment`" + "SET `prescription` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Treatment` " + "SET `prescription` = ? " + "WHERE recordID = ?;";
 			prep_updateTreatmentPrescription = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Treatment`" + "SET `diagnosisDetails` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Treatment` " + "SET `diagnosisDetails` = ? " + "WHERE recordID = ?;";
 			prep_updateTreatmentDiagnosisDetails = connection.prepareStatement(sql);
 
 			// Create new test record
@@ -344,8 +344,8 @@ public class WolfHospital {
 			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
 			// `endDate`, `responsibleDoctor`) VALUES ('14', '5', '2019-07-01',
 			// '2019-07-02', '3');
-			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`)" + "VALUES (?, ?, ?);"
-					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"
+			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`) " + "VALUES (?, ?, ?); "
+					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) "
 					+ "VALUES (?, ?, ?, ?, ?);";
 			prep_addTestRecord = connection.prepareStatement(sql);
 
@@ -366,14 +366,14 @@ public class WolfHospital {
 			// UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` =
 			// 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID =
 			// '14';
-			sql = "UPDATE `Medical Records`" + "SET `endDate` = ?" + "WHERE recordID= ?;" + "AND EXISTS"
-					+ "(SELECT * FROM `Test`" + "WHERE recordID = ?)";
+			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID= ? " + "AND EXISTS "
+					+ "(SELECT * FROM `Test` " + "WHERE recordID = ?;)";
 			prep_updateTestEndDate = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Test`" + "SET `testType` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Test` " + "SET `testType` = ? " + "WHERE recordID = ?;";
 			prep_updateTestTestType = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Test`" + "SET `testResult` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Test` " + "SET `testResult` = ? " + "WHERE recordID = ?;";
 			prep_updateTestTestResult = connection.prepareStatement(sql);
 
 			// Create check-in record
@@ -382,8 +382,8 @@ public class WolfHospital {
 			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
 			// `endDate`, `responsibleDoctor` ) VALUES ('15', '5', '2019-07-01',
 			// '2019-07-07', '4');
-			sql = "INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)" + "VALUES (?, ?, ?);"
-					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"
+			sql = "INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`) " + "VALUES (?, ?, ?); "
+					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) "
 					+ "VALUES (?, ?, ?, ?, ?);";
 			prep_addCheckinRecord = connection.prepareStatement(sql);
 
