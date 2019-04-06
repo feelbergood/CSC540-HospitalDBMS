@@ -875,7 +875,7 @@ public class WolfHospital {
 				prep_addPatients.setString(7, department);
 				prep_addPatients.setString(8, phone);
 				prep_addPatients.setString(9, address);
-				// to-do: make use of treatmentPlan and wardNum
+				// To-do: make use of variable treatmentPlan and wardNum. By calling prep_addTreatmentRecord and prep_assignWard here?
 				prep_addPatients.executeUpdate();
 				connection.commit();
 			} catch (SQLExceptionException e) {
@@ -886,7 +886,7 @@ public class WolfHospital {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// do we need another way to handle an exception?
+			// To do: do we need another way to handle an exception?
 		}
 	}
 	// Get patient info
@@ -933,6 +933,7 @@ public class WolfHospital {
 						prep_updatePatientsStatus.setString(2, patientID);
 						prep_updatePatientsStatus.executeUpdate();
 						break;
+					// To-do: need to consider update of treatmentPlan and of wardNum, it seems no need to do this?!
 					default:
 						System.out.println("Cannot update the field " + attributeToChange + " for patient " + staffID + " .");
 						break;
@@ -954,6 +955,7 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 			try {
 				prep_deletePatients.setString(1, patientID);
+				// To-do: need to consider the effect on everything related to this patient? e.g. release bed, update record, etc.
 				prep_deletePatients.executeUpdate();
 				connection.commit();
 			} catch (SQLException e) {
@@ -985,13 +987,14 @@ public class WolfHospital {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// do we need another way to handle an exception?
+			// To-do: do we need another way to handle an exception?
 		}
 	}
 	// Get ward info
-	public static void getPatient(String wardNumber) {
+	public static void getWard(String wardNumber) {
 		try {
 			prep_getWards.setString(1, wardNumber);
+			// To-do: need to get all the patients' SSN too?!
 			ResultSet rs = prep_getWards.executeQuery();
 			if (rs.next()) {
 				printWardsRow(rs);
