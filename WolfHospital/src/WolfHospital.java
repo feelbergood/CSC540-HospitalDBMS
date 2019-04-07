@@ -170,24 +170,24 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateBillingAccountMedicationPrescribed;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
-	
-	//GG
+
+	// GG
 	// Basic Information - Wards(partial, the rest should be done by others)
 	private static PreparedStatement prep_deleteWardInfo;
 	private static PreparedStatement prep_checkWardAvailability;
-	//private static PreparedStatement prep_assignWard;
-	//private static PreparedStatement prep_reserveWard;
-	//private static PreparedStatement prep_releaseWard;
-	
-	//Basic Information - Beds
+	// private static PreparedStatement prep_assignWard;
+	// private static PreparedStatement prep_reserveWard;
+	// private static PreparedStatement prep_releaseWard;
+
+	// Basic Information - Beds
 	private static PreparedStatement prep_addBedInfo;
 	private static PreparedStatement prep_getBedInfo;
 	private static PreparedStatement prep_deletebBedInfo;
-	
+
 	// Management - Beds
 	private static PreparedStatement prep_assignBed;
 	private static PreparedStatement prep_checkBedAvailability;
-	//private static PreparedStatement prep_reserveBed;
+	// private static PreparedStatement prep_reserveBed;
 	private static PreparedStatement prep_releaseBed;
 //	private static PreparedStatement prep_deleteBedInfo;
 
@@ -195,7 +195,6 @@ public class WolfHospital {
 	private static PreparedStatement prep_addPayerInfo;
 	private static PreparedStatement prep_updatePayerAddress;
 	private static PreparedStatement prep_deletePayerInfo;
-
 
 	// Establish connection
 	public static void connectToDatabase() {
@@ -262,98 +261,70 @@ public class WolfHospital {
 			String sql;
 			// cchen31
 			// Enter basic information about staff
-			sql = "INSERT INTO `Staff` (`staffID`, `name`, `age`, `gender`, `jobTitle`, `profTitle`, `department`, `phone`, `address`)" +
-					" VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
+			sql = "INSERT INTO `Staff` (`staffID`, `name`, `age`, `gender`, `jobTitle`, `profTitle`, `department`, `phone`, `address`)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			prep_addStaff = connection.prepareStatement(sql);
 			// Retrieve basic information about staff
-			sql = "SELECT * FROM `Staff`" +
-					" WHERE staffID = ?;";
-		    prep_getStaff = connection.prepareStatement(sql);
+			sql = "SELECT * FROM `Staff`" + " WHERE staffID = ?;";
+			prep_getStaff = connection.prepareStatement(sql);
 			// Update basic information about staff
-			sql = "UPDATE `Staff`" +
-					" SET `name` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `name` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffName = connection.prepareStatement(sql);
-			sql = "UPDATE `Staff`" +
-					" SET `age` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `age` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffAge = connection.prepareStatement(sql);
-			sql = "UPDATE `Staff`" +
-					" SET `jobTitle` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `jobTitle` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffJobTitle = connection.prepareStatement(sql);
-			sql = "UPDATE `Staff`" +
-					" SET `profTitle` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `profTitle` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffProfTitle = connection.prepareStatement(sql);
-			sql = "UPDATE `Staff`" +
-					" SET `department` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `department` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffDepart = connection.prepareStatement(sql);
-			sql = "UPDATE `Staff`" +
-					" SET `phone` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `phone` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffPhone = connection.prepareStatement(sql);
-			sql = "UPDATE `Staff`" +
-					" SET `address` = ?" +
-					" WHERE staffID = ?;";
+			sql = "UPDATE `Staff`" + " SET `address` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffAddress = connection.prepareStatement(sql);
 			// Delete basic information about staff
 			sql = "DELETE FROM `Staff`" + " WHERE staffID = ?;";
 			prep_deleteStaff = connection.prepareStatement(sql);
 			// Enter basic information about patients
-			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" +
-					" VALUES (?, ?);" +
-					"INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `gender`, `age`, `phone`, `address`, `status`)" +
-					" VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" + " VALUES (?, ?);"
+					+ "INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `gender`, `age`, `phone`, `address`, `status`)"
+					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 			prep_addPatients = connection.prepareStatement(sql);
 			// Retrieve basic information about patients
 			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
 			prep_getPatients = connection.prepareStatement(sql);
 			// Update basic information about patients
-			sql = "UPDATE `PersonInfo`" +
-					" SET `name` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo`" + " SET `name` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsName = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" +
-					" SET `age` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo`" + " SET `age` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsAge = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" +
-					" SET `phone` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo`" + " SET `phone` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsPhone = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" +
-					" SET `address` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo`" + " SET `address` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsAddress = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" +
-					" SET `status` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo`" + " SET `status` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsStatus = connection.prepareStatement(sql);
 			// Delete basic information about patients
 			sql = "DELETE FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
 			prep_deletePatients = connection.prepareStatement(sql);
 			// Enter basic information about wards
-			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)" +
-					" VALUES (?, ?, ?, ?);";
+			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)"
+					+ " VALUES (?, ?, ?, ?);";
 			prep_addWards = connection.prepareStatement(sql);
 			// Retrieve basic information about wards
-			sql = "SELECT * FROM `Wards`" +
-					" WHERE ward number = ?;";
+			sql = "SELECT * FROM `Wards`" + " WHERE ward number = ?;";
 			prep_getWards = connection.prepareStatement(sql);
 			// Update basic information about wards
-			sql = "UPDATE `Wards`" +
-					" SET `capacity` = ?" +
-					" WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `capacity` = ?" + " WHERE ward number = ?;";
 			prep_updateWardsCapacity = connection.prepareStatement(sql);
-			sql = "UPDATE `Wards`" +
-					" SET `charges per day` = ?" +
-					" WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `charges per day` = ?" + " WHERE ward number = ?;";
 			prep_updateWardsCharge = connection.prepareStatement(sql);
-			sql = "UPDATE `Wards`" +
-					" SET `responsible nurse` = ?" +
-					" WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `responsible nurse` = ?" + " WHERE ward number = ?;";
 			prep_updateWardsNurse = connection.prepareStatement(sql);
 			// fhy
 			// Get all treatment records
@@ -525,7 +496,7 @@ public class WolfHospital {
 			// Delete billing account
 			sql = "DELETE FROM `Billing Accounts` " + "WHERE accountID = ?;";
 			prep_deleteBillingAccount = connection.prepareStatement(sql);
-			
+
 			// GG
 			// Delete basic information about wards
 			sql = "DELETE FROM `Wards` " +
@@ -533,62 +504,57 @@ public class WolfHospital {
 			prep_deleteWardInfo = connection.prepareStatement(sql);
 			
 			// Check availability of wards
-			sql = "SELECT DISTINCT `ward number` " +
-					"FROM `Beds`" +
-					"WHERE ISNULL(patientID); ";
+			sql = "SELECT DISTINCT `ward number` " + "FROM `Beds`" + "WHERE ISNULL(patientID); ";
 			prep_checkWardAvailability = connection.prepareStatement(sql);
-			
+
 			// Assign wards:
-			//sql = "SELECT COUNT(`bed number`) FROM `Beds` WHERE `ward number` = ?; ";
-			//prep_assignWard = connection.prepareStatement(sql);
-			
+			// sql = "SELECT COUNT(`bed number`) FROM `Beds` WHERE `ward number` = ?; ";
+			// prep_assignWard = connection.prepareStatement(sql);
+
 			// Reserve wards
-			//sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " +
-			//		"VALUES (?, ?, ?, ?, ?) );" +
-			//	  "UPDATE `Beds` SET "
-			//		;
-			//prep_reserveWard = connection.prepareStatement(sql);
-			
+			// sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`,
+			// `start-date`, `end-date`) " +
+			// "VALUES (?, ?, ?, ?, ?) );" +
+			// "UPDATE `Beds` SET "
+			// ;
+			// prep_reserveWard = connection.prepareStatement(sql);
+
 			// Release wards
-			//sql = "";
-			//prep_releaseWard = connection.prepareStatement(sql);
-			
+			// sql = "";
+			// prep_releaseWard = connection.prepareStatement(sql);
+
 			// Add basic information of a bed
-			sql = "INSERT INTO `Beds` (`ward number`, `bed number`, `patientID`) " +
-					"VALUES (?, ?, ?); ";
+			sql = "INSERT INTO `Beds` (`ward number`, `bed number`, `patientID`) " + "VALUES (?, ?, ?); ";
 			prep_addBedInfo = connection.prepareStatement(sql);
-			
+
 			// Get basic information of a bed
-			sql = "SELECT * FROM `Beds` " +
-					"WHERE `ward number` = ? AND `bed number` = ?; ";
+			sql = "SELECT * FROM `Beds` " + "WHERE `ward number` = ? AND `bed number` = ?; ";
 			prep_getBedInfo = connection.prepareStatement(sql);
-			
-			
+
 			// Delete basic information of a bed
 			sql = "DELETE FROM `Beds` WHERE `ward number` = ? AND `bed number` = ?; ";
 			prep_deleteBedInfo = connection.prepareStatement(sql);
-			
+
 			// Assign beds
 			sql = "UPDATE `Beds` SET `patientID` = ? WHERE `ward number` = ? AND `bed number` = ?; ";
 			prep_assignBed = connection.prepareStatement(sql);
-			
+
 			// Check availability of beds
-			sql = "SELECT * FROM `Beds` " +
-					"WHERE ISNULL(patientID); ";
+			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID); ";
 			prep_checkBedAvailability = connection.prepareStatement(sql);
-			
+
 			// Reserve beds
-			//sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " +
-			//		"VALUES (?, ?, ?, ?, ?); ";
-			//prep_reserveBed = connection.prepareStatement(sql);
-			
+			// sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`,
+			// `start-date`, `end-date`) " +
+			// "VALUES (?, ?, ?, ?, ?); ";
+			// prep_reserveBed = connection.prepareStatement(sql);
+
 			// Release beds
 			sql = "UPDATE `Beds` SET `patientID` = NULL WHERE `ward number` = ? AND `bed number` = ?; ";
 			prep_releaseBed = connection.prepareStatement(sql);
-			
+
 			// Create treatment records
-			sql = "INSERT `Treatment` (`recordID`, `prescription`, `diagnosisDetails`) " +
-					"VALUES (?, ?, ?); ";
+			sql = "INSERT `Treatment` (`recordID`, `prescription`, `diagnosisDetails`) " + "VALUES (?, ?, ?); ";
 			prep_addTreatmentRecord = connection.prepareStatement(sql);
 
 		} catch (SQLException e) {
@@ -701,25 +667,24 @@ public class WolfHospital {
 								+ "`billingAddress` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`SSN`) " + ");");
 				// Yudong
 				// Billing accounts && PayerInfo
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" + 
+						"`accountID` VARCHAR(255) NOT NULL UNIQUE," + "`patientID` VARCHAR(255) NOT NULL," + 
+						"`visitDate` datetime NOT NULL," + "`payerSSN` VARCHAR(255) NOT NULL," + 
+						"`paymentMethod` VARCHAR(255) NOT NULL," + "`cardNumber` VARCHAR(255) DEFAULT NULL" + 
+						"`registrationFee` DOUBLE NOT NULL" + "`medicationPrescribed` BIT DEFAULT NULL" + 
+						"`accommandation fee` DOUBLE NOT NULL" + "PRIMARY KEY (`accountID`)" + 
+						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" + 
+						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" + ");");
+
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" +
-						"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
-						"`patientID` VARCHAR(255) NOT NULL," +
-						"`visitDate` datetime NOT NULL," +
-						"`payerSSN` VARCHAR(255) NOT NULL," +
-						"`paymentMethod` VARCHAR(255) NOT NULL," +
-						"`cardNumber` VARCHAR(255) DEFAULT NULL" +
-						"`registrationFee` DOUBLE NOT NULL" +
-						"`medicationPrescribed` BIT DEFAULT NULL" +
-						"`accommandation fee` DOUBLE NOT NULL" +
-						"PRIMARY KEY (`accountID`)" +
-						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
-						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" +
+						"CREATE TABLE IF NOT EXISTS`PayerInfo` ( " + 
+						"`SSN` VARCHAR(255) NOT NULL UNIQUE, " + 
+						"`billingAddress` VARCHAR(255) NOT NULL, " + 
+						"PRIMARY KEY (`SSN`) " + 
 						");");
-				
+
 				// GG
 				// Wards & Beds
-
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Beds` (" +
 						"`ward number` VARCHAR(255) NOT NULL," +
@@ -747,7 +712,6 @@ public class WolfHospital {
 							"ON DELETE CASCADE" +
 						");");
 
-
 				connection.commit();
 				System.out.println("Tables created!");
 			} catch (SQLException e) {
@@ -767,60 +731,64 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 			try {
 				switch (tableName) {
-					case "Staff":
-						addStaff("100", "Mary", 40, "Female", "Doctor", "senior", "Neurology", "654", "90 ABC St , Raleigh NC 27");
-						addStaff("101", "John", 45, "Male", "Billing Staff", "", "Office", "564", "798 XYZ St , Rochester NY 54");
-						//addStaff(102, Carol, 55, Female, Nurse, , ER, 911, 351 MH St , Greensboro NC 27);
-						//addStaff(103, Emma, 55, Female, Doctor, Senior surgeon, Oncological Surgery, 546, 49 ABC St , Raleigh NC 27);
-						//addStaff(104, Ava, 55, Female, Front Desk Staff, , Office, 777, 425 RG St , Raleigh NC 27);
-						//addStaff(105, Peter, 52, Male, Doctor, Anesthetist, Oncological Surgery, 724, 475 RG St , Raleigh NC 27);
-						//addStaff(106, Olivia, 27, Female, Nurse, , Neurology, 799, 325 PD St , Raleigh NC 27);
-						break;
-					case "Patients":
-						addPatient("1001", "000-01-1234", "David", "01/30/1980", "Male", 39, "919-123-3324", "69 ABC St , Raleigh NC 27730", "20", "001", "no");
-						//addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81 DEF St , Cary NC 27519, 20, 002, no);
-					case "Wards":
-						addWard("001", "4", "50", "102");
-				// Staff:
-									//GG
-					/* Populating data for Wards
-					 * String ward number,
-					 * Int capacity,
-					 * Double charges per day,
-					 * String responsible nurse
-					 * */
-					/* Populating data for Beds
-					 * String ward number,
-					 * String bed number,
-					 * String patientID
-					 * Demo data: for ward#001 beds#1,2,3,4; for ward#002 beds#1,2,3,4; for ward#003 beds#1,2; for ward#004 beds#1,2;
-					 * Patient000-01-1234 is assigned to w1b1, 000-03-1234 w1b2, 000-02-1234 w2b1, 000-04-1234 w3b1(finish treatment)
-					 * */
-					case "Beds":
-						manageBedAdd("001", "1", "000-01-1234");
-						manageBedAdd("001", "2", "000-03-1234");
-						manageBedAdd("001", "3", "");
-						manageBedAdd("001", "4", "");
-						manageBedAdd("002", "1", "000-02-1234");
-						manageBedAdd("002", "2", "");
-						manageBedAdd("002", "3", "");
-						manageBedAdd("002", "4", "");
-						manageBedAdd("003", "1", "000-04-1234");
-						manageBedAdd("003", "2", "");
-						manageBedAdd("004", "1", "");
-						manageBedAdd("004", "2", "");
-					/* Populating data for Assigned
-					 * String patientID,
-					 * String ward number,
-					 * String bed number,
-					 * Datetime start-date,
-					 * Datetime end-date
-					 * */
-					case "Assigned":
-						manageAssignedAdd("1001", "001", "1", "2019-03-01", "");
-						manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
-						manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
-						manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
+				case "Staff":
+					addStaff("100", "Mary", "40", "Female", "Doctor", "senior", "Neurology", "654",
+							"90 ABC St , Raleigh NC 27");
+					addStaff("101", "John", "45", "Male", "Billing Staff", "", "Office", "564",
+							"798 XYZ St , Rochester NY 54");
+					// addStaff(102, Carol, 55, Female, Nurse, , ER, 911, 351 MH St , Greensboro NC
+					// 27);
+					// addStaff(103, Emma, 55, Female, Doctor, Senior surgeon, Oncological Surgery,
+					// 546, 49 ABC St , Raleigh NC 27);
+					// addStaff(104, Ava, 55, Female, Front Desk Staff, , Office, 777, 425 RG St ,
+					// Raleigh NC 27);
+					// addStaff(105, Peter, 52, Male, Doctor, Anesthetist, Oncological Surgery, 724,
+					// 475 RG St , Raleigh NC 27);
+					// addStaff(106, Olivia, 27, Female, Nurse, , Neurology, 799, 325 PD St ,
+					// Raleigh NC 27);
+					break;
+				case "Patients":
+					addPatient("1001", "000-01-1234", "David", "01/30/1980", "Male", "39", "919-123-3324",
+							"69 ABC St , Raleigh NC 27730", "20", "001", "no");
+					// addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81
+					// DEF St , Cary NC 27519, 20, 002, no);
+				case "Wards":
+					addWard("001", "4", "50", "102");
+					// Staff:
+					// GG
+					/*
+					 * Populating data for Wards String ward number, Int capacity, Double charges
+					 * per day, String responsible nurse
+					 */
+					/*
+					 * Populating data for Beds String ward number, String bed number, String
+					 * patientID Demo data: for ward#001 beds#1,2,3,4; for ward#002 beds#1,2,3,4;
+					 * for ward#003 beds#1,2; for ward#004 beds#1,2; Patient000-01-1234 is assigned
+					 * to w1b1, 000-03-1234 w1b2, 000-02-1234 w2b1, 000-04-1234 w3b1(finish
+					 * treatment)
+					 */
+				case "Beds":
+					manageBedAdd("001", "1", "000-01-1234");
+					manageBedAdd("001", "2", "000-03-1234");
+					manageBedAdd("001", "3", "");
+					manageBedAdd("001", "4", "");
+					manageBedAdd("002", "1", "000-02-1234");
+					manageBedAdd("002", "2", "");
+					manageBedAdd("002", "3", "");
+					manageBedAdd("002", "4", "");
+					manageBedAdd("003", "1", "000-04-1234");
+					manageBedAdd("003", "2", "");
+					manageBedAdd("004", "1", "");
+					manageBedAdd("004", "2", "");
+					/*
+					 * Populating data for Assigned String patientID, String ward number, String bed
+					 * number, Datetime start-date, Datetime end-date
+					 */
+				case "Assigned":
+					manageAssignedAdd("1001", "001", "1", "2019-03-01", "");
+					manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
+					manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
+					manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
 
 					// Other tables...
 					// fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
@@ -830,42 +798,42 @@ public class WolfHospital {
 					// 104
 					// question: is empty string the correct way to deal with empty value of
 					// endDate?
-					case "Treatment":
-						// manageTreatmentRecordAdd() should be done by other teammates
-						break;
-					case "Test":
-						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-						// `endDate`, `responsibleDoctor` )
-						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
-						// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
-						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
-						// ref range:negative');
-						// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
-						// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
-						manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
-								"2019-03-15", "", "100");
-						manageTestRecordAdd("4", "test",
-								"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
-								"2019-03-21", "103");
-						break;
-					case "Check-ins":
-						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-						// `endDate`, `responsibleDoctor` )
-						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
-						// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
-						// VALUES ('9', '1', '2');
-						// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
-						manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
-						manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
-						manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
-						manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
-						break;
-					case "Billing Accounts":
-						manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
-								"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
-						break;
-					default:
-						break;
+				case "Treatment":
+					// manageTreatmentRecordAdd() should be done by other teammates
+					break;
+				case "Test":
+					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+					// `endDate`, `responsibleDoctor` )
+					// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
+					// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
+					// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
+					// ref range:negative');
+					// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
+					// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+					manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
+							"2019-03-15", "", "100");
+					manageTestRecordAdd("4", "test",
+							"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
+							"2019-03-21", "103");
+					break;
+				case "Check-ins":
+					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+					// `endDate`, `responsibleDoctor` )
+					// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
+					// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
+					// VALUES ('9', '1', '2');
+					// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+					manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
+					manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
+					manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
+					manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
+					break;
+				case "Billing Accounts":
+					manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
+							"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
+					break;
+				default:
+					break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
@@ -884,49 +852,63 @@ public class WolfHospital {
 	// cchen31
 	// Show an appointed row of Staff
 	private static void printStaffRow(ResultSet rs) {
-		String staffID = rs.getString("staffID");
-		String name = rs.getString("name");
-		int age = rs.getInt("age");
-		String gender = rs.getString("gender");
-		String jobTitle = rs.getString("jobTitle");
-		String profTitle = rs.getString("profTitle");
-		String department = rs.getString("department");
-		String phone = rs.getString("phone");
-		String address = rs.getString("address");
-
-		System.out.println(staffID + "\t" + name + "\t" + age + "\t" + gender + "\t" + jobTitle + "\t" +
-				profTitle + "\t" + department + "\t" + phone + "\t" + address);
+		try {
+			String staffID = rs.getString("staffID");
+			String name = rs.getString("name");
+			int age = rs.getInt("age");
+			String gender = rs.getString("gender");
+			String jobTitle = rs.getString("jobTitle");
+			String profTitle = rs.getString("profTitle");
+			String department = rs.getString("department");
+			String phone = rs.getString("phone");
+			String address = rs.getString("address");
+			System.out.println(staffID + "\t" + name + "\t" + age + "\t" + gender + "\t" + jobTitle + "\t" + profTitle
+					+ "\t" + department + "\t" + phone + "\t" + address);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
 	// Show an appointed row of patient
 	private static void printPatientsRow(ResultSet rs) {
-		String patientID = rs.getString("patientID");
-		String SSN = rs.getString("SSN");
-		String name = rs.getInt("name");
-		String gender = rs.getString("gender");
-		String DOB = rs.getString("DOB");
-		String age = rs.getString("age");
-		String status = rs.getString("status");
-		String phone = rs.getString("phone");
-		String address = rs.getString("address");
-
-		System.out.println(patientID + "\t" + SSN + "\t" + name + "\t" + gender + "\t" + DOB + "\t" + age  + "\t" +
-				phone + "\t" + address + "\t" + status);
+		try {
+			String patientID = rs.getString("patientID");
+			String SSN = rs.getString("SSN");
+			String name = rs.getString("name");
+			String gender = rs.getString("gender");
+			String DOB = rs.getString("DOB");
+			String age = rs.getString("age");
+			String status = rs.getString("status");
+			String phone = rs.getString("phone");
+			String address = rs.getString("address");
+			System.out.println(patientID + "\t" + SSN + "\t" + name + "\t" + gender + "\t" + DOB + "\t" + age + "\t"
+					+ phone + "\t" + address + "\t" + status);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
+
 	// Show an appointed row of wards
 	private static void printWardsRow(ResultSet rs) {
-		String wardNumber = rs.getString("ward number");
-		String capacity = rs.getString("capacity");
-		String dayCharge = rs.getInt("charges per day");
-		String nurse = rs.getString("responsible nurse");
-
-		System.out.println(wardNumber + "\t" + capacity + "\t" + dayCharge + "\t" + nurse);
+		try {
+			String wardNumber = rs.getString("ward number");
+			String capacity = rs.getString("capacity");
+			int dayCharge = rs.getInt("charges per day");
+			String nurse = rs.getString("responsible nurse");
+			System.out.println(wardNumber + "\t" + capacity + "\t" + dayCharge + "\t" + nurse);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	// Add a new staff
 	// need to deal with duplicate add?
 	public static void addStaff(String staffID, String name, String age, String gender, String jobTitle, String profTitle,
 								String department, String phone, String address) {
 		try {
-			connection.getAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_addStaff.setString(1, staffID);
 				prep_addStaff.setString(2, name);
@@ -939,11 +921,11 @@ public class WolfHospital {
 				prep_addStaff.setString(9, address);
 				prep_addStaff.executeUpdate();
 				connection.commit();
-			} catch (SQLExceptionException e) {
+			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
-				connection.getAutoCommit(true);
+				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -963,11 +945,11 @@ public class WolfHospital {
 		}
 	}
 	// update the value of an appointed field of an staff
-	public statis void updateStaff(String staffID, String attributeChanged, String newValue) {
+	public static void updateStaff(String staffID, String attributeToChange, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
-				switch (attributeChanged.toUpperCase()) {
+				switch (attributeToChange.toUpperCase()) {
 
 					case "NAME":
 						prep_updateStaffName.setString(1, newValue);
@@ -1041,25 +1023,26 @@ public class WolfHospital {
 	public static void addPatient(String patientID, String SSN, String name, String DOB, String gender, String age, String phone,
 								  String address, String treatmentPlan, String wardNum, String status) {
 		try {
-			connection.getAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_addPatients.setString(1, patientID);
 				prep_addPatients.setString(2, SSN);
-				prep_addPerso.setInt(3, Integer.parseInt(age));
-				prep_addPatients.setString(4, gender);
-				prep_addPatients.setString(5, jobTitle);
-				prep_addPatients.setString(6, profTitle);
-				prep_addPatients.setString(7, department);
+				prep_addPatients.setString(3, SSN);
+				prep_addPatients.setString(4, name);
+				prep_addPatients.setDate(5, java.sql.Date.valueOf(DOB));
+				prep_addPatients.setString(6, gender);
+				prep_addPatients.setInt(7, Integer.parseInt(age));
 				prep_addPatients.setString(8, phone);
-				prep_addPatients.setString(9, address);
+				prep_addPatients.setString(8, address);
+				prep_addPatients.setString(9, status);
 				// To-do: make use of variable treatmentPlan and wardNum. By calling prep_addTreatmentRecord and prep_assignWard here?
 				prep_addPatients.executeUpdate();
 				connection.commit();
-			} catch (SQLExceptionException e) {
+			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
-				connection.getAutoCommit(true);
+				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1072,18 +1055,18 @@ public class WolfHospital {
 			prep_getPatients.setString(1, patientID);
 			ResultSet rs = prep_getPatients.executeQuery();
 			if (rs.next()) {
-				printPatientRow(rs);
+				printPatientsRow(rs);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	// update the value of an appointed field of a patient
-	public statis void updatePatient(String patientID, String attributeChanged, String newValue) {
+	public static void updatePatient(String patientID, String attributeToChange, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
-				switch (attributeChanged.toUpperCase()) {
+				switch (attributeToChange.toUpperCase()) {
 
 					case "NAME":
 						prep_updatePatientsName.setString(1, newValue);
@@ -1112,14 +1095,14 @@ public class WolfHospital {
 						break;
 					// To-do: need to consider update of treatmentPlan and of wardNum, it seems no need to do this?!
 					default:
-						System.out.println("Cannot update the field " + attributeToChange + " for patient " + staffID + " .");
+						System.out.println("Cannot update the field " + attributeToChange + " for patient " + patientID + " .");
 						break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
-			} final {
+			} finally {
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
@@ -1148,7 +1131,7 @@ public class WolfHospital {
 	// Add a new ward
 	public static void addWard(String wardNumber, String capacity, String Daycharge, String responsibleNurse) {
 		try {
-			connection.getAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_addWards.setString(1, wardNumber);
 				prep_addWards.setString(2, capacity);
@@ -1156,11 +1139,11 @@ public class WolfHospital {
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
-			} catch (SQLExceptionException e) {
+			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
-				connection.getAutoCommit(true);
+				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1181,11 +1164,11 @@ public class WolfHospital {
 		}
 	}
 	// update the value of an appointed field of a ward
-	public statis void updateWard(String wardNumber, String attributeChanged, String newValue) {
+	public static void updateWard(String wardNumber, String attributeToChange, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
-				switch (attributeChanged.toUpperCase()) {
+				switch (attributeToChange.toUpperCase()) {
 
 					case "CAPACITY":
 						prep_updateWardsCapacity.setString(1, newValue);
@@ -1203,14 +1186,14 @@ public class WolfHospital {
 						prep_updateWardsNurse.executeUpdate();
 						break;
 					default:
-						System.out.println("Cannot update the field " + attributeToChange + " for ward " + staffID + " .");
+						System.out.println("Cannot update the field " + attributeToChange + " for ward " + wardNumber + " .");
 						break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
-			} final {
+			} finally {
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
