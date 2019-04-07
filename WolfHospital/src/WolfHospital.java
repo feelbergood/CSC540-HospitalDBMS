@@ -301,11 +301,16 @@ public class WolfHospital {
 			// Enter basic information about patients
 			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" +
 					" VALUES (?, ?);" +
-					"INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `gender`, `age`, `phone`, `address`, `status`)" +
-					" VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+					"INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `age`, `phone`, `status`)" +
+					" VALUES (?, ?, ?, ?, ?, ?);" +
+					"INSERT INTO `AgeInfo` (`DOB`, `gender`) VALUES (?, ?);" +
+					"INSERT INTO `ContactInfo` (`phone`, `address`) VALUES (?, ?);";
 			prep_addPatients = connection.prepareStatement(sql);
 			// Retrieve basic information about patients
-			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
+			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN" +
+					" JOIN `AgeInfo` a ON i.DOB = a.DOB" +
+					" JOIN  ContactInfo con ON i.phone = con.phone" +
+					" WHERE patientID = ?;";
 			prep_getPatients = connection.prepareStatement(sql);
 			// Update basic information about patients
 			sql = "UPDATE `PersonInfo`" +
@@ -316,20 +321,24 @@ public class WolfHospital {
 					" SET `age` = ?" +
 					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsAge = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" +
-					" SET `phone` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo` p `ContactInfo` c" +
+					" SET p.phone=?, c.phone=?" +
+					" WHERE p.phone=c.phone AND p.SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsPhone = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" +
+			sql = "UPDATE `ContactInfo`" +
 					" SET `address` = ?" +
-					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+					" WHERE phone IN (SELECT phone FROM PersonInfo WHERE SSN" +
+					" IN (SELECT SSN FROM Patients WHERE patientID = ?));";
 			prep_updatePatientsAddress = connection.prepareStatement(sql);
 			sql = "UPDATE `PersonInfo`" +
 					" SET `status` = ?" +
 					" WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsStatus = connection.prepareStatement(sql);
 			// Delete basic information about patients
-			sql = "DELETE FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
+			sql = "DELETE `Patients` p, `PersonInfo` i, `AgeInfo` a, `ContactInfo` con FROM p JOIN i ON p.SSN = i.SSN" +
+					" JOIN a ON i.DOB = a.DOB" +
+					" JOIN  con ON i.phone = con.phone" +
+					" WHERE patientID = ?;" ;
 			prep_deletePatients = connection.prepareStatement(sql);
 			// Enter basic information about wards
 			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)" +
@@ -649,8 +658,8 @@ public class WolfHospital {
 								"`capacity` varchar(255) NOT NULL, " +
 								"`charges per day` varchar(255) NOT NULL, " +
 								"`responsible nurse` varchar(255) NOT NULL, " +
-								"PRIMARY KEY (`ward number`)" +
-								"FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)"
+								"PRIMARY KEY (`ward number`) " +
+								"FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)" +
 								");");
 				//fhy: Medical Records, Treatment, Test, Check-ins
 				statement.executeUpdate(
@@ -779,8 +788,8 @@ public class WolfHospital {
 			try {
 				switch (tableName) {
 					case "Staff":
-						addStaff("100", "Mary", 40, "Female", "Doctor", "senior", "Neurology", "654", "90 ABC St , Raleigh NC 27");
-						addStaff("101", "John", 45, "Male", "Billing Staff", "", "Office", "564", "798 XYZ St , Rochester NY 54");
+						addStaff("100", "Mary", "40", "Female", "Doctor", "senior", "Neurology", "654", "90 ABC St , Raleigh NC 27");
+						addStaff("101", "John", "45", "Male", "Billing Staff", "", "Office", "564", "798 XYZ St , Rochester NY 54");
 						//addStaff(102, Carol, 55, Female, Nurse, , ER, 911, 351 MH St , Greensboro NC 27);
 						//addStaff(103, Emma, 55, Female, Doctor, Senior surgeon, Oncological Surgery, 546, 49 ABC St , Raleigh NC 27);
 						//addStaff(104, Ava, 55, Female, Front Desk Staff, , Office, 777, 425 RG St , Raleigh NC 27);
@@ -788,7 +797,7 @@ public class WolfHospital {
 						//addStaff(106, Olivia, 27, Female, Nurse, , Neurology, 799, 325 PD St , Raleigh NC 27);
 						break;
 					case "Patients":
-						addPatient("1001", "000-01-1234", "David", "01/30/1980", "Male", 39, "919-123-3324", "69 ABC St , Raleigh NC 27730", "20", "001", "no");
+						addPatient("1001", "000-01-1234", "David", "01/30/1980", "Male", "39", "919-123-3324", "69 ABC St , Raleigh NC 27730", "20", "001", "no");
 						//addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81 DEF St , Cary NC 27519, 20, 002, no);
 					case "Wards":
 						addWard("001", "4", "50", "102");
@@ -912,7 +921,7 @@ public class WolfHospital {
 	private static void printPatientsRow(ResultSet rs) {
 		String patientID = rs.getString("patientID");
 		String SSN = rs.getString("SSN");
-		String name = rs.getInt("name");
+		String name = rs.getString("name");
 		String gender = rs.getString("gender");
 		String DOB = rs.getString("DOB");
 		String age = rs.getString("age");
@@ -927,7 +936,7 @@ public class WolfHospital {
 	private static void printWardsRow(ResultSet rs) {
 		String wardNumber = rs.getString("ward number");
 		String capacity = rs.getString("capacity");
-		String dayCharge = rs.getInt("charges per day");
+		String dayCharge = rs.getString("charges per day");
 		String nurse = rs.getString("responsible nurse");
 
 		System.out.println(wardNumber + "\t" + capacity + "\t" + dayCharge + "\t" + nurse);
@@ -937,7 +946,7 @@ public class WolfHospital {
 	public static void addStaff(String staffID, String name, String age, String gender, String jobTitle, String profTitle,
 								String department, String phone, String address) {
 		try {
-			connection.getAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_addStaff.setString(1, staffID);
 				prep_addStaff.setString(2, name);
@@ -950,11 +959,11 @@ public class WolfHospital {
 				prep_addStaff.setString(9, address);
 				prep_addStaff.executeUpdate();
 				connection.commit();
-			} catch (SQLExceptionException e) {
+			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
-				connection.getAutoCommit(true);
+				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -974,11 +983,11 @@ public class WolfHospital {
 		}
 	}
 	// update the value of an appointed field of an staff
-	public statis void updateStaff(String staffID, String attributeChanged, String newValue) {
+	public static void updateStaff(String staffID, String attributeToChange, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
-				switch (attributeChanged.toUpperCase()) {
+				switch (attributeToChange.toUpperCase()) {
 
 					case "NAME":
 						prep_updateStaffName.setString(1, newValue);
@@ -1052,25 +1061,28 @@ public class WolfHospital {
 	public static void addPatient(String patientID, String SSN, String name, String DOB, String gender, String age, String phone,
 								  String address, String treatmentPlan, String wardNum, String status) {
 		try {
-			connection.getAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_addPatients.setString(1, patientID);
 				prep_addPatients.setString(2, SSN);
-				prep_addPerso.setInt(3, Integer.parseInt(age));
-				prep_addPatients.setString(4, gender);
-				prep_addPatients.setString(5, jobTitle);
-				prep_addPatients.setString(6, profTitle);
-				prep_addPatients.setString(7, department);
-				prep_addPatients.setString(8, phone);
-				prep_addPatients.setString(9, address);
+				prep_addPatients.setString(3, SSN);
+				prep_addPatients.setString(4, name);
+				prep_addPatients.setString(5, DOB);
+				prep_addPatients.setInt(6, Integer.parseInt(age));
+				prep_addPatients.setString(7, phone);
+				prep_addPatients.setString(8, status);
+				prep_addPatients.setString(9, DOB);
+				prep_addPatients.setString(10, gender);
+				prep_addPatients.setString(11, phone);
+				prep_addPatients.setString(12, address);                
 				// To-do: make use of variable treatmentPlan and wardNum. By calling prep_addTreatmentRecord and prep_assignWard here?
 				prep_addPatients.executeUpdate();
 				connection.commit();
-			} catch (SQLExceptionException e) {
+			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
-				connection.getAutoCommit(true);
+				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1083,14 +1095,14 @@ public class WolfHospital {
 			prep_getPatients.setString(1, patientID);
 			ResultSet rs = prep_getPatients.executeQuery();
 			if (rs.next()) {
-				printPatientRow(rs);
+				printPatientsRow(rs);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 	}
 	// update the value of an appointed field of a patient
-	public statis void updatePatient(String patientID, String attributeChanged, String newValue) {
+	public static void updatePatient(String patientID, String attributeChanged, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
@@ -1123,14 +1135,14 @@ public class WolfHospital {
 						break;
 					// To-do: need to consider update of treatmentPlan and of wardNum, it seems no need to do this?!
 					default:
-						System.out.println("Cannot update the field " + attributeToChange + " for patient " + staffID + " .");
+						System.out.println("Cannot update the field " + attributeChanged + " for patient " + patientID + " .");
 						break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
-			} final {
+			} finally {
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
@@ -1159,7 +1171,7 @@ public class WolfHospital {
 	// Add a new ward
 	public static void addWard(String wardNumber, String capacity, String Daycharge, String responsibleNurse) {
 		try {
-			connection.getAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_addWards.setString(1, wardNumber);
 				prep_addWards.setString(2, capacity);
@@ -1167,11 +1179,11 @@ public class WolfHospital {
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
-			} catch (SQLExceptionException e) {
+			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
 			} finally {
-				connection.getAutoCommit(true);
+				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -1192,7 +1204,7 @@ public class WolfHospital {
 		}
 	}
 	// update the value of an appointed field of a ward
-	public statis void updateWard(String wardNumber, String attributeChanged, String newValue) {
+	public static void updateWard(String wardNumber, String attributeChanged, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
@@ -1214,14 +1226,14 @@ public class WolfHospital {
 						prep_updateWardsNurse.executeUpdate();
 						break;
 					default:
-						System.out.println("Cannot update the field " + attributeToChange + " for ward " + staffID + " .");
+						System.out.println("Cannot update the field " + attributeChanged + " for ward " + wardNumber + " .");
 						break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
-			} final {
+			} finally {
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
