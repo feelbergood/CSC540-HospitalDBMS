@@ -102,6 +102,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateWardsCharge;
 	private static PreparedStatement prep_updateWardsNurse;
 	private static PreparedStatement prep_deleteWards;
+	private static PreparedStatement prep_deleteWardInformation;
 	// Patients
 	private static PreparedStatement prep_addPatients;
 	private static PreparedStatement prep_getPatients;
@@ -185,6 +186,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_checkBedAvailability;
 	//private static PreparedStatement prep_reserveBed;
 	private static PreparedStatement prep_releaseBed;
+	private static PreparedStatement prep_deleteBedInfo;
 
 	// Payer Info
 	private static PreparedStatement prep_addPayerInfo;
@@ -606,7 +608,6 @@ public class WolfHospital {
 				// Yudong
 				// Billing accounts && PayerInfo
 				statement.executeUpdate(
-<<<<<<< HEAD
 						"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" +
 						"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
 						"`patientID` VARCHAR(255) NOT NULL," +
@@ -660,8 +661,8 @@ public class WolfHospital {
 							"FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " +
 							"ON DELETE CASCADE" +
 						");");
-				
-=======
+
+						statement.executeUpdate(				
 						"CREATE TABLE IF NOT EXISTS`PayerInfo` ( " + "`SSN` VARCHAR(255) NOT NULL UNIQUE, "
 								+ "`billingAddress` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`SSN`) " + ");");
 
@@ -673,7 +674,6 @@ public class WolfHospital {
 						+ "`accommandationFee` DOUBLE NOT NULL " + "PRIMARY KEY (`accountID`) "
 						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) "
 						+ "FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`) " + ");");
->>>>>>> 214bfb42e18a241e76aefa0c651fa34d065a03ef
 
 				connection.commit();
 				System.out.println("Tables created!");
@@ -693,55 +693,9 @@ public class WolfHospital {
 		try {
 			connection.setAutoCommit(false);
 			try {
-<<<<<<< HEAD
-				switch(tableName) {
-					// Staff:
-					case "Staff":
-						prep_addStaff.setString(1, "xxx");
-						break;
-					// Other tables...
-					//fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
-					//demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with 2 different doctors, consist of one test(by 103) and one treatment(by 105)
-					//the only front desk staff is 104, so all check-ins are assumed to be done by 104
-					//question: is empty string the correct way to deal with empty value of endDate?
-					case "Treatment":
-						//GG
-						/* Populating data for Treatment
-						 * INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
-						 * INSERT INTO `Treatment` (`recordID`, `prescription`, `diagnosisDetails`)
-						 * String recordID,
-						 * String patientID,
-						 * Datetime startDate, endDate, 
-						 * String responsibleDoctor,
-						 * String prescription, diagnosisDetails
-						 */
-						manageTreatmentRecordAdd("1", "1001", "2019-03-01", "", "100", "nervine", "Hospitalization");
-						manageTreatmentRecordAdd("2", "1002", "2019-03-10", "", "100", "nervine", "Hospitalization");
-						break;
-					case "Test":
-						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
-						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
-						//INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
-						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+, ref range:negative');
-						//manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
-						manageTestRecordAdd(3, "test", "prescription nervine, diagnosis details Hospitalization", 1003, "2019-03-15", "", 100);
-						manageTestRecordAdd(4, "test", "prescription analgesic, diagnosis details Surgeon, Hospitalization", 1004, "2019-03-17", "2019-03-21", 103);
-						break;
-					case "Check-ins":
-						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
-						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
-						//INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
-						// VALUES ('9', '1', '2');
-						//manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
-						manageCheckinRecordAdd(1, 001, 1, 1001,"2019-03-01", "", 104);
-						manageCheckinRecordAdd(2, 002, 1, 1002,"2019-03-10", "", 104);
-						manageCheckinRecordAdd(3, 001, 2, 1003,"2019-03-15", "", 104);
-						manageCheckinRecordAdd(4, 003, 1, 1004,"2019-03-17", "2019-03-21", 104);
-						break;
-					case "Billing Accounts":
-						break;
-					
-					//GG
+				switch (tableName) {
+				// Staff:
+									//GG
 					/* Populating data for Wards
 					 * String ward number,
 					 * Int capacity,
@@ -786,61 +740,51 @@ public class WolfHospital {
 						manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
 						manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
 
+					// Other tables...
+					// fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
+					// demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with
+					// 2 different doctors, consist of one test(by 103) and one treatment(by 105)
+					// the only front desk staff is 104, so all check-ins are assumed to be done by
+					// 104
+					// question: is empty string the correct way to deal with empty value of
+					// endDate?
+					case "Treatment":
+						// manageTreatmentRecordAdd() should be done by other teammates
+						break;
+					case "Test":
+						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+						// `endDate`, `responsibleDoctor` )
+						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
+						// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
+						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
+						// ref range:negative');
+						// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
+						// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+						manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
+								"2019-03-15", "", "100");
+						manageTestRecordAdd("4", "test",
+								"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
+								"2019-03-21", "103");
+						break;
+					case "Check-ins":
+						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+						// `endDate`, `responsibleDoctor` )
+						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
+						// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
+						// VALUES ('9', '1', '2');
+						// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+						manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
+						manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
+						manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
+						manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
+						break;
+					case "Billing Accounts":
+						manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
+								"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
+						break;
+
 					default:
 						break;
-				}
-=======
-				switch (tableName) {
-				// Staff:
-				case "Staff":
-					prep_addStaff.setString(1, "xxx");
-					break;
-				// Other tables...
-				// fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
-				// demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with
-				// 2 different doctors, consist of one test(by 103) and one treatment(by 105)
-				// the only front desk staff is 104, so all check-ins are assumed to be done by
-				// 104
-				// question: is empty string the correct way to deal with empty value of
-				// endDate?
-				case "Treatment":
-					// manageTreatmentRecordAdd() should be done by other teammates
-					break;
-				case "Test":
-					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-					// `endDate`, `responsibleDoctor` )
-					// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
-					// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
-					// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
-					// ref range:negative');
-					// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
-					// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
-					manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
-							"2019-03-15", "", "100");
-					manageTestRecordAdd("4", "test",
-							"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
-							"2019-03-21", "103");
-					break;
-				case "Check-ins":
-					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-					// `endDate`, `responsibleDoctor` )
-					// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
-					// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
-					// VALUES ('9', '1', '2');
-					// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
-					manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
-					manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
-					manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
-					manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
-					break;
-				case "Billing Accounts":
-					manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
-							"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
-					break;
->>>>>>> 214bfb42e18a241e76aefa0c651fa34d065a03ef
-
-				default:
-					break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
@@ -1400,7 +1344,7 @@ public class WolfHospital {
 		
 		try {
 			
-			connecttion.setAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_deleteWardInfo.setString(1, wardNum);
 				prep_deleteWardInfo.executeUpdate();
@@ -1426,8 +1370,7 @@ public class WolfHospital {
 	public static void manageBedDelete(String wardNum, String bedNum) {
 		
 		try {
-			
-			connecttion.setAutoCommit(false);
+			connection.setAutoCommit(false);
 			try {
 				prep_deleteBedInfo.setString(1, wardNum);
 				prep_deleteBedInfo.setString(2, bedNum);
@@ -1455,7 +1398,7 @@ public class WolfHospital {
 		try {
 			result = prep_checkWardAvailability.executeQuery();
 			if (result.next()) {
-				succuss = true;
+				success = true;
 				result.beforeFirst();
 			}
 		} catch (SQLException e) {
@@ -1474,7 +1417,7 @@ public class WolfHospital {
 		try {
 			result = prep_checkBedAvailability.executeQuery();
 			if (result.next()) {
-				succuss = true;
+				success = true;
 				result.beforeFirst();
 			}
 		} catch (SQLException e) {
