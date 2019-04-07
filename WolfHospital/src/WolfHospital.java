@@ -166,7 +166,6 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateBillingAccountMedicationPrescribed;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
-<<<<<<< HEAD
 	
 	//GG
 	// Basic Information - Wards(partial, the rest should be done by others)
@@ -176,31 +175,22 @@ public class WolfHospital {
 	//private static PreparedStatement prep_reserveWard;
 	//private static PreparedStatement prep_releaseWard;
 	
-	//Baisic Information - Beds
+	//Basic Information - Beds
 	private static PreparedStatement prep_addBedInfo;
 	private static PreparedStatement prep_getBedInfo;
 	private static PreparedStatement prep_deletebBedInfo;
-=======
+	
+	// Management - Beds
+	private static PreparedStatement prep_assignBed;
+	private static PreparedStatement prep_checkBedAvailability;
+	//private static PreparedStatement prep_reserveBed;
+	private static PreparedStatement prep_releaseBed;
 
 	// Payer Info
 	private static PreparedStatement prep_addPayerInfo;
 	private static PreparedStatement prep_updatePayerAddress;
 	private static PreparedStatement prep_deletePayerInfo;
 
-	// GG
-	// Basic Information - Wards
-	private static PreparedStatement prep_deleteWardInformation;
-	private static PreparedStatement prep_checkWardAvailability;
-	private static PreparedStatement prep_assignWard;
-	private static PreparedStatement prep_reserveWard;
-	private static PreparedStatement prep_releaseWard;
-
-	// Baisic Information - Beds
->>>>>>> 214bfb42e18a241e76aefa0c651fa34d065a03ef
-	private static PreparedStatement prep_assignBed;
-	private static PreparedStatement prep_checkBedAvailability;
-	//private static PreparedStatement prep_reserveBed;
-	private static PreparedStatement prep_releaseBed;
 
 	// Establish connection
 	public static void connectToDatabase() {
