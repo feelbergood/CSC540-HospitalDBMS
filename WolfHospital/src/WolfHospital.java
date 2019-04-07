@@ -1,5 +1,3 @@
-import com.sun.org.apache.xpath.internal.operations.String;
-
 import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Scanner;
@@ -626,12 +624,24 @@ public class WolfHospital {
 								"`SSN` varchar(255) NOT NULL, " +
 								"`name` varchar(255) NOT NULL, " +
 								"`DOB` datetime NOT NULL, " +
-								"`gender` VARCHAR(255) NOT NULL, " +
     							"`age` int(3) NOT NULL, " +
 								"`phone` VARCHAR(255) NOT NULL," +
-								"`address` VARCHAR(255) NOT NULL," +
 								"`status` varchar(255) NOT NULL, " +
 								"PRIMARY KEY (`SSN`)" +
+								"FOREIGN KEY (`DOB`) REFERENCES AgeInfo(`DOB`)" +
+								"FOREIGN KEY (`phone`) REFERENCES ContactInfo(`phone`)" +
+								");");
+				statement.executeUpdate(
+						    "CREATE TABLE IF NOT EXISTS `AgeInfo`" +
+									"`DOB` datetime NOT NULL, " +
+									"`gender` VARCHAR(255) NOT NULL, " +
+									"PRIMARY KEY (`DOB`)" +
+									");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `ContactInfo`" +
+								"`phone` VARCHAR(255) NOT NULL," +
+								"`address` VARCHAR(255) NOT NULL," +
+								"PRIMARY KEY (`phone`)" +
 								");");
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Wards` (" +
@@ -884,7 +894,7 @@ public class WolfHospital {
 	// TO-DO 5: define and implement other functions
 	// cchen31
 	// Show an appointed row of Staff
-	private static void printStaffRow(Result rs) {
+	private static void printStaffRow(ResultSet rs) {
 		String staffID = rs.getString("staffID");
 		String name = rs.getString("name");
 		int age = rs.getInt("age");
@@ -899,7 +909,7 @@ public class WolfHospital {
 				profTitle + "\t" + department + "\t" + phone + "\t" + address);
 	}
 	// Show an appointed row of patient
-	private static void printPatientsRow(Result rs) {
+	private static void printPatientsRow(ResultSet rs) {
 		String patientID = rs.getString("patientID");
 		String SSN = rs.getString("SSN");
 		String name = rs.getInt("name");
@@ -914,7 +924,7 @@ public class WolfHospital {
 				phone + "\t" + address + "\t" + status);
 	}
 	// Show an appointed row of wards
-	private static void printWardsRow(Result rs) {
+	private static void printWardsRow(ResultSet rs) {
 		String wardNumber = rs.getString("ward number");
 		String capacity = rs.getString("capacity");
 		String dayCharge = rs.getInt("charges per day");
@@ -1013,7 +1023,7 @@ public class WolfHospital {
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
-			} final {
+			} finally {
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
