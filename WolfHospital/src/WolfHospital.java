@@ -81,6 +81,9 @@ public class WolfHospital {
 	private static Statement statement;
 	private static ResultSet result;
 
+	private static String[] tableNames=new String{"Staff", "AgeInfo", "ContactInfo", "PersonInfo", "Patients", "Wards",
+		"Medical Records", "Treatment", "Test", "Check-ins", "PayerInfo", "Billing Accounts", "Beds", "Assigned"};
+
 	// Prepared Statements pre-declared
 	// TO-DO 1: instantiate preparedStatements
 	// cchen31
@@ -186,7 +189,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_checkBedAvailability;
 	// private static PreparedStatement prep_reserveBed;
 	private static PreparedStatement prep_releaseBed;
-	private static PreparedStatement prep_deleteBedInfo;
+//	private static PreparedStatement prep_deleteBedInfo;
 
 	// Payer Info
 	private static PreparedStatement prep_addPayerInfo;
@@ -496,9 +499,10 @@ public class WolfHospital {
 
 			// GG
 			// Delete basic information about wards
-			sql = "DELETE FROM `Wards` " + "WHERE `ward number` = ?; ";
-			prep_deleteWardInformation = connection.prepareStatement(sql);
-
+			sql = "DELETE FROM `Wards` " +
+					"WHERE `ward number` = ?; ";
+			prep_deleteWardInfo = connection.prepareStatement(sql);
+			
 			// Check availability of wards
 			sql = "SELECT DISTINCT `ward number` " + "FROM `Beds`" + "WHERE ISNULL(patientID); ";
 			prep_checkWardAvailability = connection.prepareStatement(sql);
@@ -578,11 +582,16 @@ public class WolfHospital {
 								"PRIMARY KEY (`staffID`)" +
 								");");
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Patients` (" +
-								"`patientID` varchar(255) NOT NULL, " +
-								"`SSN` varchar(255) NOT NULL UNIQUE, " +
-								"PRIMARY KEY (`patientID`)" +
-								"FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" +
+						"CREATE TABLE IF NOT EXISTS `AgeInfo`" +
+								"`DOB` datetime NOT NULL, " +
+								"`gender` VARCHAR(255) NOT NULL, " +
+								"PRIMARY KEY (`DOB`)" +
+								");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `ContactInfo`" +
+								"`phone` VARCHAR(255) NOT NULL," +
+								"`address` VARCHAR(255) NOT NULL," +
+								"PRIMARY KEY (`phone`)" +
 								");");
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `PersonInfo` (" +
@@ -597,25 +606,23 @@ public class WolfHospital {
 								"FOREIGN KEY (`phone`) REFERENCES ContactInfo(`phone`)" +
 								");");
 				statement.executeUpdate(
-						    "CREATE TABLE IF NOT EXISTS `AgeInfo`" +
-									"`DOB` datetime NOT NULL, " +
-									"`gender` VARCHAR(255) NOT NULL, " +
-									"PRIMARY KEY (`DOB`)" +
-									");");
-				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `ContactInfo`" +
-								"`phone` VARCHAR(255) NOT NULL," +
-								"`address` VARCHAR(255) NOT NULL," +
-								"PRIMARY KEY (`phone`)" +
+						"CREATE TABLE IF NOT EXISTS `Patients` (" +
+								"`patientID` varchar(255) NOT NULL, " +
+								"`SSN` varchar(255) NOT NULL UNIQUE, " +
+								"PRIMARY KEY (`patientID`)" +
+								"FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" +
 								");");
+				// GG
+				// Wards & Beds
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Wards` (" +
-								"`ward number` varchar(255) NOT NULL, " +
-								"`capacity` varchar(255) NOT NULL, " +
-								"`charges per day` varchar(255) NOT NULL, " +
-								"`responsible nurse` varchar(255) NOT NULL, " +
-								"PRIMARY KEY (`ward number`)" +
-								"FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)" +
+								"`ward number` VARCHAR(255) NOT NULL UNIQUE," +
+								"`capacity` TINYINT NOT NULL," +
+								"`charges per day` DOUBLE NOT NULL," +
+								"`responsible nurse` VARCHAR(255) NOT NULL," +
+								"PRIMARY KEY (`ward number`) " +
+								"CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) " +
+								"ON DELETE CASCADE" +
 								");");
 				//fhy: Medical Records, Treatment, Test, Check-ins
 				statement.executeUpdate(
@@ -654,6 +661,10 @@ public class WolfHospital {
 						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
 						"FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)" +
 						");");
+
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS`PayerInfo` ( " + "`SSN` VARCHAR(255) NOT NULL UNIQUE, "
+								+ "`billingAddress` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`SSN`) " + ");");
 				// Yudong
 				// Billing accounts && PayerInfo
 				statement.executeUpdate("CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" + 
@@ -675,24 +686,31 @@ public class WolfHospital {
 				// GG
 				// Wards & Beds
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Wards` (" + "`ward number` VARCHAR(255) NOT NULL UNIQUE,"
-								+ "`capacity` TINYINT NOT NULL," + "`charges per day` DOUBLE NOT NULL,"
-								+ "`responsible nurse` VARCHAR(255) NOT NULL," + "PRIMARY KEY (`ward number`) "
-								+ "CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) "
-								+ "ON DELETE CASCADE" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Beds` (" + "`ward number` VARCHAR(255) NOT NULL,"
-						+ "`bed number` VARCHAR(255) NOT NULL," + "`patientID` VARCHAR(255) DEFAULT NULL,"
-						+ "PRIMARY KEY (`ward number`, `bed number`) " + "CONSTRAINT `fk_bed`"
-						+ "FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) "
-						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " + "ON DELETE CASCADE" + ");");
+						"CREATE TABLE IF NOT EXISTS `Beds` (" +
+						"`ward number` VARCHAR(255) NOT NULL," +
+						"`bed number` VARCHAR(255) NOT NULL," +
+						"`patientID` VARCHAR(255) DEFAULT NULL," +
+						"PRIMARY KEY (`ward number`, `bed number`) " +
+						"CONSTRAINT `fk_bed`" +
+							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
+							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
+							"ON DELETE CASCADE" +
+						");");
 				// Assigned
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Assigned` (" + "`patientID` VARCHAR(255) NOT NULL,"
-						+ "`ward number` VARCHAR(255) NOT NULL," + "`bed number` VARCHAR(255) NOT NULL,"
-						+ "`start-date` DATETIME NOT NULL," + "`end-date` DATETIME DEFAULT NULL,"
-						+ "CONSTRAINT pk_assign PRIMARY KEY (`patientID`, `ward number`, `bed number`)"
-						+ "CONSTRAINT `fk_assign`" + "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) "
-						+ "FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) "
-						+ "FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " + "ON DELETE CASCADE" + ");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Assigned` (" +
+						"`patientID` VARCHAR(255) NOT NULL," +
+						"`ward number` VARCHAR(255) NOT NULL," +
+						"`bed number` VARCHAR(255) NOT NULL," +
+						"`start-date` DATETIME NOT NULL," +
+						"`end-date` DATETIME DEFAULT NULL," +
+						"CONSTRAINT pk_assign PRIMARY KEY (`patientID`, `ward number`, `bed number`)" +
+						"CONSTRAINT `fk_assign`" +
+							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
+							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
+							"FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " +
+							"ON DELETE CASCADE" +
+						");");
 
 				connection.commit();
 				System.out.println("Tables created!");
