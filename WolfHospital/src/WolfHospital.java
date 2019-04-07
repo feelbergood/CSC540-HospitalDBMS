@@ -286,12 +286,18 @@ public class WolfHospital {
 			sql = "DELETE FROM `Staff`" + " WHERE staffID = ?;";
 			prep_deleteStaff = connection.prepareStatement(sql);
 			// Enter basic information about patients
-			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" + " VALUES (?, ?);"
-					+ "INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `gender`, `age`, `phone`, `address`, `status`)"
-					+ " VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" +
+					" VALUES (?, ?);" +
+					"INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `age`, `phone`, `status`)" +
+					" VALUES (?, ?, ?, ?, ?, ?);" +
+					"INSERT INTO `AgeInfo` (`DOB`, `gender`) VALUES (?, ?);" +
+					"INSERT INTO `ContactInfo` (`phone`, `address`) VALUES (?, ?);";
 			prep_addPatients = connection.prepareStatement(sql);
 			// Retrieve basic information about patients
-			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
+			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN" +
+					" JOIN `AgeInfo` a ON i.DOB = a.DOB" +
+					" JOIN  ContactInfo con ON i.phone = con.phone" +
+					" WHERE patientID = ?;";
 			prep_getPatients = connection.prepareStatement(sql);
 			// Update basic information about patients
 			sql = "UPDATE `PersonInfo`" + " SET `name` = ?"
@@ -300,17 +306,23 @@ public class WolfHospital {
 			sql = "UPDATE `PersonInfo`" + " SET `age` = ?"
 					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsAge = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" + " SET `phone` = ?"
-					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo` p `ContactInfo` c" +
+					" SET p.phone=?, c.phone=?" +
+					" WHERE p.phone=c.phone AND p.SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsPhone = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" + " SET `address` = ?"
-					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `ContactInfo`" +
+					" SET `address` = ?" +
+					" WHERE phone IN (SELECT phone FROM PersonInfo WHERE SSN" +
+					" IN (SELECT SSN FROM Patients WHERE patientID = ?));";
 			prep_updatePatientsAddress = connection.prepareStatement(sql);
 			sql = "UPDATE `PersonInfo`" + " SET `status` = ?"
 					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsStatus = connection.prepareStatement(sql);
 			// Delete basic information about patients
-			sql = "DELETE FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN WHERE patientID = ?;";
+			sql = "DELETE `Patients` p, `PersonInfo` i, `AgeInfo` a, `ContactInfo` con FROM p JOIN i ON p.SSN = i.SSN" +
+					" JOIN a ON i.DOB = a.DOB" +
+					" JOIN  con ON i.phone = con.phone" +
+					" WHERE patientID = ?;" ;
 			prep_deletePatients = connection.prepareStatement(sql);
 			// Enter basic information about wards
 			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)"
@@ -789,7 +801,6 @@ public class WolfHospital {
 					manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
 					manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
 					manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
-
 					// Other tables...
 					// fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
 					// demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with
@@ -877,8 +888,8 @@ public class WolfHospital {
 			String SSN = rs.getString("SSN");
 			String name = rs.getString("name");
 			String gender = rs.getString("gender");
-			String DOB = rs.getString("DOB");
-			String age = rs.getString("age");
+			String DOB = rs.getDate("DOB");
+			int age = rs.getInt("age");
 			String status = rs.getString("status");
 			String phone = rs.getString("phone");
 			String address = rs.getString("address");
@@ -894,8 +905,8 @@ public class WolfHospital {
 	private static void printWardsRow(ResultSet rs) {
 		try {
 			String wardNumber = rs.getString("ward number");
-			String capacity = rs.getString("capacity");
-			int dayCharge = rs.getInt("charges per day");
+			int capacity = rs.getInt("capacity");
+			float dayCharge = rs.getFloat("charges per day");
 			String nurse = rs.getString("responsible nurse");
 			System.out.println(wardNumber + "\t" + capacity + "\t" + dayCharge + "\t" + nurse);
 		} catch (SQLException e) {
@@ -1029,12 +1040,14 @@ public class WolfHospital {
 				prep_addPatients.setString(2, SSN);
 				prep_addPatients.setString(3, SSN);
 				prep_addPatients.setString(4, name);
-				prep_addPatients.setDate(5, java.sql.Date.valueOf(DOB));
-				prep_addPatients.setString(6, gender);
-				prep_addPatients.setInt(7, Integer.parseInt(age));
-				prep_addPatients.setString(8, phone);
-				prep_addPatients.setString(8, address);
-				prep_addPatients.setString(9, status);
+				prep_addPatients.setString(5, DOB);
+				prep_addPatients.setInt(6, Integer.parseInt(age));
+				prep_addPatients.setString(7, phone);
+				prep_addPatients.setString(8, status);
+				prep_addPatients.setString(9, DOB);
+				prep_addPatients.setString(10, gender);
+				prep_addPatients.setString(11, phone);
+				prep_addPatients.setString(12, address);                
 				// To-do: make use of variable treatmentPlan and wardNum. By calling prep_addTreatmentRecord and prep_assignWard here?
 				prep_addPatients.executeUpdate();
 				connection.commit();
@@ -1062,11 +1075,11 @@ public class WolfHospital {
 		}
 	}
 	// update the value of an appointed field of a patient
-	public static void updatePatient(String patientID, String attributeToChange, String newValue) {
+	public static void updatePatient(String patientID, String attributeChanged, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
-				switch (attributeToChange.toUpperCase()) {
+				switch (attributeChanged.toUpperCase()) {
 
 					case "NAME":
 						prep_updatePatientsName.setString(1, newValue);
@@ -1095,7 +1108,7 @@ public class WolfHospital {
 						break;
 					// To-do: need to consider update of treatmentPlan and of wardNum, it seems no need to do this?!
 					default:
-						System.out.println("Cannot update the field " + attributeToChange + " for patient " + patientID + " .");
+						System.out.println("Cannot update the field " + attributeChanged + " for patient " + patientID + " .");
 						break;
 				}
 				connection.commit();
@@ -1164,11 +1177,11 @@ public class WolfHospital {
 		}
 	}
 	// update the value of an appointed field of a ward
-	public static void updateWard(String wardNumber, String attributeToChange, String newValue) {
+	public static void updateWard(String wardNumber, String attributeChanged, String newValue) {
 		try {
 			connection.setAutoCommit(true);
 			try {
-				switch (attributeToChange.toUpperCase()) {
+				switch (attributeChanged.toUpperCase()) {
 
 					case "CAPACITY":
 						prep_updateWardsCapacity.setString(1, newValue);
@@ -1186,7 +1199,7 @@ public class WolfHospital {
 						prep_updateWardsNurse.executeUpdate();
 						break;
 					default:
-						System.out.println("Cannot update the field " + attributeToChange + " for ward " + wardNumber + " .");
+						System.out.println("Cannot update the field " + attributeChanged + " for ward " + wardNumber + " .");
 						break;
 				}
 				connection.commit();
