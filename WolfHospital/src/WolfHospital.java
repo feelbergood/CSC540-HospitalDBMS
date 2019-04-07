@@ -81,7 +81,7 @@ public class WolfHospital {
 	private static Statement statement;
 	private static ResultSet result;
 
-	private static String[] tableNames=new String{"Staff", "AgeInfo", "ContactInfo", "PersonInfo", "Patients", "Wards",
+	private static String[] tableNames=new String[]{"Staff", "AgeInfo", "ContactInfo", "PersonInfo", "Patients", "Wards",
 		"Medical Records", "Treatment", "Test", "Check-ins", "PayerInfo", "Billing Accounts", "Beds", "Assigned"};
 
 	// Prepared Statements pre-declared
@@ -182,7 +182,7 @@ public class WolfHospital {
 	// Basic Information - Beds
 	private static PreparedStatement prep_addBedInfo;
 	private static PreparedStatement prep_getBedInfo;
-	private static PreparedStatement prep_deletebBedInfo;
+	private static PreparedStatement prep_deleteBedInfo;
 
 	// Management - Beds
 	private static PreparedStatement prep_assignBed;
@@ -190,6 +190,7 @@ public class WolfHospital {
 	// private static PreparedStatement prep_reserveBed;
 	private static PreparedStatement prep_releaseBed;
 //	private static PreparedStatement prep_deleteBedInfo;
+	private static PreparedStatement prep_addAssigned;
 
 	// Payer Info
 	private static PreparedStatement prep_addPayerInfo;
@@ -216,9 +217,9 @@ public class WolfHospital {
 				// your SQL statements to the DBMS
 				statement = connection.createStatement();
 			} finally {
-				close(result);
-				close(statement);
-				close(connection);
+				// close(result);
+				// close(statement);
+				// close(connection);
 			}
 		} catch (Throwable oops) {
 			oops.printStackTrace();
@@ -557,6 +558,10 @@ public class WolfHospital {
 			sql = "INSERT `Treatment` (`recordID`, `prescription`, `diagnosisDetails`) " + "VALUES (?, ?, ?); ";
 			prep_addTreatmentRecord = connection.prepareStatement(sql);
 
+			//Create assigned
+			sql = "INSERT `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " + "VALUES (?, ?, ?, ?, ?); ";
+			prep_addAssigned = connection.prepareStatement(sql);
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -571,27 +576,27 @@ public class WolfHospital {
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Staff` (" +
 								"`staffID` VARCHAR(255) NOT NULL, " +
-								"`name` VARCHAR(255) NOT NULL," +
-								"`age` INT(3) NOT NULL," +
-								"`gender` VARCHAR(255) NOT NULL," +
-								"`jobTitle` VARCHAR(255) NOT NULL," +
-								"`profTitle` VARCHAR(255) NULL," +
-								"`department` VARCHAR(255) NOT NULL," +
-								"`phone` VARCHAR(255) NOT NULL," +
-								"`address` VARCHAR(255) NOT NULL," +
+								"`name` VARCHAR(255) NOT NULL, " +
+								"`age` INT(3) NOT NULL, " +
+								"`gender` VARCHAR(255) NOT NULL, " +
+								"`jobTitle` VARCHAR(255) NOT NULL, " +
+								"`profTitle` VARCHAR(255) NULL, " +
+								"`department` VARCHAR(255) NOT NULL, " +
+								"`phone` VARCHAR(255) NOT NULL, " +
+								"`address` VARCHAR(255) NOT NULL, " +
 								"PRIMARY KEY (`staffID`)" +
 								");");
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `AgeInfo`" +
+						"CREATE TABLE IF NOT EXISTS `AgeInfo` (" +
 								"`DOB` datetime NOT NULL, " +
 								"`gender` VARCHAR(255) NOT NULL, " +
 								"PRIMARY KEY (`DOB`)" +
 								");");
 				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `ContactInfo`" +
-								"`phone` VARCHAR(255) NOT NULL," +
-								"`address` VARCHAR(255) NOT NULL," +
-								"PRIMARY KEY (`phone`)" +
+						"CREATE TABLE IF NOT EXISTS `ContactInfo` (" +
+								"`phone` VARCHAR(255) NOT NULL, " +
+								"`address` VARCHAR(255) NOT NULL, " +
+								"PRIMARY KEY (`phone`);" +
 								");");
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `PersonInfo` (" +
@@ -800,6 +805,9 @@ public class WolfHospital {
 					// endDate?
 				case "Treatment":
 					// manageTreatmentRecordAdd() should be done by other teammates
+					//GG
+					manageTreatmentRecordAdd("1", "nervine", "Hospitalization");
+					manageTreatmentRecordAdd("2", "nervine", "Hospitalization");
 					break;
 				case "Test":
 					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
@@ -1893,12 +1901,75 @@ public class WolfHospital {
 		}
 	}
 
+	// Assigned
+	public static void manageAssignedAdd(String patientID, String wardNum, String bedNum, String start, String end){
+
+		try{
+			connection.setAutoCommit(false);
+			try{
+				connection.setAutoCommit(true);
+				prep_addAssigned.setString(1, patientID);
+				prep_addAssigned.setString(2, wardNum);
+				prep_addAssigned.setString(3, bedNum);
+				prep_addAssigned.setDate(4, java.sql.Date.valueOf(start));
+				prep_addAssigned.setDate(5, java.sql.Date.valueOf(end));
+				prep_addAssigned.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+				connection.rollback();
+			}
+			finally {
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err){
+			error_handler(err);
+		}
+
+	}
+
+	// Create treatment records
+	public static void manageTreatmentRecordAdd(String recordID, String pres, String diag){
+
+		try{
+			connection.setAutoCommit(false);
+			try{
+				connection.setAutoCommit(true);
+				prep_addTreatmentRecord.setString(1, recordID);
+				prep_addTreatmentRecord.setString(2, pres);
+				prep_addTreatmentRecord.setString(3, diag);
+				prep_addTreatmentRecord.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err){
+				connection.rollback();
+			}
+			finally{
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+
 	public static void error_handler(Throwable error) {
 
 	}
 
 	public static void main(String[] args) {
 		printCommands(CMD_MAIN);
+		connectToDatabase();
+		generatePreparedStatements();
+		generateTables();
+		for (String name: tableNames) {
+			populateTables(name);
+		}
+		close(result);
+		close(statement);
+		close(connection);
 	}
 	
 	static void close(Connection connection) {
