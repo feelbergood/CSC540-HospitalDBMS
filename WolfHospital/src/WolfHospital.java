@@ -103,6 +103,8 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateWardsCapacity;
 	private static PreparedStatement prep_updateWardsCharge;
 	private static PreparedStatement prep_updateWardsNurse;
+	private static PreparedStatement prep_deleteWards;
+	private static PreparedStatement prep_deleteWardInformation;
 	// Patients
 	private static PreparedStatement prep_addPatients;
 	private static PreparedStatement prep_getPatients;
@@ -167,25 +169,32 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateBillingAccountMedicationPrescribed;
 	private static PreparedStatement prep_updateBillingAccountVisitDate;
 	private static PreparedStatement prep_deleteBillingAccount;
+	
+	//GG
+	// Basic Information - Wards(partial, the rest should be done by others)
+	private static PreparedStatement prep_deleteWardInfo;
+	private static PreparedStatement prep_checkWardAvailability;
+	//private static PreparedStatement prep_assignWard;
+	//private static PreparedStatement prep_reserveWard;
+	//private static PreparedStatement prep_releaseWard;
+	
+	//Basic Information - Beds
+	private static PreparedStatement prep_addBedInfo;
+	private static PreparedStatement prep_getBedInfo;
+	private static PreparedStatement prep_deletebBedInfo;
+	
+	// Management - Beds
+	private static PreparedStatement prep_assignBed;
+	private static PreparedStatement prep_checkBedAvailability;
+	//private static PreparedStatement prep_reserveBed;
+	private static PreparedStatement prep_releaseBed;
+	private static PreparedStatement prep_deleteBedInfo;
 
 	// Payer Info
 	private static PreparedStatement prep_addPayerInfo;
 	private static PreparedStatement prep_updatePayerAddress;
 	private static PreparedStatement prep_deletePayerInfo;
 
-	// GG
-	// Basic Information - Wards
-	private static PreparedStatement prep_deleteWardInformation;
-	private static PreparedStatement prep_checkWardAvailability;
-	private static PreparedStatement prep_assignWard;
-	private static PreparedStatement prep_reserveWard;
-	private static PreparedStatement prep_releaseWard;
-
-	// Baisic Information - Beds
-	private static PreparedStatement prep_assignBed;
-	private static PreparedStatement prep_checkBedAvailability;
-	private static PreparedStatement prep_reserveBed;
-	private static PreparedStatement prep_releaseBed;
 
 	// Establish connection
 	public static void connectToDatabase() {
@@ -362,14 +371,14 @@ public class WolfHospital {
 			// UPDATE `Medical Records` SET `endDate` = '2020-01-01' WHERE recordID = 13;
 			// UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle'
 			// WHERE recordID = '13';
-			sql = "UPDATE `Medical Records`" + "SET `endDate` = ?" + "WHERE recordID = ?;" + "AND EXISTS"
-					+ "(SELECT * FROM `Treatment`" + "WHERE recordID = ?)";
+			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID = ? " + "AND EXISTS "
+					+ "(SELECT * FROM `Treatment` " + "WHERE recordID = ?;)";
 			prep_updateTreatmentEndDate = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Treatment`" + "SET `prescription` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Treatment` " + "SET `prescription` = ? " + "WHERE recordID = ?;";
 			prep_updateTreatmentPrescription = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Treatment`" + "SET `diagnosisDetails` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Treatment` " + "SET `diagnosisDetails` = ? " + "WHERE recordID = ?;";
 			prep_updateTreatmentDiagnosisDetails = connection.prepareStatement(sql);
 
 			// Create new test record
@@ -378,8 +387,8 @@ public class WolfHospital {
 			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
 			// `endDate`, `responsibleDoctor`) VALUES ('14', '5', '2019-07-01',
 			// '2019-07-02', '3');
-			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`)" + "VALUES (?, ?, ?);"
-					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"
+			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`) " + "VALUES (?, ?, ?); "
+					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) "
 					+ "VALUES (?, ?, ?, ?, ?);";
 			prep_addTestRecord = connection.prepareStatement(sql);
 
@@ -400,14 +409,14 @@ public class WolfHospital {
 			// UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` =
 			// 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID =
 			// '14';
-			sql = "UPDATE `Medical Records`" + "SET `endDate` = ?" + "WHERE recordID= ?;" + "AND EXISTS"
-					+ "(SELECT * FROM `Test`" + "WHERE recordID = ?)";
+			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID= ? " + "AND EXISTS "
+					+ "(SELECT * FROM `Test` " + "WHERE recordID = ?;)";
 			prep_updateTestEndDate = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Test`" + "SET `testType` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Test` " + "SET `testType` = ? " + "WHERE recordID = ?;";
 			prep_updateTestTestType = connection.prepareStatement(sql);
 
-			sql = "UPDATE `Test`" + "SET `testResult` = ?" + "WHERE recordID = ?;";
+			sql = "UPDATE `Test` " + "SET `testResult` = ? " + "WHERE recordID = ?;";
 			prep_updateTestTestResult = connection.prepareStatement(sql);
 
 			// Create check-in record
@@ -416,8 +425,8 @@ public class WolfHospital {
 			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
 			// `endDate`, `responsibleDoctor` ) VALUES ('15', '5', '2019-07-01',
 			// '2019-07-07', '4');
-			sql = "INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)" + "VALUES (?, ?, ?);"
-					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`)"
+			sql = "INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`) " + "VALUES (?, ?, ?); "
+					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) "
 					+ "VALUES (?, ?, ?, ?, ?);";
 			prep_addCheckinRecord = connection.prepareStatement(sql);
 
@@ -515,6 +524,71 @@ public class WolfHospital {
 			// Delete billing account
 			sql = "DELETE FROM `Billing Accounts` " + "WHERE accountID = ?;";
 			prep_deleteBillingAccount = connection.prepareStatement(sql);
+			
+			// GG
+			// Delete basic information about wards
+			sql = "DELETE FROM `Wards` " +
+					"WHERE `ward number` = ?; ";
+			prep_deleteWardInformation = connection.prepareStatement(sql);
+			
+			// Check availability of wards
+			sql = "SELECT DISTINCT `ward number` " +
+					"FROM `Beds`" +
+					"WHERE ISNULL(patientID); ";
+			prep_checkWardAvailability = connection.prepareStatement(sql);
+			
+			// Assign wards:
+			//sql = "SELECT COUNT(`bed number`) FROM `Beds` WHERE `ward number` = ?; ";
+			//prep_assignWard = connection.prepareStatement(sql);
+			
+			// Reserve wards
+			//sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " +
+			//		"VALUES (?, ?, ?, ?, ?) );" +
+			//	  "UPDATE `Beds` SET "
+			//		;
+			//prep_reserveWard = connection.prepareStatement(sql);
+			
+			// Release wards
+			//sql = "";
+			//prep_releaseWard = connection.prepareStatement(sql);
+			
+			// Add basic information of a bed
+			sql = "INSERT INTO `Beds` (`ward number`, `bed number`, `patientID`) " +
+					"VALUES (?, ?, ?); ";
+			prep_addBedInfo = connection.prepareStatement(sql);
+			
+			// Get basic information of a bed
+			sql = "SELECT * FROM `Beds` " +
+					"WHERE `ward number` = ? AND `bed number` = ?; ";
+			prep_getBedInfo = connection.prepareStatement(sql);
+			
+			
+			// Delete basic information of a bed
+			sql = "DELETE FROM `Beds` WHERE `ward number` = ? AND `bed number` = ?; ";
+			prep_deleteBedInfo = connection.prepareStatement(sql);
+			
+			// Assign beds
+			sql = "UPDATE `Beds` SET `patientID` = ? WHERE `ward number` = ? AND `bed number` = ?; ";
+			prep_assignBed = connection.prepareStatement(sql);
+			
+			// Check availability of beds
+			sql = "SELECT * FROM `Beds` " +
+					"WHERE ISNULL(patientID); ";
+			prep_checkBedAvailability = connection.prepareStatement(sql);
+			
+			// Reserve beds
+			//sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " +
+			//		"VALUES (?, ?, ?, ?, ?); ";
+			//prep_reserveBed = connection.prepareStatement(sql);
+			
+			// Release beds
+			sql = "UPDATE `Beds` SET `patientID` = NULL WHERE `ward number` = ? AND `bed number` = ?; ";
+			prep_releaseBed = connection.prepareStatement(sql);
+			
+			// Create treatment records
+			sql = "INSERT `Treatment` (`recordID`, `prescription`, `diagnosisDetails`) " +
+					"VALUES (?, ?, ?); ";
+			prep_addTreatmentRecord = connection.prepareStatement(sql);
 
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -608,6 +682,61 @@ public class WolfHospital {
 				// Yudong
 				// Billing accounts && PayerInfo
 				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" +
+						"`accountID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`patientID` VARCHAR(255) NOT NULL," +
+						"`visitDate` datetime NOT NULL," +
+						"`payerSSN` VARCHAR(255) NOT NULL," +
+						"`paymentMethod` VARCHAR(255) NOT NULL," +
+						"`cardNumber` VARCHAR(255) DEFAULT NULL" +
+						"`registrationFee` DOUBLE NOT NULL" +
+						"`medicationPrescribed` BIT DEFAULT NULL" +
+						"`accommandation fee` DOUBLE NOT NULL" +
+						"PRIMARY KEY (`accountID`)" +
+						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
+						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" +
+						");");
+				
+				// GG
+				// Wards & Beds
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Wards` (" +
+						"`ward number` VARCHAR(255) NOT NULL UNIQUE," +
+						"`capacity` TINYINT NOT NULL," +
+						"`charges per day` DOUBLE NOT NULL," +
+						"`responsible nurse` VARCHAR(255) NOT NULL," +
+						"PRIMARY KEY (`ward number`) " +
+						"CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) " +
+						"ON DELETE CASCADE" +
+						");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Beds` (" +
+						"`ward number` VARCHAR(255) NOT NULL," +
+						"`bed number` VARCHAR(255) NOT NULL," +
+						"`patientID` VARCHAR(255) DEFAULT NULL," +
+						"PRIMARY KEY (`ward number`, `bed number`) " +
+						"CONSTRAINT `fk_bed`" +
+							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
+							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
+							"ON DELETE CASCADE" +
+						");");
+				// Assigned
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Assigned` (" +
+						"`patientID` VARCHAR(255) NOT NULL," +
+						"`ward number` VARCHAR(255) NOT NULL," +
+						"`bed number` VARCHAR(255) NOT NULL," +
+						"`start-date` DATETIME NOT NULL," +
+						"`end-date` DATETIME DEFAULT NULL," +
+						"CONSTRAINT pk_assign PRIMARY KEY (`patientID`, `ward number`, `bed number`)" +
+						"CONSTRAINT `fk_assign`" +
+							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
+							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
+							"FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " +
+							"ON DELETE CASCADE" +
+						");");
+
+						statement.executeUpdate(				
 						"CREATE TABLE IF NOT EXISTS`PayerInfo` ( " + "`SSN` VARCHAR(255) NOT NULL UNIQUE, "
 								+ "`billingAddress` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`SSN`) " + ");");
 
@@ -638,8 +767,7 @@ public class WolfHospital {
 		try {
 			connection.setAutoCommit(false);
 			try {
-				switch(tableName) {
-					// Staff:
+				switch (tableName) {
 					case "Staff":
 						addStaff(100, Mary, 40, Female, Doctor, senior, Neurology, 654, 90 ABC St , Raleigh NC 27);
 						addStaff(101, John, 45, Male, Billing Staff, , Office, 564, 798 XYZ St , Rochester NY 54);
@@ -654,41 +782,91 @@ public class WolfHospital {
 						addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81 DEF St , Cary NC 27519, 20, 002, no);
 					case "Wards":
 						addWard(001, 4, 50, 102);
-						//fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
-					//demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with 2 different doctors, consist of one test(by 103) and one treatment(by 105)
-					//the only front desk staff is 104, so all check-ins are assumed to be done by 104
-					//question: is empty string the correct way to deal with empty value of endDate?
+				// Staff:
+									//GG
+					/* Populating data for Wards
+					 * String ward number,
+					 * Int capacity,
+					 * Double charges per day,
+					 * String responsible nurse
+					 * */
+					/* Populating data for Beds
+					 * String ward number,
+					 * String bed number,
+					 * String patientID
+					 * Demo data: for ward#001 beds#1,2,3,4; for ward#002 beds#1,2,3,4; for ward#003 beds#1,2; for ward#004 beds#1,2;
+					 * Patient000-01-1234 is assigned to w1b1, 000-03-1234 w1b2, 000-02-1234 w2b1, 000-04-1234 w3b1(finish treatment)
+					 * */
+					case "Beds":
+						manageBedAdd("001", "1", "000-01-1234");
+						manageBedAdd("001", "2", "000-03-1234");
+						manageBedAdd("001", "3", "");
+						manageBedAdd("001", "4", "");
+						manageBedAdd("002", "1", "000-02-1234");
+						manageBedAdd("002", "2", "");
+						manageBedAdd("002", "3", "");
+						manageBedAdd("002", "4", "");
+						manageBedAdd("003", "1", "000-04-1234");
+						manageBedAdd("003", "2", "");
+						manageBedAdd("004", "1", "");
+						manageBedAdd("004", "2", "");
+					/* Populating data for Assigned
+					 * String patientID,
+					 * String ward number,
+					 * String bed number,
+					 * Datetime start-date,
+					 * Datetime end-date
+					 * */
+					case "Assigned":
+						manageAssignedAdd("1001", "001", "1", "2019-03-01", "");
+						manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
+						manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
+						manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
+
+					// Other tables...
+					// fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
+					// demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with
+					// 2 different doctors, consist of one test(by 103) and one treatment(by 105)
+					// the only front desk staff is 104, so all check-ins are assumed to be done by
+					// 104
+					// question: is empty string the correct way to deal with empty value of
+					// endDate?
 					case "Treatment":
-						//manageTreatmentRecordAdd() should be done by other teammates
+						// manageTreatmentRecordAdd() should be done by other teammates
 						break;
 					case "Test":
-						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
+						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+						// `endDate`, `responsibleDoctor` )
 						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
-						//INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
-						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+, ref range:negative');
-						//manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
-						manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003", "2019-03-15", "", "100");
-						manageTestRecordAdd("4", "test", "prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17", "2019-03-21", "103");
+						// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
+						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
+						// ref range:negative');
+						// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
+						// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+						manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
+								"2019-03-15", "", "100");
+						manageTestRecordAdd("4", "test",
+								"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
+								"2019-03-21", "103");
 						break;
 					case "Check-ins":
-						//INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`	)
+						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+						// `endDate`, `responsibleDoctor` )
 						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
-						//INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
+						// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
 						// VALUES ('9', '1', '2');
-						//manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
-						manageCheckinRecordAdd("1", "001", "1", "1001","2019-03-01", "", "104");
-						manageCheckinRecordAdd("2", "002", "1", "1002","2019-03-10", "", "104");
-						manageCheckinRecordAdd("3", "001", "2", "1003","2019-03-15", "", "104");
-						manageCheckinRecordAdd("4", "003", "1", "1004","2019-03-17", "2019-03-21", "104");
+						// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+						manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
+						manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
+						manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
+						manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
 						break;
 					case "Billing Accounts":
+						manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
+								"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
 						break;
-
 					default:
 						break;
-				}
-				default:
-					break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
@@ -1564,6 +1742,172 @@ public class WolfHospital {
 		}
 		catch (Throwable err) {
 			// error_handler(err);
+		}
+	}
+	
+	//GG
+	/* Delete ward basic information
+	 * 
+	 * Return: none
+	 * 
+	 */
+	public static void manageWardDelete(String wardNum) {
+		
+		try {
+			
+			connection.setAutoCommit(false);
+			try {
+				prep_deleteWardInfo.setString(1, wardNum);
+				prep_deleteWardInfo.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+				connection.rollback();
+			}
+			finally {
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+			//error_handler(err);
+		}
+	}
+	
+	/* Delete bed basic information
+	 * 
+	 * Return: none
+	 * 
+	 */
+	public static void manageBedDelete(String wardNum, String bedNum) {
+		
+		try {
+			connection.setAutoCommit(false);
+			try {
+				prep_deleteBedInfo.setString(1, wardNum);
+				prep_deleteBedInfo.setString(2, bedNum);
+				prep_deleteBedInfo.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+				connection.rollback();
+			}
+			finally {
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+			//error_handler(err);
+		}
+	}
+	
+	/* Check ward availability
+	 * 
+	 */
+	public static boolean checkWardAvailability() {
+		
+		boolean success = false;
+		try {
+			result = prep_checkWardAvailability.executeQuery();
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return success;
+	}
+	
+	/* Check bed availability
+	 * 
+	 */
+	public static boolean checkBedAvailability() {
+		
+		boolean success = false;
+		try {
+			result = prep_checkBedAvailability.executeQuery();
+			if (result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return success;
+	}
+	
+	// Create bed information
+	public static void manageBedAdd(String wardNum, String bedNum, String patientID) {
+		
+		try {
+			connection.setAutoCommit(false);
+			try {
+				prep_addBedInfo.setString(1, wardNum);
+				prep_addBedInfo.setString(2, bedNum);
+				prep_addBedInfo.setString(3, patientID);
+				prep_addBedInfo.executeUpdate();
+				connection.commit();
+			}
+			catch (Throwable err) {
+				connection.rollback();
+			}
+			finally {
+				connection.setAutoCommit(true);
+			}
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	// Get bed information
+	public static boolean showBedInfo(String wardNum, String bedNum) {
+		
+		boolean success = false;
+		try {
+			prep_getBedInfo.setString(1, wardNum);
+			prep_getBedInfo.setString(2, bedNum);
+			result = prep_getBedInfo.executeQuery();
+			
+			if(result.next()) {
+				success = true;
+				result.beforeFirst();
+			}
+			System.out.println("\nShowBedInformation\n");
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return success;
+	}
+	
+	// Assign bed to patient
+	public static void manageBedAssign(String patientID, String wardNum, String bedNum) {
+		
+		try {
+			connection.setAutoCommit(true);
+			prep_assignBed.setString(1, patientID);
+			prep_assignBed.setString(2, wardNum);
+			prep_assignBed.setString(3, bedNum);
+			prep_assignBed.executeUpdate();
+		} catch (Throwable err) {
+			//error_handler(err);
+		}
+	}
+	
+	// Reserve bed(not sure whether we need this function currently)
+	
+	// Release bed
+	public static void manageBedRelease(String wardNum, String bedNum) {
+		
+		try {
+			connection.setAutoCommit(true);
+			prep_releaseBed.setString(1, wardNum);
+			prep_releaseBed.setString(2, bedNum);
+			prep_releaseBed.executeUpdate();
+		} catch (Throwable err) {
+			//error_handler(err);
 		}
 	}
 
