@@ -798,7 +798,7 @@ public class WolfHospital {
 						prep_updateStaffName.executeUpdate();
 						break;
 					case "AGE":
-						prep_updateStaffAge.setString(1, newValue);
+						prep_updateStaffAge.setInt(1, Integer.parseInt(newValue));
 						prep_updateStaffAge.setString(2, staffID);
 						prep_updateStaffAge.executeUpdate();
 						break;
@@ -914,7 +914,7 @@ public class WolfHospital {
 						prep_updatePatientsName.executeUpdate();
 						break;
 					case "AGE":
-						prep_updatePatientsAge.setString(1, newValue);
+						prep_updatePatientsAge.setInt(1, Integer.parseInt(newValue));
 						prep_updatePatientsAge.setString(2, patientID);
 						prep_updatePatientsAge.executeUpdate();
 						break;
@@ -975,7 +975,7 @@ public class WolfHospital {
 			try {
 				prep_addWards.setString(1, wardNumber);
 				prep_addWards.setString(2, capacity);
-				prep_addWards.setInt(3, Daycharge);
+				prep_addWards.setString(3, Daycharge);
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
