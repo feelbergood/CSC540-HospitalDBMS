@@ -564,53 +564,113 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 			try {
 				// Wayne: Staff, Patients, Wards:
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Staff` (" + "`staffID` VARCHAR(255) NOT NULL, "
-						+ "`name` VARCHAR(255) NOT NULL," + "`age` INT(3) NOT NULL," + "`gender` VARCHAR(255) NOT NULL,"
-						+ "`jobTitle` VARCHAR(255) NOT NULL," + "`profTitle` VARCHAR(255) NULL,"
-						+ "`department` VARCHAR(255) NOT NULL," + "`phone` VARCHAR(255) NOT NULL,"
-						+ "`address` VARCHAR(255) NOT NULL," + "PRIMARY KEY (`staffID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Patients` ("
-						+ "`patientID` varchar(255) NOT NULL, " + "`SSN` varchar(255) NOT NULL UNIQUE, "
-						+ "PRIMARY KEY (`patientID`)" + "FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `PersonInfo` (" + "`SSN` varchar(255) NOT NULL, "
-						+ "`name` varchar(255) NOT NULL, " + "`DOB` datetime NOT NULL, "
-						+ "`gender` VARCHAR(255) NOT NULL, " + "`age` int(3) NOT NULL, "
-						+ "`phone` VARCHAR(255) NOT NULL," + "`address` VARCHAR(255) NOT NULL,"
-						+ "`status` varchar(255) NOT NULL, " + "PRIMARY KEY (`SSN`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Wards` (" + "`ward number` varchar(255) NOT NULL, "
-						+ "`capacity` varchar(255) NOT NULL, " + "`charges per day` varchar(255) NOT NULL, "
-						+ "`responsible nurse` varchar(255) NOT NULL, " + "PRIMARY KEY (`ward number`)"
-						+ "FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)" + ");");
-				// fhy: Medical Records, Treatment, Test, Check-ins
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Medical Records` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`patientID` VARCHAR(255) NOT NULL,"
-						+ "`startDate` DATETIME NOT NULL," + "`endDate` DATETIME DEFAULT NULL,"
-						+ "`responsibleDoctor` VARCHAR(255) NOT NULL," + "PRIMARY KEY (`recordID`)"
-						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)"
-						+ "FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Treatment` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`prescription` VARCHAR(255) NOT NULL,"
-						+ "`diagnosisDetails` VARCHAR(255) NOT NULL," + "PRIMARY KEY (`recordID`)"
-						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Test` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`testType` VARCHAR(255) NOT NULL,"
-						+ "`testResult` VARCHAR(255) NOT NULL," + "PRIMARY KEY (`recordID`)"
-						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Check-ins` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`wardNumber` VARCHAR(255) DEFAULT NULL,"
-						+ "`bedNumber` VARCHAR(255) DEFAULT NULL," + "PRIMARY KEY (`recordID`)"
-						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)"
-						+ "FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)" + ");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Staff` (" +
+								"`staffID` VARCHAR(255) NOT NULL, " +
+								"`name` VARCHAR(255) NOT NULL," +
+								"`age` INT(3) NOT NULL," +
+								"`gender` VARCHAR(255) NOT NULL," +
+								"`jobTitle` VARCHAR(255) NOT NULL," +
+								"`profTitle` VARCHAR(255) NULL," +
+								"`department` VARCHAR(255) NOT NULL," +
+								"`phone` VARCHAR(255) NOT NULL," +
+								"`address` VARCHAR(255) NOT NULL," +
+								"PRIMARY KEY (`staffID`)" +
+								");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Patients` (" +
+								"`patientID` varchar(255) NOT NULL, " +
+								"`SSN` varchar(255) NOT NULL UNIQUE, " +
+								"PRIMARY KEY (`patientID`)" +
+								"FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" +
+								");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `PersonInfo` (" +
+								"`SSN` varchar(255) NOT NULL, " +
+								"`name` varchar(255) NOT NULL, " +
+								"`DOB` datetime NOT NULL, " +
+    							"`age` int(3) NOT NULL, " +
+								"`phone` VARCHAR(255) NOT NULL," +
+								"`status` varchar(255) NOT NULL, " +
+								"PRIMARY KEY (`SSN`)" +
+								"FOREIGN KEY (`DOB`) REFERENCES AgeInfo(`DOB`)" +
+								"FOREIGN KEY (`phone`) REFERENCES ContactInfo(`phone`)" +
+								");");
+				statement.executeUpdate(
+						    "CREATE TABLE IF NOT EXISTS `AgeInfo`" +
+									"`DOB` datetime NOT NULL, " +
+									"`gender` VARCHAR(255) NOT NULL, " +
+									"PRIMARY KEY (`DOB`)" +
+									");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `ContactInfo`" +
+								"`phone` VARCHAR(255) NOT NULL," +
+								"`address` VARCHAR(255) NOT NULL," +
+								"PRIMARY KEY (`phone`)" +
+								");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Wards` (" +
+								"`ward number` varchar(255) NOT NULL, " +
+								"`capacity` varchar(255) NOT NULL, " +
+								"`charges per day` varchar(255) NOT NULL, " +
+								"`responsible nurse` varchar(255) NOT NULL, " +
+								"PRIMARY KEY (`ward number`)" +
+								"FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`)" +
+								");");
+				//fhy: Medical Records, Treatment, Test, Check-ins
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Medical Records` (" +
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`patientID` VARCHAR(255) NOT NULL," +
+						"`startDate` DATETIME NOT NULL," +
+						"`endDate` DATETIME DEFAULT NULL," +
+						"`responsibleDoctor` VARCHAR(255) NOT NULL," +
+						"PRIMARY KEY (`recordID`)" +
+						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" +
+						"FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`)" +
+						");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Treatment` (" +
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`prescription` VARCHAR(255) NOT NULL," +
+						"`diagnosisDetails` VARCHAR(255) NOT NULL," +
+						"PRIMARY KEY (`recordID`)" +
+						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
+						");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Test` (" +
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`testType` VARCHAR(255) NOT NULL," +
+						"`testResult` VARCHAR(255) NOT NULL," +
+						"PRIMARY KEY (`recordID`)" +
+						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
+						");");
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Check-ins` (" +
+						"`recordID` VARCHAR(255) NOT NULL UNIQUE," +
+						"`wardNumber` VARCHAR(255) DEFAULT NULL," +
+						"`bedNumber` VARCHAR(255) DEFAULT NULL," +
+						"PRIMARY KEY (`recordID`)" +
+						"FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" +
+						"FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)" +
+						");");
 				// Yudong
 				// Billing accounts && PayerInfo
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` ("
-						+ "`accountID` VARCHAR(255) NOT NULL UNIQUE," + "`patientID` VARCHAR(255) NOT NULL,"
-						+ "`visitDate` datetime NOT NULL," + "`payerSSN` VARCHAR(255) NOT NULL,"
-						+ "`paymentMethod` VARCHAR(255) NOT NULL," + "`cardNumber` VARCHAR(255) DEFAULT NULL"
-						+ "`registrationFee` DOUBLE NOT NULL" + "`medicationPrescribed` BIT DEFAULT NULL"
-						+ "`accommandation fee` DOUBLE NOT NULL" + "PRIMARY KEY (`accountID`)"
-						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)"
-						+ "FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" + ");");
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS IF NOT EXISTS `Billing Accounts` (" + 
+						"`accountID` VARCHAR(255) NOT NULL UNIQUE," + "`patientID` VARCHAR(255) NOT NULL," + 
+						"`visitDate` datetime NOT NULL," + "`payerSSN` VARCHAR(255) NOT NULL," + 
+						"`paymentMethod` VARCHAR(255) NOT NULL," + "`cardNumber` VARCHAR(255) DEFAULT NULL" + 
+						"`registrationFee` DOUBLE NOT NULL" + "`medicationPrescribed` BIT DEFAULT NULL" + 
+						"`accommandation fee` DOUBLE NOT NULL" + "PRIMARY KEY (`accountID`)" + 
+						"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`)" + 
+						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" + ");");
+
+				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS`PayerInfo` ( " + 
+						"`SSN` VARCHAR(255) NOT NULL UNIQUE, " + 
+						"`billingAddress` VARCHAR(255) NOT NULL, " + 
+						"PRIMARY KEY (`SSN`) " + 
+						");");
 
 				// GG
 				// Wards & Beds
@@ -633,19 +693,6 @@ public class WolfHospital {
 						+ "CONSTRAINT `fk_assign`" + "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) "
 						+ "FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) "
 						+ "FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " + "ON DELETE CASCADE" + ");");
-
-				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS`PayerInfo` ( " + "`SSN` VARCHAR(255) NOT NULL UNIQUE, "
-								+ "`billingAddress` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`SSN`) " + ");");
-
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS`Billing Accounts` ( "
-						+ "`accountID` VARCHAR(255) NOT NULL UNIQUE, " + "`patientID` VARCHAR(255) NOT NULL, "
-						+ "`visitDate` datetime NOT NULL, " + "`payerSSN` VARCHAR(255) NOT NULL, "
-						+ "`paymentMethod` VARCHAR(255) NOT NULL, " + "`cardNumber` VARCHAR(255) DEFAULT NULL "
-						+ "`registrationFee` DOUBLE NOT NULL " + "`medicationPrescribed` BIT DEFAULT NULL "
-						+ "`accommandationFee` DOUBLE NOT NULL " + "PRIMARY KEY (`accountID`) "
-						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) "
-						+ "FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`) " + ");");
 
 				connection.commit();
 				System.out.println("Tables created!");
