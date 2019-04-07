@@ -888,8 +888,8 @@ public class WolfHospital {
 			String SSN = rs.getString("SSN");
 			String name = rs.getString("name");
 			String gender = rs.getString("gender");
-			String DOB = rs.getString("DOB");
-			String age = rs.getString("age");
+			String DOB = rs.getDate("DOB");
+			int age = rs.getInt("age");
 			String status = rs.getString("status");
 			String phone = rs.getString("phone");
 			String address = rs.getString("address");
@@ -905,8 +905,8 @@ public class WolfHospital {
 	private static void printWardsRow(ResultSet rs) {
 		try {
 			String wardNumber = rs.getString("ward number");
-			String capacity = rs.getString("capacity");
-			int dayCharge = rs.getInt("charges per day");
+			int capacity = rs.getInt("capacity");
+			float dayCharge = rs.getFloat("charges per day");
 			String nurse = rs.getString("responsible nurse");
 			System.out.println(wardNumber + "\t" + capacity + "\t" + dayCharge + "\t" + nurse);
 		} catch (SQLException e) {
