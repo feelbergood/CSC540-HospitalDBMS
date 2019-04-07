@@ -769,19 +769,19 @@ public class WolfHospital {
 			try {
 				switch (tableName) {
 					case "Staff":
-						addStaff(100, Mary, 40, Female, Doctor, senior, Neurology, 654, 90 ABC St , Raleigh NC 27);
-						addStaff(101, John, 45, Male, Billing Staff, , Office, 564, 798 XYZ St , Rochester NY 54);
-						addStaff(102, Carol, 55, Female, Nurse, , ER, 911, 351 MH St , Greensboro NC 27);
-						addStaff(103, Emma, 55, Female, Doctor, Senior surgeon, Oncological Surgery, 546, 49 ABC St , Raleigh NC 27);
-						addStaff(104, Ava, 55, Female, Front Desk Staff, , Office, 777, 425 RG St , Raleigh NC 27);
-						addStaff(105, Peter, 52, Male, Doctor, Anesthetist, Oncological Surgery, 724, 475 RG St , Raleigh NC 27);
-						addStaff(106, Olivia, 27, Female, Nurse, , Neurology, 799, 325 PD St , Raleigh NC 27);
+						addStaff("100", "Mary", 40, "Female", "Doctor", "senior", "Neurology", "654", "90 ABC St , Raleigh NC 27");
+						addStaff("101", "John", 45, "Male", "Billing Staff", "", "Office", "564", "798 XYZ St , Rochester NY 54");
+						//addStaff(102, Carol, 55, Female, Nurse, , ER, 911, 351 MH St , Greensboro NC 27);
+						//addStaff(103, Emma, 55, Female, Doctor, Senior surgeon, Oncological Surgery, 546, 49 ABC St , Raleigh NC 27);
+						//addStaff(104, Ava, 55, Female, Front Desk Staff, , Office, 777, 425 RG St , Raleigh NC 27);
+						//addStaff(105, Peter, 52, Male, Doctor, Anesthetist, Oncological Surgery, 724, 475 RG St , Raleigh NC 27);
+						//addStaff(106, Olivia, 27, Female, Nurse, , Neurology, 799, 325 PD St , Raleigh NC 27);
 						break;
 					case "Patients":
-						addPatient(1001, 000-01-1234, David, 01/30/1980, Male, 39, 919-123-3324, 69 ABC St , Raleigh NC 27730, 20, 001, no);
-						addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81 DEF St , Cary NC 27519, 20, 002, no);
+						addPatient("1001", "000-01-1234", "David", "01/30/1980", "Male", 39, "919-123-3324", "69 ABC St , Raleigh NC 27730", "20", "001", "no");
+						//addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81 DEF St , Cary NC 27519, 20, 002, no);
 					case "Wards":
-						addWard(001, 4, 50, 102);
+						addWard("001", "4", "50", "102");
 				// Staff:
 									//GG
 					/* Populating data for Wards
