@@ -630,13 +630,13 @@ public class WolfHospital {
 								"FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" +
 								");");
 				// GG
-				// Wards & Beds
+				// Wards
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Wards` (" +
 								"`ward number` VARCHAR(255) NOT NULL UNIQUE, " +
-								"`capacity` TINYINT NOT NULL, " +
-								"`charges per day` DOUBLE NOT NULL, " +
-								"`responsible nurse` VARCHAR(255) NOT NULL, " +
+								"`capacity` INT NOT NULL, " +
+								"`charges per day` INT NOT NULL, " +
+								"`responsible nurse` VARCHAR(255) DEFAULT NULL, " +
 								"PRIMARY KEY (`ward number`), " +
 								"CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) " +
 								"ON DELETE SET NULL" +
@@ -698,7 +698,7 @@ public class WolfHospital {
 						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" + ");");
 
 				// GG
-				// Wards & Beds
+				// Beds
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Beds` (" +
 						"`ward number` VARCHAR(255) NOT NULL," +
@@ -763,7 +763,10 @@ public class WolfHospital {
 					// addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81
 					// DEF St , Cary NC 27519, 20, 002, no);
 				case "Wards":
-					addWard("001", "4", "50", "102");
+					addWard("001", 4, 50, "102");
+					addWard("002", 4, 50, "102");
+					addWard("003", 2, 100, "106");
+					addWard("004", 2, 100, "106");
 					// Staff:
 					// GG
 					/*
@@ -1143,13 +1146,13 @@ public class WolfHospital {
 		}
 	}
 	// Add a new ward
-	public static void addWard(String wardNumber, String capacity, String Daycharge, String responsibleNurse) {
+	public static void addWard(String wardNumber, int capacity, int Daycharge, String responsibleNurse) {
 		try {
 			connection.setAutoCommit(false);
 			try {
 				prep_addWards.setString(1, wardNumber);
-				prep_addWards.setString(2, capacity);
-				prep_addWards.setString(3, Daycharge);
+				prep_addWards.setInt(2, capacity);
+				prep_addWards.setInt(3, Daycharge);
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
