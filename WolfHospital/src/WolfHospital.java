@@ -639,7 +639,7 @@ public class WolfHospital {
 								"`responsible nurse` VARCHAR(255) NOT NULL, " +
 								"PRIMARY KEY (`ward number`), " +
 								"CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) " +
-								"ON DELETE CASCADE" +
+								"ON DELETE SET NULL" +
 								");");
 				//fhy: Medical Records, Treatment, Test, Check-ins
 				statement.executeUpdate(
@@ -705,10 +705,8 @@ public class WolfHospital {
 						"`bed number` VARCHAR(255) NOT NULL," +
 						"`patientID` VARCHAR(255) DEFAULT NULL," +
 						"PRIMARY KEY (`ward number`, `bed number`), " +
-						"CONSTRAINT `fk_bed` " +
-							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
-							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
-							"ON DELETE CASCADE" +
+						"CONSTRAINT `fk_bedwn` FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) ON DELETE CASCADE, " +
+						"CONSTRAINT `fk_bedpi` FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) ON DELETE SET NULL" +
 						");");
 				// Assigned
 				statement.executeUpdate(
@@ -719,10 +717,8 @@ public class WolfHospital {
 						"`start-date` DATETIME NOT NULL," +
 						"`end-date` DATETIME DEFAULT NULL," +
 						"CONSTRAINT pk_assign PRIMARY KEY (`patientID`, `ward number`, `bed number`)," +
-						"CONSTRAINT `fk_assign` " +
-							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
-							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
-							"FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " +
+						"CONSTRAINT `fk_assignpi` FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) ON DELETE CASCADE, " +
+						"CONSTRAINT `fk_assginwb` FOREIGN KEY (`ward number`, `bed number`) REFERENCES Beds(`ward number`, `bed number`) " +
 							"ON DELETE CASCADE" +
 						");");
 
