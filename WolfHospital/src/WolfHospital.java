@@ -592,7 +592,7 @@ public class WolfHospital {
 								"`age` INT(3) NOT NULL, " +
 								"`gender` VARCHAR(255) NOT NULL, " +
 								"`jobTitle` VARCHAR(255) NOT NULL, " +
-								"`profTitle` VARCHAR(255) NULL, " +
+								"`profTitle` VARCHAR(255) DEFAULT NULL, " +
 								"`department` VARCHAR(255) NOT NULL, " +
 								"`phone` VARCHAR(255) NOT NULL, " +
 								"`address` VARCHAR(255) NOT NULL, " +
