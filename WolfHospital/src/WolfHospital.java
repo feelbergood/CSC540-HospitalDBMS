@@ -2023,6 +2023,45 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
+	//fhy
+	public static void userTreatmentAdd(){
+		//manageTreatmentRecordAdd(String recordID, String pres, String diag)
+	}
+	public static void userTreatmentGetAll(){
+		//showAllTreatmentRecords(String patientID)
+	}
+	public static void userTreatmentGet(){
+		//showTreatmentRecord(String recordID)
+	}
+	public static void userTreatmentUpdate(){
+		//manageTreatmentUpdate(String recordID, String attributeToChange, String valueToChange)
+	}
+	public static void userTestAdd(){
+		//manageTestRecordAdd(String recordID, String testType, String testResult, String patientID,
+		//			String startDate, String endDate, String responsibleDoctor)
+	}
+	public static void userTestGetAll(){
+		//showAllTestRecords(String patientID)
+	}
+	public static void userTestGet(){
+		//showTestRecord(String recordID)
+	}
+	public static void userTestUpdate(){
+		//manageTestUpdate(String recordID, String attributeToChange, String valueToChange)
+	}
+	public static void userCheckinAdd(){
+		//manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber, String patientID,
+		//			String startDate, String endDate, String responsibleDoctor)
+	}
+	public static void userCheckinGetAll(){
+		//showAllCheckinRecords(String patientID)
+	}
+	public static void userCheckinGet(){
+		//showCheckinRecord(String recordID)
+	}
+	public static void userCheckinUpdate(){
+		//manageCheckinUpdate(String recordID, String attributeToChange, String valueToChange)
+	}
 
 	public static void main(String[] args) {
 		try {
@@ -2127,6 +2166,9 @@ public class WolfHospital {
                             case CMD_CHECKIN_GET:
                             		userCheckinGet();
                                 break;
+							case CMD_CHECKIN_UPDATE:
+									userCheckinUpdate();
+								break;
                             case CMD_QUIT:
                                 quit = true;
                                 break;
