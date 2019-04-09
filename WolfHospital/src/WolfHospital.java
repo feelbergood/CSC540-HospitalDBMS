@@ -2052,9 +2052,57 @@ public class WolfHospital {
 	 * */
 	
 	// GG
+	/*
+	 * user task: Enter a new billing account for a patient
+	 * */
 	public static void userBillingAcctAdd() {
 		
 		try {
+			//declare variables
+			String accountID;
+			String patientID;
+			String visitDate;
+			String payerSSN;
+			String paymentMethod;
+			String cardNum;
+			String regFee;
+			String medPrescribed;
+			String accomFee;
+			String address;
+			
+			//Get account id you wish to enter a new billing account record
+			System.out.print("\nEnter the account ID you wish to add:\n");
+			accountID = scanner.nextLine();
+			//Get patient id
+			System.out.print("\nEnter the patient ID for this billing account:\n");
+			patientID = scanner.nextLine();
+			//Get visit date
+			System.out.print("\nEnter the visit date:\n");
+			visitDate = scanner.nextLine();
+			//Get payer's ssn
+			System.out.print("\nEnter the payer's SSN for this billing account:\n");
+			payerSSN = scanner.nextLine();
+			//Get payment method
+			System.out.print("\nEnter the payment method:\n");
+			paymentMethod = scanner.nextLine();
+			//Get card number
+			System.out.print("\nEnter the card number for this payment:\n");
+			cardNum = scanner.nextLine();
+			//Get registration fee
+			System.out.print("\nEnter the registration fee:\n");
+			regFee = scanner.nextLine();
+			//Get medication prescribed
+			System.out.print("\nEnter the medication prescribed:\n");
+			medPrescribed = scanner.nextLine();
+			//Get accomandation fee
+			System.out.print("\nEnter the accomandation fee:\n");
+			accomFee = scanner.nextLine();
+			//Get billing address
+			System.out.print("\nEnter the billing address for the payment:\n");
+			address = scanner.nextLine();
+			
+			//call method that interacts with the Database
+			manageBillingAccountAdd(accountID, patientID, visitDate, payerSSN, paymentMethod, cardNum, regFee, medPrescribed, accomFee, address);
 			
 		}
 		catch (Throwable err) {
