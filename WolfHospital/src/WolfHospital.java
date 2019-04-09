@@ -2046,7 +2046,53 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
-
+	
+	/*
+	 * begin user-interaction methods
+	 * */
+	
+	// GG
+	public static void userBillingAcctAdd() {
+		
+		try {
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	public static void userBillingAcctGet() {
+		
+		try {
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	public static void userBillingAcctUpdate() {
+		
+		try {
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	public static void userBillingAcctDelete() {
+		
+		try {
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	
 	public static void main(String[] args) {
 		try {
         
@@ -2156,7 +2202,7 @@ public class WolfHospital {
                     case CMD_BILLING_ACCOUNTS:
                     //GG
                     	switch (command.toUpperCase()){
-                          case CMD_BILLING_ACCT_ADD:
+                          	case CMD_BILLING_ACCT_ADD:
                           	userBillingAcctAdd();
                           	break;
                         	case CMD_BILLING_ACCT_GET:
