@@ -252,7 +252,7 @@ public class WolfHospital {
               System.out.println("\t- update treatment record");
               System.out.println(CMD_TEST_ADD);
               System.out.println("\t- add a new test record");
-              System.out.println(CMD_TEST_GETALL)
+              System.out.println(CMD_TEST_GETALL);
               System.out.println("\t- retrieve all test records");
               System.out.println(CMD_TEST_GET);
               System.out.println("\t- retrieve a test record");
@@ -657,25 +657,23 @@ public class WolfHospital {
 		}
 	}
 	
-	
-	// 04/08 : Before create tables - drop all existing tables
+	//04/09 drop all existing tables before populating tables
 	public static void dropAllExistingTables() {
 		
 		try {
 			DatabaseMetaData metaData;
 			String tableName;
-			
 			metaData = connection.getMetaData();
 			result = metaData.getTables(null, null, "%", null);
 			
-			while(result.next()) {
+			while (result.next()) {
 				tableName = result.getString(3);
-				statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+				statement.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
 				statement.executeUpdate("DROP TABLE " + tableName);
-				statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 1");
+				statement.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
 			}
 		}
-		catch (Throwable err) {
+		catch(Throwable err) {
 			error_handler(err);
 		}
 	}
@@ -2090,28 +2088,22 @@ public class WolfHospital {
                                 break;
                           	case CMD_BILLING_ACCOUNTS:
                             //GG
-                            	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
+                            	printCommands(CMD_BILLING_ACCOUNTS);
                             	currentMenu = CMD_BILLING_ACCOUNTS;
                             	break;
-                            case CMD_PATIENTS:
+                            //case CMD_ADMIN:
                                 // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_PATIENTS);
+                             //   printCommands(CMD_MANAGE);
                                 // Remember what menu we're in
-                                currentMenu = CMD_PATIENTS;
-                                break;
-                            case CMD_ADMIN:
-                                // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_MANAGE);
-                                // Remember what menu we're in
-                                currentMenu = CMD_MANAGE;
-                                break;                                
+                             //   currentMenu = CMD_MANAGE;
+                             //   break;                                
                             case CMD_QUIT:
                                 quit = true;
                                 break;
                             default:
                                 // Remind the user about what commands are available
                                 System.out.println("\nCommand not recognized");
-                                startup_printAvailableCommands(CMD_MAIN);
+                                printCommands(CMD_MAIN);
                                 break;
                         }
                         break;
@@ -2164,7 +2156,7 @@ public class WolfHospital {
                     case CMD_BILLING_ACCOUNTS:
                     //GG
                     	switch (command.toUpperCase()){
-                          case CMD_BILLING_ACCT_ADD：
+                          case CMD_BILLING_ACCT_ADD:
                           	userBillingAcctAdd();
                           	break;
                         	case CMD_BILLING_ACCT_GET:
@@ -2354,7 +2346,7 @@ public class WolfHospital {
                             break;
                         case CMD_MAIN:
                             // Tell the user their options in this new menu
-                            startup_printAvailableCommands(CMD_MAIN);
+                            printCommands(CMD_MAIN);
                             // Remember what menu we're in
                             currentMenu = CMD_MAIN;
                             break;
@@ -2364,7 +2356,7 @@ public class WolfHospital {
                         default:
                             // Remind the user about what commands are available
                             System.out.println("\nCommand not recognized");
-                            startup_printAvailableCommands(CMD_MANAGE);
+                            printCommands(CMD_MANAGE);
                             break;
                         }
                         break;
@@ -2373,7 +2365,7 @@ public class WolfHospital {
                 }
             }
             // Connection
-            jdbc_connection.close();
+            connection.close();
         
         }
         catch (Throwable err) {
