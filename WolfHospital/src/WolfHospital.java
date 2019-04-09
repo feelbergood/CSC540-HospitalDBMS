@@ -18,61 +18,64 @@ public class WolfHospital {
 	// Administrators: manage all operations of users above and process staff and
 	// hospital information.
 	// Patients: Retrieve own billing account, medical records, patient info
-	private static final String CMD_MAIN = "MAIN";
-	private static final String CMD_OPERATORS = "OPERATORS";
-	private static final String CMD_BILLING = "BILLING STAFF";
-	private static final String CMD_DOCTORS = "DOCTORS";
-	private static final String CMD_PATIENTS = "PATIENTS";
-	private static final String CMD_ADMIN = "ADMINISTRATORS";
-	private static final String CMD_QUIT = "QUIT";
+    private static final String CMD_MAIN = "MAIN";
+    private static final String CMD_INFORMATION_PROCESSING = "INFORMATION PROCESSING"; // CWChen
+    private static final String CMD_MEDICAL_RECORDS = "MAINTAINING MEDICAL RECORDS"; //fhy
+    private static final String CMD_BILLING_ACCOUNTS = "MAINTAINING BILLING ACCOUNTS"; //GG
+    private static final String CMD_REPORTS = "REPORTS"; // ryd
+    private static final String CMD_QUIT = "QUIT";
 
-	private static final String CMD_STAFF_ADD = "ADD STAFF";
-	private static final String CMD_STAFF_GET = "RETRIEVE STAFF";
-	private static final String CMD_STAFF_UPDATE = "UPDATE STAFF";
-	private static final String CMD_STAFF_DELETE = "DELETE STAFF";
+    private static final String CMD_STAFF_ADD = "ADD STAFF";
+    private static final String CMD_STAFF_GET = "RETRIEVE STAFF";
+    private static final String CMD_STAFF_UPDATE = "UPDATE STAFF";
+    private static final String CMD_STAFF_DELETE = "DELETE STAFF";
 
-	private static final String CMD_PATIENT_ADD = "ADD PATIENT";
-	private static final String CMD_PATIENT_GET = "RETRIEVE PATIENT";
-	private static final String CMD_PATIENT_UPDATE = "UPDATE PATIENT";
-	private static final String CMD_PATIENT_DELETE = "DELETE PATIENT";
+    private static final String CMD_PATIENT_ADD = "ADD PATIENT";
+    private static final String CMD_PATIENT_GET = "RETRIEVE PATIENT";
+    private static final String CMD_PATIENT_UPDATE = "UPDATE PATIENT";
+    private static final String CMD_PATIENT_DELETE = "DELETE PATIENT";
 
-	private static final String CMD_WARD_ADD = "ADD WARD";
-	private static final String CMD_WARD_GET = "RETRIEVE WARD";
-	private static final String CMD_WARD_UPDATE = "UPDATE WARD";
-	private static final String CMD_WARD_DELETE = "DELETE WARD";
-	private static final String CMD_WARD_CHECK = "CHECK AVAILABLE WARD";
-	private static final String CMD_WARD_ASSIGN = "ASSIGN WARD";
-	private static final String CMD_WARD_RESERVE = "RESERVE WARD";
-	private static final String CMD_WARD_RELEASE = "RELEASE WARD";
+    private static final String CMD_WARD_ADD = "ADD WARD";
+    private static final String CMD_WARD_GET = "RETRIEVE WARD";
+    private static final String CMD_WARD_UPDATE = "UPDATE WARD";
+    private static final String CMD_WARD_DELETE = "DELETE WARD";
+    private static final String CMD_WARD_CHECK = "CHECK AVAILABLE WARD";
+    private static final String CMD_WARD_ASSIGN = "ASSIGN WARD";
+    private static final String CMD_WARD_RESERVE = "RESERVE WARD";
+    private static final String CMD_WARD_RELEASE = "RELEASE WARD";
 
-	private static final String CMD_BED_CHECK = "CHECK AVAILABLE BED";
-	private static final String CMD_BED_ASSIGN = "ASSIGN BED";
-	private static final String CMD_BED_RESERVE = "RESERVE BED";
-	private static final String CMD_BED_RELEASE = "RELEASE BED";
+    private static final String CMD_BED_CHECK = "CHECK AVAILABLE BED";
+    private static final String CMD_BED_ASSIGN = "ASSIGN BED";
+    private static final String CMD_BED_GET = "RETRIEVE BED";
+    private static final String CMD_BED_RESERVE = "RESERVE BED";
+    private static final String CMD_BED_RELEASE = "RELEASE BED";
 
-	private static final String CMD_TREATMENT_ADD = "ADD TREATMENT";
-	private static final String CMD_TREATMENT_GETALL = "GET ALL TREATMENTS";
-	private static final String CMD_TREATMENT_GET = "GET A TREATMENT";
-	private static final String CMD_TREATMENT_UPDATE = "UPDATE TREATMENT";
-	private static final String CMD_TEST_ADD = "ADD TEST";
-	private static final String CMD_TEST_GETALL = "GET ALL TESTS";
-	private static final String CMD_TEST_GET = "GET A TEST";
-	private static final String CMD_TEST_UPDATE = "UPDATE TEST";
-	private static final String CMD_CHECKIN_ADD = "ADD CHECK-IN";
-	private static final String CMD_CHECKIN_GETALL = "GET ALL CHECK-INS";
-	private static final String CMD_CHECKIN_GET = "GET A CHECK-IN";
-	private static final String CMD_CHECKIN_UPDATE = "UPDATE CHECK-IN";
+    private static final String CMD_TREATMENT_ADD = "ADD TREATMENT";
+    private static final String CMD_TREATMENT_GETALL = "GET ALL TREATMENTS";
+    private static final String CMD_TREATMENT_GET = "GET A TREATMENT";
+    private static final String CMD_TREATMENT_UPDATE = "UPDATE TREATMENT";
+    private static final String CMD_TEST_ADD = "ADD TEST";
+    private static final String CMD_TEST_GETALL = "GET ALL TESTS";
+    private static final String CMD_TEST_GET = "GET A TEST";
+    private static final String CMD_TEST_UPDATE = "UPDATE TEST";
+    private static final String CMD_CHECKIN_ADD = "ADD CHECK-IN";
+    private static final String CMD_CHECKIN_GETALL = "GET ALL CHECK-INS";
+    private static final String CMD_CHECKIN_GET = "GET A CHECK-IN";
+    private static final String CMD_CHECKIN_UPDATE = "UPDATE CHECK-IN";
 
-	private static final String CMD_MEDICAL_HISTORY_REPORT = "REPORT MEDICAL HISTORY";
-	private static final String CMD_USAGE_STATUS_REPORT = "REPORT USAGE STATUS";
-	private static final String CMD_PATIENT_NUMBER_REPORT = "REPORT PATIENT NUMBER";
-	private static final String CMD_WARD_USAGE_PERCENT_REPORT = "REPORT WARD USAGE PERCENTAGE";
-	private static final String CMD_DOCTOR_RESPONS_REPORT = "REPORT DOCTOR REPONSIBLITIES";
+    private static final String CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT = "MEDICAL HISTORY I";
+	private static final String CMD_MEDICAL_HISTORY_BY_TIME_REPORT = "MEDICAL HISTORY II";
+    private static final String CMD_WARD_USAGE_STATUS_REPORT = "WARD USAGE STATUS";
+	private static final String CMD_BED_USAGE_STATUS_REPORT = "BED USAGE STATUS";
+    private static final String CMD_NUMBER_PATIENTS_REPORT = "NUMBER OF PATIENTS";
+    private static final String CMD_WARD_USAGE_PERCENT_REPORT = "WARD USAGE PERCENTAGE";
+    private static final String CMD_DOCTOR_RESPONS_REPORT = "DOCTOR REPONSIBLITIES";
+	private static final String CMD_STAFF_INFO_REPORT = "STAFF INFORMATION";
 
-	private static final String CMD_BILLING_ACCT_ADD = "ADD BILLING ACCOUNT";
-	private static final String CMD_BILLING_ACCT_GET = "RETRIEVE BILLING ACCOUNT";
-	private static final String CMD_BILLING_ACCT_UPDATE = "UPDATE BILLING ACCOUNT";
-	private static final String CMD_BILLING_ACCT_DELETE = "DELETE BILLING ACCOUNT";
+    private static final String CMD_BILLING_ACCT_ADD = "ADD BILLING ACCOUNT";
+    private static final String CMD_BILLING_ACCT_GET = "RETRIEVE BILLING ACCOUNT";
+    private static final String CMD_BILLING_ACCT_UPDATE = "UPDATE BILLING ACCOUNT";
+    private static final String CMD_BILLING_ACCT_DELETE = "DELETE BILLING ACCOUNT";
 
 	private static Scanner scanner;
 	private static String currentMenu;
@@ -226,35 +229,110 @@ public class WolfHospital {
 		}
 	}
 
-	public static void printCommands(String menu) {
-		System.out.println(menu);
-		System.out.println("Available Commands:");
-		switch (menu) {
-		case CMD_MAIN:
-			System.out.println(CMD_OPERATORS);
-			System.out.println(CMD_BILLING);
-			System.out.println(CMD_DOCTORS);
-			System.out.println(CMD_PATIENTS);
-			System.out.println(CMD_ADMIN);
-			System.out.println(CMD_QUIT);
-			break;
-		case CMD_OPERATORS:
-			System.out.println();
-			break;
-		case CMD_BILLING:
-			System.out.println();
-			break;
-		case CMD_DOCTORS:
-			System.out.println();
-			break;
-		case CMD_PATIENTS:
-			System.out.println();
-			break;
-		case CMD_ADMIN:
-			System.out.println();
-			break;
-		}
-	}
+    public static void printCommands(String menu) {
+        System.out.println(menu);
+        System.out.println("Available Commands:");
+        switch (menu) {
+          case CMD_MAIN:
+              System.out.println(CMD_INFORMATION_PROCESSING);
+              System.out.println(CMD_MEDICAL_RECORDS);
+              System.out.println(CMD_BILLING_ACCOUNTS);
+              System.out.println(CMD_REPORTS);
+              System.out.println(CMD_QUIT);
+              break;
+          case CMD_MEDICAL_RECORDS:
+              //fhy      
+              System.out.println(CMD_TREATMENT_ADD);
+              System.out.println("\t- add a new treatment record");
+              System.out.println(CMD_TREATMENT_GETALL);
+              System.out.println("\t- retrieve all treatment records");
+              System.out.println(CMD_TREATMENT_GET);
+              System.out.println("\t- retrieve a treatment record");
+              System.out.println(CMD_TREATMENT_UPDATE);
+              System.out.println("\t- update treatment record");
+              System.out.println(CMD_TEST_ADD);
+              System.out.println("\t- add a new test record");
+              System.out.println(CMD_TEST_GETALL)
+              System.out.println("\t- retrieve all test records");
+              System.out.println(CMD_TEST_GET);
+              System.out.println("\t- retrieve a test record");
+              System.out.println(CMD_TEST_UPDATE);
+              System.out.println("\t- update test record");
+              System.out.println(CMD_CHECKIN_ADD);
+              System.out.println("\t- add a check-in record");  
+              System.out.println(CMD_CHECKIN_GETALL);
+              System.out.println("\t- retrieve all check-in records");
+              System.out.println(CMD_CHECKIN_GET);
+              System.out.println("\t- retrieve a check-in record");     
+              System.out.println(CMD_QUIT);
+              System.out.println("\t- exit the program");
+              break;
+          case CMD_BILLING_ACCOUNTS:
+              //GG    
+              System.out.println(CMD_BILLING_ACCT_ADD);
+              System.out.println("\t- add billing account");
+              System.out.println(CMD_BILLING_ACCT_GET);
+              System.out.println("\t- retrieve billing account");
+              System.out.println(CMD_BILLING_ACCT_UPDATE);
+              System.out.println("\t- update billing account");
+              System.out.println(CMD_BILLING_ACCT_DELETE);
+              System.out.println("\t- delete billing account");
+              break;
+          case CMD_INFORMATION_PROCESSING:
+              System.out.println(CMD_STAFF_ADD);
+              System.out.println("\t- add a new staff");
+              System.out.println(CMD_STAFF_UPDATE);
+              System.out.println("\t- update a staff");
+              System.out.println(CMD_STAFF_DELETE);
+              System.out.println("\t- delete a staff");
+              System.out.println(CMD_PATIENT_ADD);
+              System.out.println("\t- add a new patient");
+              System.out.println(CMD_PATIENT_UPDATE);
+              System.out.println("\t- update a patient");
+              System.out.println(CMD_PATIENT_DELETE);
+              System.out.println("\t- delete a patient");
+              System.out.println(CMD_WARD_ADD);
+              System.out.println("\t- add a new ward");
+              System.out.println(CMD_WARD_UPDATE);
+              System.out.println("\t- update a ward");
+              System.out.println(CMD_WARD_DELETE);
+              System.out.println("\t- delete a ward");
+              System.out.println(CMD_WARD_CHECK);
+              System.out.println("\t- check available wards");
+              System.out.println(CMD_BED_CHECK);
+              System.out.println("\t- check available beds");
+              System.out.println(CMD_WARD_ASSIGN);
+              System.out.println("\t- find available wards");
+              System.out.println(CMD_BED_ASSIGN);
+              System.out.println("\t- find available beds");
+              System.out.println(CMD_WARD_RESERVE);
+              System.out.println("\t- assign an available ward to patient");
+              System.out.println(CMD_BED_RESERVE);
+              System.out.println("\t- assign an available bed to patient");
+              System.out.println(CMD_WARD_RELEASE);
+              System.out.println("\t- release an ward");
+              System.out.println(CMD_BED_RELEASE);
+              System.out.println("\t- release a bed");
+              break;
+          case CMD_REPORTS:
+            System.out.println(CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT);
+            System.out.println("\t- report medical history for a patient");
+						System.out.println(CMD_MEDICAL_HISTORY_BY_TIME_REPORT);
+            System.out.println("\t- report medical history for a time period");
+    				System.out.println(CMD_WARD_USAGE_STATUS_REPORT);
+            System.out.println("\t- report ward usage status");
+						System.out.println(CMD_BED_USAGE_STATUS_REPORT);
+            System.out.println("\t- report bed usage status");
+    				System.out.println(CMD_NUMBER_PATIENTS_REPORT);
+            System.out.println("\t- report number of patients per month");
+    				System.out.println(CMD_WARD_USAGE_PERCENT_REPORT);
+            System.out.println("\t- report ward usage precentage");
+						System.out.println(CMD_DOCTOR_RESPONS_REPORT);
+            System.out.println("\t- report doctors' responsibility");
+						System.out.println(CMD_STAFF_INFO_REPORT);
+            System.out.println("\t- report staff information grouped by role");
+        }
+    }
 
 	// TO-DO 2: assign instantiated prepared statements
 	public static void generatePreparedStatements() {
@@ -1946,24 +2024,341 @@ public class WolfHospital {
 		}
 	}
 
+	public static void main(String[] args) {
+		try {
+        
+            // Declare local variables
+            boolean quit = false;
+            String command;
+            
+            // Print welcome
+            System.out.println("\nWelcome to Wolf Inns Hotel Management System");
+            
+           
+            connectToDatabase();
+            generatePreparedStatements();
+            
+            // generateTables();
+            for (String name: tableNames) {
+                populateTables(name);
+            }
+            
+            // Print available commands
+            printCommands(CMD_MAIN);
+
+            // Watch for user input
+            currentMenu = CMD_MAIN;
+            scanner = new Scanner(System.in);
+            while (quit == false) {
+                System.out.print("user -> ");
+                command = scanner.nextLine();
+                switch (currentMenu) {
+                    case CMD_MAIN:
+                        // Check user's input (case insensitively)
+                        switch (command.toUpperCase()) {
+                            //fhy
+                            case CMD_MEDICAL_RECORDS:
+                                // Tell the user their options in this new menu
+                                printCommands(CMD_MEDICAL_RECORDS);
+                                // Remember what menu we're in
+                                currentMenu = CMD_MEDICAL_RECORDS;
+                                break;
+                          	case CMD_BILLING_ACCOUNTS:
+                            //GG
+                            	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
+                            	currentMenu = CMD_BILLING_ACCOUNTS;
+                            	break;
+                            case CMD_PATIENTS:
+                                // Tell the user their options in this new menu
+                                startup_printAvailableCommands(CMD_PATIENTS);
+                                // Remember what menu we're in
+                                currentMenu = CMD_PATIENTS;
+                                break;
+                            case CMD_ADMIN:
+                                // Tell the user their options in this new menu
+                                startup_printAvailableCommands(CMD_MANAGE);
+                                // Remember what menu we're in
+                                currentMenu = CMD_MANAGE;
+                                break;                                
+                            case CMD_QUIT:
+                                quit = true;
+                                break;
+                            default:
+                                // Remind the user about what commands are available
+                                System.out.println("\nCommand not recognized");
+                                startup_printAvailableCommands(CMD_MAIN);
+                                break;
+                        }
+                        break;
+                       
+                    //fhy
+                    case CMD_MEDICAL_RECORDS:
+                        switch (command.toUpperCase()){
+                            case CMD_TREATMENT_ADD:
+                            		userTreatmentAdd();
+                                break;
+                            case CMD_TREATMENT_GETALL:
+                            		userTreatmentGetAll();
+                                break;
+                            case CMD_TREATMENT_GET:
+                            		userTreatmentGet();
+                                break;
+                            case CMD_TREATMENT_UPDATE:
+                            		userTreatmentUpdate();
+                                break;
+                            case CMD_TEST_ADD:
+                            		userTestAdd();
+                                break;   
+                            case CMD_TEST_GETALL:
+                            		userTestGetAll();
+                                break;   
+                            case CMD_TEST_GET:
+                            		userTestGet();
+                                break;
+                            case CMD_TEST_UPDATE:
+                            		userTestUpdate();
+                                break;
+                            case CMD_CHECKIN_ADD:
+                            		userCheckinAdd();
+                                break;
+                            case CMD_CHECKIN_GETALL:
+                            		userCheckinGetAll();
+                                break;
+                            case CMD_CHECKIN_GET:
+                            		userCheckinGet();
+                                break;
+                            case CMD_QUIT:
+                                quit = true;
+                                break;
+                            default:
+                                // Remind the user about what commands are available
+                                System.out.println("\nCommand not recognized");
+                                printCommands(CMD_MEDICAL_RECORDS);
+                                break;     
+                        }
+                    case CMD_BILLING_ACCOUNTS:
+                    //GG
+                    	switch (command.toUpperCase()){
+                          case CMD_BILLING_ACCT_ADD：
+                          	userBillingAcctAdd();
+                          	break;
+                        	case CMD_BILLING_ACCT_GET:
+                          	userBillingAcctGet();
+                          	break;
+                        	case CMD_BILLING_ACCT_UPDATE:
+                          	userBillingAcctUpdate();
+                          	break;
+                        	case CMD_BILLING_ACCT_DELETE:
+                          	userBillingAcctDelete();
+                          	break;
+                        	case CMD_QUIT:
+                          	quit = true;
+                          	break;
+                        	default:
+                          	System.out.println("\nCommand not recognized");
+                          	printCommands(CMD_BILLING_ACCOUNTS);
+                          	break;
+                      }
+                    case CMD_INFORMATION_PROCESSING:
+                        switch (command.toUpperCase()) {
+                            case CMD_STAFF_ADD:
+                                userStaffAdd();
+                                break;
+                          	case CMD_STAFF_UPDATE:
+                            		userStaffUpdate();
+                            		break;
+                          	case CMD_STAFF_DELETE:
+                            		userStaffDelete();
+                            		break;
+                          	case CMD_PATIENT_ADD:
+                            		userPatientAdd();
+                            		break;
+                            case CMD_PATIENT_UPDATE:
+                            		userPatientUpdate();
+                            		break;
+                          	case CMD_PATIENT_DELETE:
+                            		userPatientDelete();
+                            		break;
+                            case CMD_WARD_ADD:
+                            		userWardAdd();
+                            		break;
+                            case CMD_WARD_UPDATE:
+                            		userWardUpdate();
+                            		break;
+                          	case CMD_WARD_DELETE:
+                            		userWardDelete();
+                            		break;
+                            case CMD_WARD_CHECK:
+                            		userWardCheck();
+                            		break;
+                          	case CMD_BED_CHECK:
+                            		userBedCheck();
+                            		break;
+                            case CMD_WARD_ASSIGN:
+                            		userWardAssign();
+                            		break;
+                          	case CMD_BED_ASSIGN:
+                            		userBedAssign();
+                            		break;
+                            case CMD_WARD_RESERVE:
+                            		userWardReserve();
+                            		break;
+                          	case CMD_BED_RESERVE:
+                            		userBedReserve();
+                            		break;
+                            case CMD_WARD_RELEASE:
+                            		userWardRelease();
+                            		break;
+                          	case CMD_BED_RELEASE:
+                            		userBedRelease();
+                            		break;
+                          	default:
+                            	  System.out.println("\nCommand not found");
+                            		printCommands(CMD_INFORMATION_PROCESSING);
+                            		break;
+                        }
+												break;
+                    case CMD_REPORTS:
+                        // Check user's input (case insensitively)
+                        switch (command.toUpperCase()) {
+                            case CMD_REPORT_REVENUE:
+                                user_reportHotelRevenue();
+                            break;
+                            case CMD_REPORT_HOTELS:
+                                user_reportEntireTable("Hotels");
+                                break;
+                            case CMD_REPORT_ROOMS:
+                                user_reportEntireTable("Rooms");
+                                break;
+                            case CMD_REPORT_STAFF:
+                                user_reportEntireTable("Staff");
+                                break;
+                            case CMD_REPORT_CUSTOMERS:
+                                user_reportEntireTable("Customers");
+                                break;
+                            case CMD_REPORT_STAYS:
+                                user_reportEntireTable("Stays");
+                                break;
+                            case CMD_REPORT_SERVICES:
+                                user_reportEntireTable("ServiceTypes");
+                                break;
+                            case CMD_REPORT_PROVIDED:
+                                user_reportEntireTable("Provided");
+                                break;                           
+                            case CMD_REPORT_OCCUPANCY_BY_HOTEL:
+                                user_reportOccupancyByHotel();
+                                break;
+                            case CMD_REPORT_OCCUPANCY_BY_ROOM_TYPE:
+                                user_reportOccupancyByRoomType();
+                                break;
+                            case CMD_REPORT_OCCUPANCY_BY_DATE_RANGE:
+                                user_reportOccupancyByDateRange();
+                                break;
+                            case CMD_REPORT_OCCUPANCY_BY_CITY:
+                                user_reportOccupancyByCity();
+                                break;
+                            case CMD_REPORT_TOTAL_OCCUPANCY:
+                                user_reportTotalOccupancy();
+                                break;
+                            case CMD_REPORT_PERCENTAGE_OF_ROOMS_OCCUPIED:
+                                user_reportPercentageOfRoomsOccupied();
+                                break;
+                            case CMD_REPORT_STAFF_GROUPED_BY_ROLE:
+                                user_reportStaffGroupedByRole();
+                                break;
+                            case CMD_REPORT_STAFF_SERVING_DURING_STAY:
+                                user_reportStaffServingDuringStay();
+                                break;
+                            case CMD_MAIN:
+                                // Tell the user their options in this new menu
+                                startup_printAvailableCommands(CMD_MAIN);
+                                // Remember what menu we're in
+                                currentMenu = CMD_MAIN;
+                                break;
+                            case CMD_QUIT:
+                                quit = true;
+                                break;
+                            default:
+                                // Remind the user about what commands are available
+                                System.out.println("\nCommand not recognized");
+                                startup_printAvailableCommands(CMD_REPORTS);
+                                break;
+                        }
+                        break;
+                    case CMD_MANAGE:
+                        // Check user's input (case insensitively)
+                        switch (command.toUpperCase()) {
+                        case CMD_MANAGE_HOTEL_ADD:
+                            user_manageHotelAdd();
+                            break;
+                        case CMD_MANAGE_HOTEL_UPDATE:
+                            user_manageHotelUpdate();
+                            break;
+                        case CMD_MANAGE_HOTEL_DELETE:
+                            user_manageHotelDelete();
+                            break;
+                        case CMD_MANAGE_STAFF_ADD:
+                            user_manageStaffAdd();
+                            break;
+                        case CMD_MANAGE_STAFF_UPDATE:
+                            user_manageStaffUpdate();
+                            break;
+                        case CMD_MANAGE_STAFF_DELETE:
+                            user_manageStaffDelete();
+                            break;
+                        case CMD_MANAGE_ROOM_ADD:
+                            user_manageRoomAdd();
+                            break;
+                        case CMD_MANAGE_ROOM_UPDATE:
+                            user_manageRoomUpdate();
+                            break;
+                        case CMD_MANAGE_ROOM_DELETE:
+                            user_manageRoomDelete();
+                            break;
+                        case CMD_MANAGE_CUSTOMER_ADD:
+                            user_manageCustomerAdd();
+                            break;
+                        case CMD_MANAGE_CUSTOMER_UPDATE:
+                            user_manageCustomerUpdate();
+                            break;
+                        case CMD_MANAGE_CUSTOMER_DELETE:
+                            user_manageCustomerDelete();
+                            break;
+                        case CMD_MANAGE_SERVICE_COST_UPDATE:
+                            user_manageUpdateServiceCost();
+                            break;
+                        case CMD_MAIN:
+                            // Tell the user their options in this new menu
+                            startup_printAvailableCommands(CMD_MAIN);
+                            // Remember what menu we're in
+                            currentMenu = CMD_MAIN;
+                            break;
+                        case CMD_QUIT:
+                            quit = true;
+                            break;
+                        default:
+                            // Remind the user about what commands are available
+                            System.out.println("\nCommand not recognized");
+                            startup_printAvailableCommands(CMD_MANAGE);
+                            break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            // Connection
+            jdbc_connection.close();
+        
+        }
+        catch (Throwable err) {
+            error_handler(err);
+        }
+	}
 
 	public static void error_handler(Throwable error) {
 
 	}
-
-	public static void main(String[] args) {
-		printCommands(CMD_MAIN);
-		connectToDatabase();
-		generatePreparedStatements();
-		// generateTables();
-		for (String name: tableNames) {
-			populateTables(name);
-		}
-		close(result);
-		close(statement);
-		close(connection);
-	}
-	
 	static void close(Connection connection) {
 	    if(connection != null) {
 	        try {
