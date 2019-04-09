@@ -592,7 +592,7 @@ public class WolfHospital {
 								"`age` INT(3) NOT NULL, " +
 								"`gender` VARCHAR(255) NOT NULL, " +
 								"`jobTitle` VARCHAR(255) NOT NULL, " +
-								"`profTitle` VARCHAR(255) NULL, " +
+								"`profTitle` VARCHAR(255) DEFAULT NULL, " +
 								"`department` VARCHAR(255) NOT NULL, " +
 								"`phone` VARCHAR(255) NOT NULL, " +
 								"`address` VARCHAR(255) NOT NULL, " +
@@ -630,16 +630,16 @@ public class WolfHospital {
 								"FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" +
 								");");
 				// GG
-				// Wards & Beds
+				// Wards
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Wards` (" +
 								"`ward number` VARCHAR(255) NOT NULL UNIQUE, " +
-								"`capacity` TINYINT NOT NULL, " +
-								"`charges per day` DOUBLE NOT NULL, " +
-								"`responsible nurse` VARCHAR(255) NOT NULL, " +
+								"`capacity` INT NOT NULL, " +
+								"`charges per day` INT NOT NULL, " +
+								"`responsible nurse` VARCHAR(255) DEFAULT NULL, " +
 								"PRIMARY KEY (`ward number`), " +
 								"CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) " +
-								"ON DELETE CASCADE" +
+								"ON DELETE SET NULL" +
 								");");
 				//fhy: Medical Records, Treatment, Test, Check-ins
 				statement.executeUpdate(
@@ -698,17 +698,15 @@ public class WolfHospital {
 						"FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" + ");");
 
 				// GG
-				// Wards & Beds
+				// Beds
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `Beds` (" +
 						"`ward number` VARCHAR(255) NOT NULL," +
 						"`bed number` VARCHAR(255) NOT NULL," +
 						"`patientID` VARCHAR(255) DEFAULT NULL," +
 						"PRIMARY KEY (`ward number`, `bed number`), " +
-						"CONSTRAINT `fk_bed` " +
-							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
-							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
-							"ON DELETE CASCADE" +
+						"CONSTRAINT `fk_bedwn` FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) ON DELETE CASCADE, " +
+						"CONSTRAINT `fk_bedpi` FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) ON DELETE SET NULL" +
 						");");
 				// Assigned
 				statement.executeUpdate(
@@ -719,10 +717,8 @@ public class WolfHospital {
 						"`start-date` DATETIME NOT NULL," +
 						"`end-date` DATETIME DEFAULT NULL," +
 						"CONSTRAINT pk_assign PRIMARY KEY (`patientID`, `ward number`, `bed number`)," +
-						"CONSTRAINT `fk_assign` " +
-							"FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) " +
-							"FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) " +
-							"FOREIGN KEY (`bed number`) REFERENCES Beds(`bed number`) " +
+						"CONSTRAINT `fk_assignpi` FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) ON DELETE CASCADE, " +
+						"CONSTRAINT `fk_assginwb` FOREIGN KEY (`ward number`, `bed number`) REFERENCES Beds(`ward number`, `bed number`) " +
 							"ON DELETE CASCADE" +
 						");");
 
@@ -767,7 +763,10 @@ public class WolfHospital {
 					// addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81
 					// DEF St , Cary NC 27519, 20, 002, no);
 				case "Wards":
-					addWard("001", "4", "50", "102");
+					addWard("001", 4, 50, "102");
+					addWard("002", 4, 50, "102");
+					addWard("003", 2, 100, "106");
+					addWard("004", 2, 100, "106");
 					// Staff:
 					// GG
 					/*
@@ -1147,13 +1146,13 @@ public class WolfHospital {
 		}
 	}
 	// Add a new ward
-	public static void addWard(String wardNumber, String capacity, String Daycharge, String responsibleNurse) {
+	public static void addWard(String wardNumber, int capacity, int Daycharge, String responsibleNurse) {
 		try {
 			connection.setAutoCommit(false);
 			try {
 				prep_addWards.setString(1, wardNumber);
-				prep_addWards.setString(2, capacity);
-				prep_addWards.setString(3, Daycharge);
+				prep_addWards.setInt(2, capacity);
+				prep_addWards.setInt(3, Daycharge);
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
