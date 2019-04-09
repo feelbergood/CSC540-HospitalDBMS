@@ -578,10 +578,35 @@ public class WolfHospital {
 			e.printStackTrace();
 		}
 	}
-
+	
+	
+	// 04/08 : Before create tables - drop all existing tables
+	public static void dropAllExistingTables() {
+		
+		try {
+			DatabaseMetaData metaData;
+			String tableName;
+			
+			metaData = connection.getMetaData();
+			result = metaData.getTables(null, null, "%", null);
+			
+			while(result.next()) {
+				tableName = result.getString(3);
+				statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 0");
+				statement.executeUpdate("DROP TABLE " + tableName);
+				statement.executeUpdate("SET FOREIGN_KEY_CHECKS = 1");
+			}
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
 	// TO-DO 3: create tables
 	public static void generateTables() {
 		try {
+			
+			dropAllExistingTables();
 			connection.setAutoCommit(false);
 			try {
 				// Wayne: Staff, Patients, Wards:
