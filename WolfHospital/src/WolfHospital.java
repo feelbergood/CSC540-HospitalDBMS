@@ -746,40 +746,29 @@ public class WolfHospital {
 							"90 ABC St , Raleigh NC 27");
 					addStaff("101", "John", "45", "Male", "Billing Staff", "", "Office", "564",
 							"798 XYZ St , Rochester NY 54");
-					// addStaff(102, Carol, 55, Female, Nurse, , ER, 911, 351 MH St , Greensboro NC
-					// 27);
-					// addStaff(103, Emma, 55, Female, Doctor, Senior surgeon, Oncological Surgery,
-					// 546, 49 ABC St , Raleigh NC 27);
-					// addStaff(104, Ava, 55, Female, Front Desk Staff, , Office, 777, 425 RG St ,
-					// Raleigh NC 27);
-					// addStaff(105, Peter, 52, Male, Doctor, Anesthetist, Oncological Surgery, 724,
-					// 475 RG St , Raleigh NC 27);
-					// addStaff(106, Olivia, 27, Female, Nurse, , Neurology, 799, 325 PD St ,
-					// Raleigh NC 27);
+					addStaff("102", "Carol", "55", "Female", "Nurse", "", "ER", "911", 
+							"351 MH St , Greensboro NC 27");
+					addStaff("103", "Emma", "55", "Female", "Doctor", "Senior surgeon", "Oncological Surgery", "546", 
+							"49 ABC St , Raleigh NC 27");
+					addStaff("104", "Ava", "55", "Female", "Front Desk Staff", "", "Office", "777", 
+							"425 RG St , Raleigh NC 27");
+					addStaff("105", "Peter", "52", "Male", "Doctor", "Anesthetist", "Oncological Surgery", "724",
+							"475 RG St , Raleigh NC 27");
+					addStaff("106", "Olivia", "27", "Female", "Nurse", "", "Neurology", "799", 
+							"325 PD St , Raleigh NC 27");
 					break;
 				case "Patients":
-					addPatient("1001", "000-01-1234", "David", "01/30/1980", "Male", "39", "919-123-3324",
+					addPatient("1001", "000-01-1234", "David", "1980-01-30", "Male", "39", "919-123-3324",
 							"69 ABC St , Raleigh NC 27730", "20", "001", "no");
-					// addPatient(1002, 000-02-1234, Sarah, 01/30/1971, Female, 48, 919-563-3478, 81
-					// DEF St , Cary NC 27519, 20, 002, no);
+					addPatient("1002", "000-02-1234", "Sarah", "1971-01-30", "Female", "48", "919-563-3478",
+							"81 DEF St , Cary NC 27519", "20", "002", "no");
+					break;
 				case "Wards":
 					addWard("001", 4, 50, "102");
 					addWard("002", 4, 50, "102");
 					addWard("003", 2, 100, "106");
 					addWard("004", 2, 100, "106");
-					// Staff:
-					// GG
-					/*
-					 * Populating data for Wards String ward number, Int capacity, Double charges
-					 * per day, String responsible nurse
-					 */
-					/*
-					 * Populating data for Beds String ward number, String bed number, String
-					 * patientID Demo data: for ward#001 beds#1,2,3,4; for ward#002 beds#1,2,3,4;
-					 * for ward#003 beds#1,2; for ward#004 beds#1,2; Patient000-01-1234 is assigned
-					 * to w1b1, 000-03-1234 w1b2, 000-02-1234 w2b1, 000-04-1234 w3b1(finish
-					 * treatment)
-					 */
+					break;
 				case "Beds":
 					manageBedAdd("001", "1", "000-01-1234");
 					manageBedAdd("001", "2", "000-03-1234");
@@ -793,6 +782,7 @@ public class WolfHospital {
 					manageBedAdd("003", "2", "");
 					manageBedAdd("004", "1", "");
 					manageBedAdd("004", "2", "");
+					break;
 					/*
 					 * Populating data for Assigned String patientID, String ward number, String bed
 					 * number, Datetime start-date, Datetime end-date
@@ -802,14 +792,7 @@ public class WolfHospital {
 					manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
 					manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
 					manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
-					// Other tables...
-					// fhy: Medical Records(along with other tables), Treatment, Test, Check-ins
-					// demo data: assuming Medical Records #1 #2 are Treatment, #3 is Test, #4 with
-					// 2 different doctors, consist of one test(by 103) and one treatment(by 105)
-					// the only front desk staff is 104, so all check-ins are assumed to be done by
-					// 104
-					// question: is empty string the correct way to deal with empty value of
-					// endDate?
+					break;
 				case "Treatment":
 					// manageTreatmentRecordAdd() should be done by other teammates
 					//GG
@@ -1972,7 +1955,7 @@ public class WolfHospital {
 		printCommands(CMD_MAIN);
 		connectToDatabase();
 		generatePreparedStatements();
-		generateTables();
+		// generateTables();
 		for (String name: tableNames) {
 			populateTables(name);
 		}
