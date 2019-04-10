@@ -2175,7 +2175,20 @@ public class WolfHospital {
 	public static void userBillingAcctDelete() {
 		
 		try {
+			//Declare local variables
+			String accountID;
 			
+			//Get account id
+			System.out.println("\nEnter the billing id you wish to delete:\n");
+			accountID = scanner.nextLine();
+				
+			//Print the billing account information you plan to delete
+			System.out.println("\nThe billing account information you have chosen:\n");
+			result.beforeFirst();
+			showBillingAccount(accountID);
+			
+			//Call method that interacts with the Database
+			deleteBillingAccount(accountID);
 		}
 		catch (Throwable err) {
 			error_handler(err);
