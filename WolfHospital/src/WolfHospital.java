@@ -667,10 +667,33 @@ public class WolfHospital {
 			e.printStackTrace();
 		}
 	}
-
+	
+	//04/09 drop all existing tables before populating tables
+	public static void dropAllExistingTables() {
+		
+		try {
+			DatabaseMetaData metaData;
+			String tableName;
+			metaData = connection.getMetaData();
+			result = metaData.getTables(null, null, "%", null);
+			
+			while (result.next()) {
+				tableName = result.getString(3);
+				statement.executeUpdate("SET FOREIGN_KEY_CHECKS=0");
+				statement.executeUpdate("DROP TABLE " + tableName);
+				statement.executeUpdate("SET FOREIGN_KEY_CHECKS=1");
+			}
+		}
+		catch(Throwable err) {
+			error_handler(err);
+		}
+	}
+	
 	// TO-DO 3: create tables
 	public static void generateTables() {
 		try {
+			
+			dropAllExistingTables();
 			connection.setAutoCommit(false);
 			try {
 				// Wayne: Staff, Patients, Wards:
@@ -2050,7 +2073,156 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
-
+	
+	/*
+	 * begin user-interaction methods
+	 * */
+	
+	// GG
+	/*
+	 * user task: Enter a new billing account for a patient
+	 * return: none
+	 * */
+	public static void userBillingAcctAdd() {
+		
+		try {
+			//Declare local variables
+			String accountID;
+			String patientID;
+			String visitDate;
+			String payerSSN;
+			String paymentMethod;
+			String cardNum;
+			String regFee;
+			String medPrescribed;
+			String accomFee;
+			String address;
+			
+			//Get account id you wish to enter a new billing account record
+			System.out.println("\nEnter the account ID you wish to add:\n");
+			accountID = scanner.nextLine();
+			//Get patient id
+			System.out.println("\nEnter the patient ID for this billing account:\n");
+			patientID = scanner.nextLine();
+			//Get visit date
+			System.out.println("\nEnter the visit date:\n");
+			visitDate = scanner.nextLine();
+			//Get payer's ssn
+			System.out.println("\nEnter the payer's SSN for this billing account:\n");
+			payerSSN = scanner.nextLine();
+			//Get payment method
+			System.out.println("\nEnter the payment method:\n");
+			paymentMethod = scanner.nextLine();
+			//Get card number
+			System.out.println("\nEnter the card number for this payment:\n");
+			cardNum = scanner.nextLine();
+			//Get registration fee
+			System.out.println("\nEnter the registration fee:\n");
+			regFee = scanner.nextLine();
+			//Get medication prescribed
+			System.out.println("\nEnter the medication prescribed:\n");
+			medPrescribed = scanner.nextLine();
+			//Get accomandation fee
+			System.out.println("\nEnter the accomandation fee:\n");
+			accomFee = scanner.nextLine();
+			//Get billing address
+			System.out.println("\nEnter the billing address for the payment:\n");
+			address = scanner.nextLine();
+			
+			//call method that interacts with the Database
+			manageBillingAccountAdd(accountID, patientID, visitDate, payerSSN, paymentMethod, cardNum, regFee, medPrescribed, accomFee, address);
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	/*
+	 * user task: Retrieve a billing account
+	 * return: none
+	 * */
+	public static void userBillingAcctGet() {
+		
+		try {			
+			//Declare local variables
+			String accountID;
+			
+			//Get accountID
+			System.out.println("\nEnter the account ID you wish to retrieve:\n");
+			accountID = scanner.nextLine();
+			
+			//Call method that interacts with the Database
+			showBillingAccount(accountID);
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	/*
+	 * user task: Update a billing account certain attribute
+	 * return: none
+	 * */
+	public static void userBillingAcctUpdate() {
+		
+		try {
+			//Declare local variables
+			String accountID;
+			String attrToChange;
+			String valueToChange;
+			
+			//Get account id
+			System.out.println("\nEnter the billing id you wish to update:\n");
+			accountID = scanner.nextLine();
+				
+			//Print the billing account information you plan to update
+			System.out.println("\nThe billing account information you have chosen:\n");
+			result.beforeFirst();
+			showBillingAccount(accountID);
+			
+			//Get attribute to change
+			//Print all possible attribute can be changed
+			System.out.println("\nPlease select the attribute you wish to update[BILLINGADDRESS, PAYMENTTYPE, CARDNUMBER, REGISTRATIONFEE, ACCOMMANDATIONFEE, MEDICATIONPRESCRIBED, VISITDATE]:\n");
+			attrToChange = scanner.nextLine();
+			//Get value to change
+			System.out.println("\nEnter the new value:\n");
+			valueToChange = scanner.nextLine();
+			
+			//Call method that interacts with the Database
+			manageBillingAccountUpdate(accountID, attrToChange, valueToChange);
+			
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	public static void userBillingAcctDelete() {
+		
+		try {
+			//Declare local variables
+			String accountID;
+			
+			//Get account id
+			System.out.println("\nEnter the billing id you wish to delete:\n");
+			accountID = scanner.nextLine();
+				
+			//Print the billing account information you plan to delete
+			System.out.println("\nThe billing account information you have chosen:\n");
+			result.beforeFirst();
+			showBillingAccount(accountID);
+			
+			//Call method that interacts with the Database
+			deleteBillingAccount(accountID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+	
+	
 	public static void main(String[] args) {
 		try {
         
