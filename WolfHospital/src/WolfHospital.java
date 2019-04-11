@@ -2091,6 +2091,48 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
+
+	//fhy
+	public static void userTreatmentAdd(){
+		//manageTreatmentRecordAdd(String recordID, String pres, String diag)
+	}
+	public static void userTreatmentGetAll(){
+		//showAllTreatmentRecords(String patientID)
+	}
+	public static void userTreatmentGet(){
+		//showTreatmentRecord(String recordID)
+	}
+	public static void userTreatmentUpdate(){
+		//manageTreatmentUpdate(String recordID, String attributeToChange, String valueToChange)
+	}
+	public static void userTestAdd(){
+		//manageTestRecordAdd(String recordID, String testType, String testResult, String patientID,
+		//			String startDate, String endDate, String responsibleDoctor)
+	}
+	public static void userTestGetAll(){
+		//showAllTestRecords(String patientID)
+	}
+	public static void userTestGet(){
+		//showTestRecord(String recordID)
+	}
+	public static void userTestUpdate(){
+		//manageTestUpdate(String recordID, String attributeToChange, String valueToChange)
+	}
+	public static void userCheckinAdd(){
+		//manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber, String patientID,
+		//			String startDate, String endDate, String responsibleDoctor)
+	}
+	public static void userCheckinGetAll(){
+		//showAllCheckinRecords(String patientID)
+	}
+	public static void userCheckinGet(){
+		//showCheckinRecord(String recordID)
+	}
+	public static void userCheckinUpdate(){
+		//manageCheckinUpdate(String recordID, String attributeToChange, String valueToChange)
+	}
+
+
 	
 	/*
 	 * begin user-interaction methods
@@ -2239,8 +2281,7 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
-	
-	
+
 	public static void main(String[] args) {
 		try {
         
@@ -2315,263 +2356,266 @@ public class WolfHospital {
             //                     break;
             //             }
             //             break;
-                       
-            //         //fhy
-            //         case CMD_MEDICAL_RECORDS:
-            //             switch (command.toUpperCase()){
-            //                 case CMD_TREATMENT_ADD:
-            //                 		userTreatmentAdd();
-            //                     break;
-            //                 case CMD_TREATMENT_GETALL:
-            //                 		userTreatmentGetAll();
-            //                     break;
-            //                 case CMD_TREATMENT_GET:
-            //                 		userTreatmentGet();
-            //                     break;
-            //                 case CMD_TREATMENT_UPDATE:
-            //                 		userTreatmentUpdate();
-            //                     break;
-            //                 case CMD_TEST_ADD:
-            //                 		userTestAdd();
-            //                     break;   
-            //                 case CMD_TEST_GETALL:
-            //                 		userTestGetAll();
-            //                     break;   
-            //                 case CMD_TEST_GET:
-            //                 		userTestGet();
-            //                     break;
-            //                 case CMD_TEST_UPDATE:
-            //                 		userTestUpdate();
-            //                     break;
-            //                 case CMD_CHECKIN_ADD:
-            //                 		userCheckinAdd();
-            //                     break;
-            //                 case CMD_CHECKIN_GETALL:
-            //                 		userCheckinGetAll();
-            //                     break;
-            //                 case CMD_CHECKIN_GET:
-            //                 		userCheckinGet();
-            //                     break;
-            //                 case CMD_QUIT:
-            //                     quit = true;
-            //                     break;
-            //                 default:
-            //                     // Remind the user about what commands are available
-            //                     System.out.println("\nCommand not recognized");
-            //                     printCommands(CMD_MEDICAL_RECORDS);
-            //                     break;     
-            //             }
-            //         case CMD_BILLING_ACCOUNTS:
-            //         //GG
-            //         	switch (command.toUpperCase()){
-            //               case CMD_BILLING_ACCT_ADD:
-            //               	userBillingAcctAdd();
-            //               	break;
-            //             	case CMD_BILLING_ACCT_GET:
-            //               	userBillingAcctGet();
-            //               	break;
-            //             	case CMD_BILLING_ACCT_UPDATE:
-            //               	userBillingAcctUpdate();
-            //               	break;
-            //             	case CMD_BILLING_ACCT_DELETE:
-            //               	userBillingAcctDelete();
-            //               	break;
-            //             	case CMD_QUIT:
-            //               	quit = true;
-            //               	break;
-            //             	default:
-            //               	System.out.println("\nCommand not recognized");
-            //               	printCommands(CMD_BILLING_ACCOUNTS);
-            //               	break;
-            //           }
-            //         case CMD_INFORMATION_PROCESSING:
-            //             switch (command.toUpperCase()) {
-            //                 case CMD_STAFF_ADD:
-            //                     userStaffAdd();
-            //                     break;
-            //               	case CMD_STAFF_UPDATE:
-            //                 		userStaffUpdate();
-            //                 		break;
-            //               	case CMD_STAFF_DELETE:
-            //                 		userStaffDelete();
-            //                 		break;
-            //               	case CMD_PATIENT_ADD:
-            //                 		userPatientAdd();
-            //                 		break;
-            //                 case CMD_PATIENT_UPDATE:
-            //                 		userPatientUpdate();
-            //                 		break;
-            //               	case CMD_PATIENT_DELETE:
-            //                 		userPatientDelete();
-            //                 		break;
-            //                 case CMD_WARD_ADD:
-            //                 		userWardAdd();
-            //                 		break;
-            //                 case CMD_WARD_UPDATE:
-            //                 		userWardUpdate();
-            //                 		break;
-            //               	case CMD_WARD_DELETE:
-            //                 		userWardDelete();
-            //                 		break;
-            //                 case CMD_WARD_CHECK:
-            //                 		userWardCheck();
-            //                 		break;
-            //               	case CMD_BED_CHECK:
-            //                 		userBedCheck();
-            //                 		break;
-            //                 case CMD_WARD_ASSIGN:
-            //                 		userWardAssign();
-            //                 		break;
-            //               	case CMD_BED_ASSIGN:
-            //                 		userBedAssign();
-            //                 		break;
-            //                 case CMD_WARD_RESERVE:
-            //                 		userWardReserve();
-            //                 		break;
-            //               	case CMD_BED_RESERVE:
-            //                 		userBedReserve();
-            //                 		break;
-            //                 case CMD_WARD_RELEASE:
-            //                 		userWardRelease();
-            //                 		break;
-            //               	case CMD_BED_RELEASE:
-            //                 		userBedRelease();
-            //                 		break;
-            //               	default:
-            //                 	  System.out.println("\nCommand not found");
-            //                 		printCommands(CMD_INFORMATION_PROCESSING);
-            //                 		break;
-            //             }
-			// 									break;
-            //         case CMD_REPORTS:
-            //             // Check user's input (case insensitively)
-            //             switch (command.toUpperCase()) {
-            //                 case CMD_REPORT_REVENUE:
-            //                     user_reportHotelRevenue();
-            //                 break;
-            //                 case CMD_REPORT_HOTELS:
-            //                     user_reportEntireTable("Hotels");
-            //                     break;
-            //                 case CMD_REPORT_ROOMS:
-            //                     user_reportEntireTable("Rooms");
-            //                     break;
-            //                 case CMD_REPORT_STAFF:
-            //                     user_reportEntireTable("Staff");
-            //                     break;
-            //                 case CMD_REPORT_CUSTOMERS:
-            //                     user_reportEntireTable("Customers");
-            //                     break;
-            //                 case CMD_REPORT_STAYS:
-            //                     user_reportEntireTable("Stays");
-            //                     break;
-            //                 case CMD_REPORT_SERVICES:
-            //                     user_reportEntireTable("ServiceTypes");
-            //                     break;
-            //                 case CMD_REPORT_PROVIDED:
-            //                     user_reportEntireTable("Provided");
-            //                     break;                           
-            //                 case CMD_REPORT_OCCUPANCY_BY_HOTEL:
-            //                     user_reportOccupancyByHotel();
-            //                     break;
-            //                 case CMD_REPORT_OCCUPANCY_BY_ROOM_TYPE:
-            //                     user_reportOccupancyByRoomType();
-            //                     break;
-            //                 case CMD_REPORT_OCCUPANCY_BY_DATE_RANGE:
-            //                     user_reportOccupancyByDateRange();
-            //                     break;
-            //                 case CMD_REPORT_OCCUPANCY_BY_CITY:
-            //                     user_reportOccupancyByCity();
-            //                     break;
-            //                 case CMD_REPORT_TOTAL_OCCUPANCY:
-            //                     user_reportTotalOccupancy();
-            //                     break;
-            //                 case CMD_REPORT_PERCENTAGE_OF_ROOMS_OCCUPIED:
-            //                     user_reportPercentageOfRoomsOccupied();
-            //                     break;
-            //                 case CMD_REPORT_STAFF_GROUPED_BY_ROLE:
-            //                     user_reportStaffGroupedByRole();
-            //                     break;
-            //                 case CMD_REPORT_STAFF_SERVING_DURING_STAY:
-            //                     user_reportStaffServingDuringStay();
-            //                     break;
-            //                 case CMD_MAIN:
-            //                     // Tell the user their options in this new menu
-            //                     startup_printAvailableCommands(CMD_MAIN);
-            //                     // Remember what menu we're in
-            //                     currentMenu = CMD_MAIN;
-            //                     break;
-            //                 case CMD_QUIT:
-            //                     quit = true;
-            //                     break;
-            //                 default:
-            //                     // Remind the user about what commands are available
-            //                     System.out.println("\nCommand not recognized");
-            //                     startup_printAvailableCommands(CMD_REPORTS);
-            //                     break;
-            //             }
-            //             break;
-            //         case CMD_MANAGE:
-            //             // Check user's input (case insensitively)
-            //             switch (command.toUpperCase()) {
-            //             case CMD_MANAGE_HOTEL_ADD:
-            //                 user_manageHotelAdd();
-            //                 break;
-            //             case CMD_MANAGE_HOTEL_UPDATE:
-            //                 user_manageHotelUpdate();
-            //                 break;
-            //             case CMD_MANAGE_HOTEL_DELETE:
-            //                 user_manageHotelDelete();
-            //                 break;
-            //             case CMD_MANAGE_STAFF_ADD:
-            //                 user_manageStaffAdd();
-            //                 break;
-            //             case CMD_MANAGE_STAFF_UPDATE:
-            //                 user_manageStaffUpdate();
-            //                 break;
-            //             case CMD_MANAGE_STAFF_DELETE:
-            //                 user_manageStaffDelete();
-            //                 break;
-            //             case CMD_MANAGE_ROOM_ADD:
-            //                 user_manageRoomAdd();
-            //                 break;
-            //             case CMD_MANAGE_ROOM_UPDATE:
-            //                 user_manageRoomUpdate();
-            //                 break;
-            //             case CMD_MANAGE_ROOM_DELETE:
-            //                 user_manageRoomDelete();
-            //                 break;
-            //             case CMD_MANAGE_CUSTOMER_ADD:
-            //                 user_manageCustomerAdd();
-            //                 break;
-            //             case CMD_MANAGE_CUSTOMER_UPDATE:
-            //                 user_manageCustomerUpdate();
-            //                 break;
-            //             case CMD_MANAGE_CUSTOMER_DELETE:
-            //                 user_manageCustomerDelete();
-            //                 break;
-            //             case CMD_MANAGE_SERVICE_COST_UPDATE:
-            //                 user_manageUpdateServiceCost();
-            //                 break;
-            //             case CMD_MAIN:
-            //                 // Tell the user their options in this new menu
-            //                 startup_printAvailableCommands(CMD_MAIN);
-            //                 // Remember what menu we're in
-            //                 currentMenu = CMD_MAIN;
-            //                 break;
-            //             case CMD_QUIT:
-            //                 quit = true;
-            //                 break;
-            //             default:
-            //                 // Remind the user about what commands are available
-            //                 System.out.println("\nCommand not recognized");
-            //                 startup_printAvailableCommands(CMD_MANAGE);
-            //                 break;
-            //             }
-            //             break;
-            //         default:
-            //             break;
-                // }
-            // }
+      
+                    //fhy
+                    case CMD_MEDICAL_RECORDS:
+                        switch (command.toUpperCase()){
+                            case CMD_TREATMENT_ADD:
+                            		userTreatmentAdd();
+                                break;
+                            case CMD_TREATMENT_GETALL:
+                            		userTreatmentGetAll();
+                                break;
+                            case CMD_TREATMENT_GET:
+                            		userTreatmentGet();
+                                break;
+                            case CMD_TREATMENT_UPDATE:
+                            		userTreatmentUpdate();
+                                break;
+                            case CMD_TEST_ADD:
+                            		userTestAdd();
+                                break;   
+                            case CMD_TEST_GETALL:
+                            		userTestGetAll();
+                                break;   
+                            case CMD_TEST_GET:
+                            		userTestGet();
+                                break;
+                            case CMD_TEST_UPDATE:
+                            		userTestUpdate();
+                                break;
+                            case CMD_CHECKIN_ADD:
+                            		userCheckinAdd();
+                                break;
+                            case CMD_CHECKIN_GETALL:
+                            		userCheckinGetAll();
+                                break;
+                            case CMD_CHECKIN_GET:
+                            		userCheckinGet();
+                                break;
+							case CMD_CHECKIN_UPDATE:
+									userCheckinUpdate();
+								break;
+                            case CMD_QUIT:
+                                quit = true;
+                                break;
+                            default:
+                                // Remind the user about what commands are available
+                                System.out.println("\nCommand not recognized");
+                                printCommands(CMD_MEDICAL_RECORDS);
+                                break;     
+                        }
+                    case CMD_BILLING_ACCOUNTS:
+                    //GG
+                    	switch (command.toUpperCase()){
+                          case CMD_BILLING_ACCT_ADD：
+                          	userBillingAcctAdd();
+                          	break;
+                        	case CMD_BILLING_ACCT_GET:
+                          	userBillingAcctGet();
+                          	break;
+                        	case CMD_BILLING_ACCT_UPDATE:
+                          	userBillingAcctUpdate();
+                          	break;
+                        	case CMD_BILLING_ACCT_DELETE:
+                          	userBillingAcctDelete();
+                          	break;
+                        	case CMD_QUIT:
+                          	quit = true;
+                          	break;
+                        	default:
+                          	System.out.println("\nCommand not recognized");
+                          	printCommands(CMD_BILLING_ACCOUNTS);
+                          	break;
+                      }
+                    case CMD_INFORMATION_PROCESSING:
+                        switch (command.toUpperCase()) {
+                            case CMD_STAFF_ADD:
+                                userStaffAdd();
+                                break;
+                          	case CMD_STAFF_UPDATE:
+                            		userStaffUpdate();
+                            		break;
+                          	case CMD_STAFF_DELETE:
+                            		userStaffDelete();
+                            		break;
+                          	case CMD_PATIENT_ADD:
+                            		userPatientAdd();
+                            		break;
+                            case CMD_PATIENT_UPDATE:
+                            		userPatientUpdate();
+                            		break;
+                          	case CMD_PATIENT_DELETE:
+                            		userPatientDelete();
+                            		break;
+                            case CMD_WARD_ADD:
+                            		userWardAdd();
+                            		break;
+                            case CMD_WARD_UPDATE:
+                            		userWardUpdate();
+                            		break;
+                          	case CMD_WARD_DELETE:
+                            		userWardDelete();
+                            		break;
+                            case CMD_WARD_CHECK:
+                            		userWardCheck();
+                            		break;
+                          	case CMD_BED_CHECK:
+                            		userBedCheck();
+                            		break;
+                            case CMD_WARD_ASSIGN:
+                            		userWardAssign();
+                            		break;
+                          	case CMD_BED_ASSIGN:
+                            		userBedAssign();
+                            		break;
+                            case CMD_WARD_RESERVE:
+                            		userWardReserve();
+                            		break;
+                          	case CMD_BED_RESERVE:
+                            		userBedReserve();
+                            		break;
+                            case CMD_WARD_RELEASE:
+                            		userWardRelease();
+                            		break;
+                          	case CMD_BED_RELEASE:
+                            		userBedRelease();
+                            		break;
+                          	default:
+                            	  System.out.println("\nCommand not found");
+                            		printCommands(CMD_INFORMATION_PROCESSING);
+                            		break;
+                        }
+												break;
+                    case CMD_REPORTS:
+                        // Check user's input (case insensitively)
+                        switch (command.toUpperCase()) {
+                            case CMD_REPORT_REVENUE:
+                                user_reportHotelRevenue();
+                            break;
+                            case CMD_REPORT_HOTELS:
+                                user_reportEntireTable("Hotels");
+                                break;
+                            case CMD_REPORT_ROOMS:
+                                user_reportEntireTable("Rooms");
+                                break;
+                            case CMD_REPORT_STAFF:
+                                user_reportEntireTable("Staff");
+                                break;
+                            case CMD_REPORT_CUSTOMERS:
+                                user_reportEntireTable("Customers");
+                                break;
+                            case CMD_REPORT_STAYS:
+                                user_reportEntireTable("Stays");
+                                break;
+                            case CMD_REPORT_SERVICES:
+                                user_reportEntireTable("ServiceTypes");
+                                break;
+                            case CMD_REPORT_PROVIDED:
+                                user_reportEntireTable("Provided");
+                                break;                           
+                            case CMD_REPORT_OCCUPANCY_BY_HOTEL:
+                                user_reportOccupancyByHotel();
+                                break;
+                            case CMD_REPORT_OCCUPANCY_BY_ROOM_TYPE:
+                                user_reportOccupancyByRoomType();
+                                break;
+                            case CMD_REPORT_OCCUPANCY_BY_DATE_RANGE:
+                                user_reportOccupancyByDateRange();
+                                break;
+                            case CMD_REPORT_OCCUPANCY_BY_CITY:
+                                user_reportOccupancyByCity();
+                                break;
+                            case CMD_REPORT_TOTAL_OCCUPANCY:
+                                user_reportTotalOccupancy();
+                                break;
+                            case CMD_REPORT_PERCENTAGE_OF_ROOMS_OCCUPIED:
+                                user_reportPercentageOfRoomsOccupied();
+                                break;
+                            case CMD_REPORT_STAFF_GROUPED_BY_ROLE:
+                                user_reportStaffGroupedByRole();
+                                break;
+                            case CMD_REPORT_STAFF_SERVING_DURING_STAY:
+                                user_reportStaffServingDuringStay();
+                                break;
+                            case CMD_MAIN:
+                                // Tell the user their options in this new menu
+                                startup_printAvailableCommands(CMD_MAIN);
+                                // Remember what menu we're in
+                                currentMenu = CMD_MAIN;
+                                break;
+                            case CMD_QUIT:
+                                quit = true;
+                                break;
+                            default:
+                                // Remind the user about what commands are available
+                                System.out.println("\nCommand not recognized");
+                                startup_printAvailableCommands(CMD_REPORTS);
+                                break;
+                        }
+                        break;
+                    case CMD_MANAGE:
+                        // Check user's input (case insensitively)
+                        switch (command.toUpperCase()) {
+                        case CMD_MANAGE_HOTEL_ADD:
+                            user_manageHotelAdd();
+                            break;
+                        case CMD_MANAGE_HOTEL_UPDATE:
+                            user_manageHotelUpdate();
+                            break;
+                        case CMD_MANAGE_HOTEL_DELETE:
+                            user_manageHotelDelete();
+                            break;
+                        case CMD_MANAGE_STAFF_ADD:
+                            user_manageStaffAdd();
+                            break;
+                        case CMD_MANAGE_STAFF_UPDATE:
+                            user_manageStaffUpdate();
+                            break;
+                        case CMD_MANAGE_STAFF_DELETE:
+                            user_manageStaffDelete();
+                            break;
+                        case CMD_MANAGE_ROOM_ADD:
+                            user_manageRoomAdd();
+                            break;
+                        case CMD_MANAGE_ROOM_UPDATE:
+                            user_manageRoomUpdate();
+                            break;
+                        case CMD_MANAGE_ROOM_DELETE:
+                            user_manageRoomDelete();
+                            break;
+                        case CMD_MANAGE_CUSTOMER_ADD:
+                            user_manageCustomerAdd();
+                            break;
+                        case CMD_MANAGE_CUSTOMER_UPDATE:
+                            user_manageCustomerUpdate();
+                            break;
+                        case CMD_MANAGE_CUSTOMER_DELETE:
+                            user_manageCustomerDelete();
+                            break;
+                        case CMD_MANAGE_SERVICE_COST_UPDATE:
+                            user_manageUpdateServiceCost();
+                            break;
+                        case CMD_MAIN:
+                            // Tell the user their options in this new menu
+                            startup_printAvailableCommands(CMD_MAIN);
+                            // Remember what menu we're in
+                            currentMenu = CMD_MAIN;
+                            break;
+                        case CMD_QUIT:
+                            quit = true;
+                            break;
+                        default:
+                            // Remind the user about what commands are available
+                            System.out.println("\nCommand not recognized");
+                            startup_printAvailableCommands(CMD_MANAGE);
+                            break;
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
             // Connection
             connection.close();
         
