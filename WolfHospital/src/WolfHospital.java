@@ -2,6 +2,7 @@ import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Scanner;
 
+
 public class WolfHospital {
 	// Update your user info alone here
 	private static final String jdbcURL = "jdbc:mariadb://classdb2.csc.ncsu.edu:3306/yrao3"; // Using SERVICE_NAME
@@ -84,7 +85,7 @@ public class WolfHospital {
 	private static Statement statement;
 	private static ResultSet result;
 
-	private static String[] tableNames=new String[]{"Staff", "AgeInfo", "ContactInfo", "PersonInfo", "Patients", "Wards",
+	private static String[] tableNames=new String[]{"Staff", "Patients", "AgeInfo", "ContactInfo", "PersonInfo",  "Wards",
 		"Medical Records", "Treatment", "Test", "Check-ins", "PayerInfo", "Billing Accounts", "Beds", "Assigned"};
 
 	// Prepared Statements pre-declared
@@ -111,6 +112,9 @@ public class WolfHospital {
 	private static PreparedStatement prep_deleteWardInformation;
 	// Patients
 	private static PreparedStatement prep_addPatients;
+	private static PreparedStatement prep_addAgeInfo;
+	private static PreparedStatement prep_addContactInfo;
+	private static PreparedStatement prep_addPersonInfo;
 	private static PreparedStatement prep_getPatients;
 	private static PreparedStatement prep_updatePatientsName;
 	private static PreparedStatement prep_updatePatientsAge;
@@ -220,9 +224,9 @@ public class WolfHospital {
 				// your SQL statements to the DBMS
 				statement = connection.createStatement();
 			} finally {
-				// close(result);
-				// close(statement);
-				// close(connection);
+//				 close(result);
+//				 close(statement);
+//				 close(connection);
 			}
 		} catch (Throwable oops) {
 			oops.printStackTrace();
@@ -252,7 +256,7 @@ public class WolfHospital {
               System.out.println("\t- update treatment record");
               System.out.println(CMD_TEST_ADD);
               System.out.println("\t- add a new test record");
-              System.out.println(CMD_TEST_GETALL)
+              System.out.println(CMD_TEST_GETALL);
               System.out.println("\t- retrieve all test records");
               System.out.println(CMD_TEST_GET);
               System.out.println("\t- retrieve a test record");
@@ -365,17 +369,24 @@ public class WolfHospital {
 			sql = "DELETE FROM `Staff`" + " WHERE staffID = ?;";
 			prep_deleteStaff = connection.prepareStatement(sql);
 			// Enter basic information about patients
-			sql = "INSERT INTO `Patients` (`patientID`, `SSN`)" +
-					" VALUES (?, ?);" +
-					"INSERT  INTO `PersonInfo` (`SSN`, `name`, `DOB`, `age`, `phone`, `status`)" +
-					" VALUES (?, ?, ?, ?, ?, ?);" +
-					"INSERT INTO `AgeInfo` (`DOB`, `gender`) VALUES (?, ?);" +
-					"INSERT INTO `ContactInfo` (`phone`, `address`) VALUES (?, ?);";
+			sql = "INSERT INTO `Patients` (`patientID`, `SSN`) VALUES (?, ?);";
 			prep_addPatients = connection.prepareStatement(sql);
+			
+			sql	= "INSERT INTO `AgeInfo` (`DOB`, `age`) VALUES (?, ?);";
+			prep_addAgeInfo = connection.prepareStatement(sql);
+			
+			sql	= "INSERT INTO `ContactInfo` (`phone`, `address`) VALUES (?, ?);";
+			prep_addContactInfo = connection.prepareStatement(sql);
+			
+			sql = "INSERT INTO `PersonInfo` (`SSN`, `name`, `DOB`, `gender`, `phone`, " +
+					"`processing treatment plan`, `in ward`, `completing treatment`) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
+			prep_addPersonInfo = connection.prepareStatement(sql);
+			
 			// Retrieve basic information about patients
 			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN" +
 					" JOIN `AgeInfo` a ON i.DOB = a.DOB" +
-					" JOIN  ContactInfo con ON i.phone = con.phone" +
+					" JOIN ContactInfo con ON i.phone = con.phone" +
 					" WHERE patientID = ?;";
 			prep_getPatients = connection.prepareStatement(sql);
 			// Update basic information about patients
@@ -679,7 +690,7 @@ public class WolfHospital {
 				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `AgeInfo` (" +
 								"`DOB` datetime NOT NULL, " +
-								"`gender` VARCHAR(255) NOT NULL, " +
+								"`age` INT(2) NOT NULL, " +
 								"PRIMARY KEY (`DOB`)" +
 								");");
 				statement.executeUpdate(
@@ -689,24 +700,26 @@ public class WolfHospital {
 								"PRIMARY KEY (`phone`)" +
 								");");
 				statement.executeUpdate(
+						"CREATE TABLE IF NOT EXISTS `Patients` (" +
+								"`patientID` varchar(255) NOT NULL UNIQUE, " +
+								"`SSN` varchar(255) NOT NULL UNIQUE, " +
+								"PRIMARY KEY (`patientID`) " +
+								");");
+				statement.executeUpdate(
 						"CREATE TABLE IF NOT EXISTS `PersonInfo` (" +
-								"`SSN` varchar(255) NOT NULL, " +
+								"`SSN` varchar(255) NOT NULL UNIQUE, " +
 								"`name` varchar(255) NOT NULL, " +
 								"`DOB` datetime NOT NULL, " +
-    							"`age` int(3) NOT NULL, " +
-								"`phone` VARCHAR(255) NOT NULL," +
-								"`status` varchar(255) NOT NULL, " +
+								"`gender` VARCHAR(255) NOT NULL, " +
+								"`phone` VARCHAR(255) NOT NULL, " +
+								"`processing treatment plan` VARCHAR(255) NOT NULL, " +
+								"`in ward` VARCHAR(255), " +
+								"`completing treatment` BIT, " +
 								"PRIMARY KEY (`SSN`), " +
 								"FOREIGN KEY (`DOB`) REFERENCES AgeInfo(`DOB`), " +
 								"FOREIGN KEY (`phone`) REFERENCES ContactInfo(`phone`)" +
 								");");
-				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Patients` (" +
-								"`patientID` varchar(255) NOT NULL, " +
-								"`SSN` varchar(255) NOT NULL UNIQUE, " +
-								"PRIMARY KEY (`patientID`), " +
-								"FOREIGN KEY (`SSN`) REFERENCES PersonInfo(`SSN`)" +
-								");");
+				
 				// GG
 				// Wards
 				statement.executeUpdate(
@@ -819,104 +832,109 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 			try {
 				switch (tableName) {
-				case "Staff":
-					addStaff("100", "Mary", "40", "Female", "Doctor", "senior", "Neurology", "654",
-							"90 ABC St , Raleigh NC 27");
-					addStaff("101", "John", "45", "Male", "Billing Staff", "", "Office", "564",
-							"798 XYZ St , Rochester NY 54");
-					addStaff("102", "Carol", "55", "Female", "Nurse", "", "ER", "911", 
-							"351 MH St , Greensboro NC 27");
-					addStaff("103", "Emma", "55", "Female", "Doctor", "Senior surgeon", "Oncological Surgery", "546", 
-							"49 ABC St , Raleigh NC 27");
-					addStaff("104", "Ava", "55", "Female", "Front Desk Staff", "", "Office", "777", 
-							"425 RG St , Raleigh NC 27");
-					addStaff("105", "Peter", "52", "Male", "Doctor", "Anesthetist", "Oncological Surgery", "724",
-							"475 RG St , Raleigh NC 27");
-					addStaff("106", "Olivia", "27", "Female", "Nurse", "", "Neurology", "799", 
-							"325 PD St , Raleigh NC 27");
-					break;
-				case "Patients":
-					addPatient("1001", "000-01-1234", "David", "1980-01-30", "Male", "39", "919-123-3324",
-							"69 ABC St , Raleigh NC 27730", "20", "001", "no");
-					addPatient("1002", "000-02-1234", "Sarah", "1971-01-30", "Female", "48", "919-563-3478",
-							"81 DEF St , Cary NC 27519", "20", "002", "no");
-					break;
-				case "Wards":
-					addWard("001", 4, 50, "102");
-					addWard("002", 4, 50, "102");
-					addWard("003", 2, 100, "106");
-					addWard("004", 2, 100, "106");
-					break;
-				case "Beds":
-					manageBedAdd("001", "1", "000-01-1234");
-					manageBedAdd("001", "2", "000-03-1234");
-					manageBedAdd("001", "3", "");
-					manageBedAdd("001", "4", "");
-					manageBedAdd("002", "1", "000-02-1234");
-					manageBedAdd("002", "2", "");
-					manageBedAdd("002", "3", "");
-					manageBedAdd("002", "4", "");
-					manageBedAdd("003", "1", "000-04-1234");
-					manageBedAdd("003", "2", "");
-					manageBedAdd("004", "1", "");
-					manageBedAdd("004", "2", "");
-					break;
-					/*
-					 * Populating data for Assigned String patientID, String ward number, String bed
-					 * number, Datetime start-date, Datetime end-date
-					 */
-				case "Assigned":
-					manageAssignedAdd("1001", "001", "1", "2019-03-01", "");
-					manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
-					manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
-					manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
-					break;
-				case "Treatment":
-					// manageTreatmentRecordAdd() should be done by other teammates
-					//GG
-					manageTreatmentRecordAdd("1", "nervine", "Hospitalization");
-					manageTreatmentRecordAdd("2", "nervine", "Hospitalization");
-					break;
-				case "Test":
-					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-					// `endDate`, `responsibleDoctor` )
-					// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
-					// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
-					// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
-					// ref range:negative');
-					// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
-					// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
-					manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
-							"2019-03-15", "", "100");
-					manageTestRecordAdd("4", "test",
-							"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
-							"2019-03-21", "103");
-					break;
-				case "Check-ins":
-					// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-					// `endDate`, `responsibleDoctor` )
-					// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
-					// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
-					// VALUES ('9', '1', '2');
-					// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
-					manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
-					manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
-					manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
-					manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
-					break;
-				case "Billing Accounts":
-					manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
-							"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
-					break;
-				default:
-					break;
+					case "Staff":
+						addStaff("100", "Mary", "40", "Female", "Doctor", "senior", "Neurology", "654",
+								"90 ABC St , Raleigh NC 27");
+						addStaff("101", "John", "45", "Male", "Billing Staff", "", "Office", "564",
+								"798 XYZ St , Rochester NY 54");
+						addStaff("102", "Carol", "55", "Female", "Nurse", "", "ER", "911", 
+								"351 MH St , Greensboro NC 27");
+						addStaff("103", "Emma", "55", "Female", "Doctor", "Senior surgeon", "Oncological Surgery", "546", 
+								"49 ABC St , Raleigh NC 27");
+						addStaff("104", "Ava", "55", "Female", "Front Desk Staff", "", "Office", "777", 
+								"425 RG St , Raleigh NC 27");
+						addStaff("105", "Peter", "52", "Male", "Doctor", "Anesthetist", "Oncological Surgery", "724",
+								"475 RG St , Raleigh NC 27");
+						addStaff("106", "Olivia", "27", "Female", "Nurse", "", "Neurology", "799", 
+								"325 PD St , Raleigh NC 27");
+						break;
+					case "Patients":
+						addPatient("1001", "000-01-1234", "David", "1980-01-30", "Male", "39", "919-123-3324",
+								"69 ABC St , Raleigh NC 27730", "20", "001", "no");
+						addPatient("1002", "000-02-1234", "Sarah", "1971-01-30", "Female", "48", "919-563-3478",
+								"81 DEF St , Cary NC 27519", "20", "002", "no");
+						addPatient("1003", "000-03-1234", "Joseph", "1987-01-30", "Male", "32", "919-957-2199",
+								"31 OPG St , Cary NC 27519", "10", "001", "no");
+						addPatient("1004", "000-04-1234", "Lucy", "1985-01-30", "Female", "34", "919-838-7123",
+								"10 TBC St , Raleigh NC 27730", "5", "003", "yes");
+						break;
+					case "Wards":
+						addWard("001", 4, 50, "102");
+						addWard("002", 4, 50, "102");
+						addWard("003", 2, 100, "106");
+						addWard("004", 2, 100, "106");
+						break;
+					case "Beds":
+						manageBedAdd("001", "1", "000-01-1234");
+						manageBedAdd("001", "2", "000-03-1234");
+						manageBedAdd("001", "3", "");
+						manageBedAdd("001", "4", "");
+						manageBedAdd("002", "1", "000-02-1234");
+						manageBedAdd("002", "2", "");
+						manageBedAdd("002", "3", "");
+						manageBedAdd("002", "4", "");
+						manageBedAdd("003", "1", "000-04-1234");
+						manageBedAdd("003", "2", "");
+						manageBedAdd("004", "1", "");
+						manageBedAdd("004", "2", "");
+						break;
+						/*
+						 * Populating data for Assigned String patientID, String ward number, String bed
+						 * number, Datetime start-date, Datetime end-date
+						 */
+					case "Assigned":
+						manageAssignedAdd("1001", "001", "1", "2019-03-01", "");
+						manageAssignedAdd("1002", "002", "1", "2019-03-10", "");
+						manageAssignedAdd("1003", "001", "2", "2019-03-15", "");
+						manageAssignedAdd("1004", "003", "1", "2019-03-17", "2019-03-21");
+						break;
+					case "Treatment":
+						// manageTreatmentRecordAdd() should be done by other teammates
+						//GG
+						manageTreatmentRecordAdd("1", "nervine", "Hospitalization");
+						manageTreatmentRecordAdd("2", "nervine", "Hospitalization");
+						break;
+					case "Test":
+						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+						// `endDate`, `responsibleDoctor` )
+						// VALUES ('5', '1', '2019-03-01', '2019-03-02', '3');
+						// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)
+						// VALUES ('5', 'DPC POC Urinalysis Chemical', 'Protein, Urinalysis value:2+,
+						// ref range:negative');
+						// manageTestRecordAdd(5, "DPC POC Urinalysis Chemical", "Protein, Urinalysis
+						// value:2+, ref range:negative", 1, "2019-03-01", "2019-03-02", 3);
+						manageTestRecordAdd("3", "test", "prescription nervine, diagnosis details Hospitalization", "1003",
+								"2019-03-15", "", "100");
+						manageTestRecordAdd("4", "test",
+								"prescription analgesic, diagnosis details Surgeon, Hospitalization", "1004", "2019-03-17",
+								"2019-03-21", "103");
+						break;
+					case "Check-ins":
+						// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
+						// `endDate`, `responsibleDoctor` )
+						// VALUES ('9', '1', '2019-03-01', '2019-03-07', '13');
+						// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)
+						// VALUES ('9', '1', '2');
+						// manageCheckinRecordAdd(9, 1, 2, 1, "2019-03-01", "2019-03-07", 13);
+						manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "", "104");
+						manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "", "104");
+						manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "", "104");
+						manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
+						break;
+					case "Billing Accounts":
+						manageBillingAccountAdd("1001", "1004", "2019-03-17", "000-04-1234", "Credit Card",
+								"4044987612349123", "100", "yes", "400", "10 TBC St. Raleigh NC 27730");
+						break;
+					default:
+						break;
 				}
 				connection.commit();
+				System.out.println("Table [" + tableName + "] populated!");
 			} catch (SQLException e) {
 				connection.rollback();
+				System.out.println("Table [" + tableName + "] rollbacked!");
 				e.printStackTrace();
 			} finally {
-				System.out.println("Tables populated!");
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e1) {
@@ -1097,24 +1115,33 @@ public class WolfHospital {
 	}
 	// Add a new patient
 	public static void addPatient(String patientID, String SSN, String name, String DOB, String gender, String age, String phone,
-								  String address, String treatmentPlan, String wardNum, String status) {
+								  String address, String processing, String inWard, String completing) {
 		try {
 			connection.setAutoCommit(false);
 			try {
 				prep_addPatients.setString(1, patientID);
 				prep_addPatients.setString(2, SSN);
-				prep_addPatients.setString(3, SSN);
-				prep_addPatients.setString(4, name);
-				prep_addPatients.setDate(5, java.sql.Date.valueOf(DOB));
-				prep_addPatients.setInt(6, Integer.parseInt(age));
-				prep_addPatients.setString(7, phone);
-				prep_addPatients.setString(8, status);
-				prep_addPatients.setString(9, DOB);
-				prep_addPatients.setString(10, gender);
-				prep_addPatients.setString(11, phone);
-				prep_addPatients.setString(12, address);                
+				
+				prep_addAgeInfo.setDate(1, java.sql.Date.valueOf(DOB));
+				prep_addAgeInfo.setInt(2, Integer.parseInt(age));
+				
+				prep_addContactInfo.setString(1, phone);
+				prep_addContactInfo.setString(2, address);                
+				
+				prep_addPersonInfo.setString(1, SSN);
+				prep_addPersonInfo.setString(2, name);
+				prep_addPersonInfo.setDate(3, java.sql.Date.valueOf(DOB));
+				prep_addPersonInfo.setString(4, gender);
+				prep_addPersonInfo.setString(5, phone);
+				prep_addPersonInfo.setString(6, processing);
+				prep_addPersonInfo.setString(7, inWard);
+				prep_addPersonInfo.setBoolean(8, completing.equals("yes")? true : false);
+
 				// To-do: make use of variable treatmentPlan and wardNum. By calling prep_addTreatmentRecord and prep_assignWard here?
 				prep_addPatients.executeUpdate();
+				prep_addAgeInfo.executeUpdate();
+				prep_addContactInfo.executeUpdate();
+				prep_addPersonInfo.executeUpdate();
 				connection.commit();
 			} catch (SQLException e) {
 				connection.rollback();
@@ -1696,7 +1723,7 @@ public class WolfHospital {
 				prep_addBillingAccount.setString(5, paymentMethod);
 				prep_addBillingAccount.setString(6, cardNumber);
 				prep_addBillingAccount.setDouble(7, Double.parseDouble(registrationFee));
-				prep_addBillingAccount.setBoolean(8, medicationPrescribed=="yes"?true:false);
+				prep_addBillingAccount.setBoolean(8, medicationPrescribed.equals("yes")?true:false);
 				prep_addBillingAccount.setDouble(9, Double.parseDouble(acconmmandationFee));
 				prep_addBillingAccount.executeUpdate();
 				connection.commit();
@@ -2038,7 +2065,7 @@ public class WolfHospital {
             connectToDatabase();
             generatePreparedStatements();
             
-            // generateTables();
+            generateTables();
             for (String name: tableNames) {
                 populateTables(name);
             }
@@ -2047,308 +2074,308 @@ public class WolfHospital {
             printCommands(CMD_MAIN);
 
             // Watch for user input
-            currentMenu = CMD_MAIN;
-            scanner = new Scanner(System.in);
-            while (quit == false) {
-                System.out.print("user -> ");
-                command = scanner.nextLine();
-                switch (currentMenu) {
-                    case CMD_MAIN:
-                        // Check user's input (case insensitively)
-                        switch (command.toUpperCase()) {
-                            //fhy
-                            case CMD_MEDICAL_RECORDS:
-                                // Tell the user their options in this new menu
-                                printCommands(CMD_MEDICAL_RECORDS);
-                                // Remember what menu we're in
-                                currentMenu = CMD_MEDICAL_RECORDS;
-                                break;
-                          	case CMD_BILLING_ACCOUNTS:
-                            //GG
-                            	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
-                            	currentMenu = CMD_BILLING_ACCOUNTS;
-                            	break;
-                            case CMD_PATIENTS:
-                                // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_PATIENTS);
-                                // Remember what menu we're in
-                                currentMenu = CMD_PATIENTS;
-                                break;
-                            case CMD_ADMIN:
-                                // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_MANAGE);
-                                // Remember what menu we're in
-                                currentMenu = CMD_MANAGE;
-                                break;                                
-                            case CMD_QUIT:
-                                quit = true;
-                                break;
-                            default:
-                                // Remind the user about what commands are available
-                                System.out.println("\nCommand not recognized");
-                                startup_printAvailableCommands(CMD_MAIN);
-                                break;
-                        }
-                        break;
+            // currentMenu = CMD_MAIN;
+            // scanner = new Scanner(System.in);
+            // while (quit == false) {
+            //     System.out.print("user -> ");
+            //     command = scanner.nextLine();
+            //     switch (currentMenu) {
+            //         case CMD_MAIN:
+            //             // Check user's input (case insensitively)
+            //             switch (command.toUpperCase()) {
+            //                 //fhy
+            //                 case CMD_MEDICAL_RECORDS:
+            //                     // Tell the user their options in this new menu
+            //                     printCommands(CMD_MEDICAL_RECORDS);
+            //                     // Remember what menu we're in
+            //                     currentMenu = CMD_MEDICAL_RECORDS;
+            //                     break;
+            //               	case CMD_BILLING_ACCOUNTS:
+            //                 //GG
+            //                 	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
+            //                 	currentMenu = CMD_BILLING_ACCOUNTS;
+            //                 	break;
+            //                 case CMD_PATIENTS:
+            //                     // Tell the user their options in this new menu
+            //                     startup_printAvailableCommands(CMD_PATIENTS);
+            //                     // Remember what menu we're in
+            //                     currentMenu = CMD_PATIENTS;
+            //                     break;
+            //                 case CMD_ADMIN:
+            //                     // Tell the user their options in this new menu
+            //                     startup_printAvailableCommands(CMD_MANAGE);
+            //                     // Remember what menu we're in
+            //                     currentMenu = CMD_MANAGE;
+            //                     break;                                
+            //                 case CMD_QUIT:
+            //                     quit = true;
+            //                     break;
+            //                 default:
+            //                     // Remind the user about what commands are available
+            //                     System.out.println("\nCommand not recognized");
+            //                     startup_printAvailableCommands(CMD_MAIN);
+            //                     break;
+            //             }
+            //             break;
                        
-                    //fhy
-                    case CMD_MEDICAL_RECORDS:
-                        switch (command.toUpperCase()){
-                            case CMD_TREATMENT_ADD:
-                            		userTreatmentAdd();
-                                break;
-                            case CMD_TREATMENT_GETALL:
-                            		userTreatmentGetAll();
-                                break;
-                            case CMD_TREATMENT_GET:
-                            		userTreatmentGet();
-                                break;
-                            case CMD_TREATMENT_UPDATE:
-                            		userTreatmentUpdate();
-                                break;
-                            case CMD_TEST_ADD:
-                            		userTestAdd();
-                                break;   
-                            case CMD_TEST_GETALL:
-                            		userTestGetAll();
-                                break;   
-                            case CMD_TEST_GET:
-                            		userTestGet();
-                                break;
-                            case CMD_TEST_UPDATE:
-                            		userTestUpdate();
-                                break;
-                            case CMD_CHECKIN_ADD:
-                            		userCheckinAdd();
-                                break;
-                            case CMD_CHECKIN_GETALL:
-                            		userCheckinGetAll();
-                                break;
-                            case CMD_CHECKIN_GET:
-                            		userCheckinGet();
-                                break;
-                            case CMD_QUIT:
-                                quit = true;
-                                break;
-                            default:
-                                // Remind the user about what commands are available
-                                System.out.println("\nCommand not recognized");
-                                printCommands(CMD_MEDICAL_RECORDS);
-                                break;     
-                        }
-                    case CMD_BILLING_ACCOUNTS:
-                    //GG
-                    	switch (command.toUpperCase()){
-                          case CMD_BILLING_ACCT_ADD：
-                          	userBillingAcctAdd();
-                          	break;
-                        	case CMD_BILLING_ACCT_GET:
-                          	userBillingAcctGet();
-                          	break;
-                        	case CMD_BILLING_ACCT_UPDATE:
-                          	userBillingAcctUpdate();
-                          	break;
-                        	case CMD_BILLING_ACCT_DELETE:
-                          	userBillingAcctDelete();
-                          	break;
-                        	case CMD_QUIT:
-                          	quit = true;
-                          	break;
-                        	default:
-                          	System.out.println("\nCommand not recognized");
-                          	printCommands(CMD_BILLING_ACCOUNTS);
-                          	break;
-                      }
-                    case CMD_INFORMATION_PROCESSING:
-                        switch (command.toUpperCase()) {
-                            case CMD_STAFF_ADD:
-                                userStaffAdd();
-                                break;
-                          	case CMD_STAFF_UPDATE:
-                            		userStaffUpdate();
-                            		break;
-                          	case CMD_STAFF_DELETE:
-                            		userStaffDelete();
-                            		break;
-                          	case CMD_PATIENT_ADD:
-                            		userPatientAdd();
-                            		break;
-                            case CMD_PATIENT_UPDATE:
-                            		userPatientUpdate();
-                            		break;
-                          	case CMD_PATIENT_DELETE:
-                            		userPatientDelete();
-                            		break;
-                            case CMD_WARD_ADD:
-                            		userWardAdd();
-                            		break;
-                            case CMD_WARD_UPDATE:
-                            		userWardUpdate();
-                            		break;
-                          	case CMD_WARD_DELETE:
-                            		userWardDelete();
-                            		break;
-                            case CMD_WARD_CHECK:
-                            		userWardCheck();
-                            		break;
-                          	case CMD_BED_CHECK:
-                            		userBedCheck();
-                            		break;
-                            case CMD_WARD_ASSIGN:
-                            		userWardAssign();
-                            		break;
-                          	case CMD_BED_ASSIGN:
-                            		userBedAssign();
-                            		break;
-                            case CMD_WARD_RESERVE:
-                            		userWardReserve();
-                            		break;
-                          	case CMD_BED_RESERVE:
-                            		userBedReserve();
-                            		break;
-                            case CMD_WARD_RELEASE:
-                            		userWardRelease();
-                            		break;
-                          	case CMD_BED_RELEASE:
-                            		userBedRelease();
-                            		break;
-                          	default:
-                            	  System.out.println("\nCommand not found");
-                            		printCommands(CMD_INFORMATION_PROCESSING);
-                            		break;
-                        }
-												break;
-                    case CMD_REPORTS:
-                        // Check user's input (case insensitively)
-                        switch (command.toUpperCase()) {
-                            case CMD_REPORT_REVENUE:
-                                user_reportHotelRevenue();
-                            break;
-                            case CMD_REPORT_HOTELS:
-                                user_reportEntireTable("Hotels");
-                                break;
-                            case CMD_REPORT_ROOMS:
-                                user_reportEntireTable("Rooms");
-                                break;
-                            case CMD_REPORT_STAFF:
-                                user_reportEntireTable("Staff");
-                                break;
-                            case CMD_REPORT_CUSTOMERS:
-                                user_reportEntireTable("Customers");
-                                break;
-                            case CMD_REPORT_STAYS:
-                                user_reportEntireTable("Stays");
-                                break;
-                            case CMD_REPORT_SERVICES:
-                                user_reportEntireTable("ServiceTypes");
-                                break;
-                            case CMD_REPORT_PROVIDED:
-                                user_reportEntireTable("Provided");
-                                break;                           
-                            case CMD_REPORT_OCCUPANCY_BY_HOTEL:
-                                user_reportOccupancyByHotel();
-                                break;
-                            case CMD_REPORT_OCCUPANCY_BY_ROOM_TYPE:
-                                user_reportOccupancyByRoomType();
-                                break;
-                            case CMD_REPORT_OCCUPANCY_BY_DATE_RANGE:
-                                user_reportOccupancyByDateRange();
-                                break;
-                            case CMD_REPORT_OCCUPANCY_BY_CITY:
-                                user_reportOccupancyByCity();
-                                break;
-                            case CMD_REPORT_TOTAL_OCCUPANCY:
-                                user_reportTotalOccupancy();
-                                break;
-                            case CMD_REPORT_PERCENTAGE_OF_ROOMS_OCCUPIED:
-                                user_reportPercentageOfRoomsOccupied();
-                                break;
-                            case CMD_REPORT_STAFF_GROUPED_BY_ROLE:
-                                user_reportStaffGroupedByRole();
-                                break;
-                            case CMD_REPORT_STAFF_SERVING_DURING_STAY:
-                                user_reportStaffServingDuringStay();
-                                break;
-                            case CMD_MAIN:
-                                // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_MAIN);
-                                // Remember what menu we're in
-                                currentMenu = CMD_MAIN;
-                                break;
-                            case CMD_QUIT:
-                                quit = true;
-                                break;
-                            default:
-                                // Remind the user about what commands are available
-                                System.out.println("\nCommand not recognized");
-                                startup_printAvailableCommands(CMD_REPORTS);
-                                break;
-                        }
-                        break;
-                    case CMD_MANAGE:
-                        // Check user's input (case insensitively)
-                        switch (command.toUpperCase()) {
-                        case CMD_MANAGE_HOTEL_ADD:
-                            user_manageHotelAdd();
-                            break;
-                        case CMD_MANAGE_HOTEL_UPDATE:
-                            user_manageHotelUpdate();
-                            break;
-                        case CMD_MANAGE_HOTEL_DELETE:
-                            user_manageHotelDelete();
-                            break;
-                        case CMD_MANAGE_STAFF_ADD:
-                            user_manageStaffAdd();
-                            break;
-                        case CMD_MANAGE_STAFF_UPDATE:
-                            user_manageStaffUpdate();
-                            break;
-                        case CMD_MANAGE_STAFF_DELETE:
-                            user_manageStaffDelete();
-                            break;
-                        case CMD_MANAGE_ROOM_ADD:
-                            user_manageRoomAdd();
-                            break;
-                        case CMD_MANAGE_ROOM_UPDATE:
-                            user_manageRoomUpdate();
-                            break;
-                        case CMD_MANAGE_ROOM_DELETE:
-                            user_manageRoomDelete();
-                            break;
-                        case CMD_MANAGE_CUSTOMER_ADD:
-                            user_manageCustomerAdd();
-                            break;
-                        case CMD_MANAGE_CUSTOMER_UPDATE:
-                            user_manageCustomerUpdate();
-                            break;
-                        case CMD_MANAGE_CUSTOMER_DELETE:
-                            user_manageCustomerDelete();
-                            break;
-                        case CMD_MANAGE_SERVICE_COST_UPDATE:
-                            user_manageUpdateServiceCost();
-                            break;
-                        case CMD_MAIN:
-                            // Tell the user their options in this new menu
-                            startup_printAvailableCommands(CMD_MAIN);
-                            // Remember what menu we're in
-                            currentMenu = CMD_MAIN;
-                            break;
-                        case CMD_QUIT:
-                            quit = true;
-                            break;
-                        default:
-                            // Remind the user about what commands are available
-                            System.out.println("\nCommand not recognized");
-                            startup_printAvailableCommands(CMD_MANAGE);
-                            break;
-                        }
-                        break;
-                    default:
-                        break;
-                }
-            }
+            //         //fhy
+            //         case CMD_MEDICAL_RECORDS:
+            //             switch (command.toUpperCase()){
+            //                 case CMD_TREATMENT_ADD:
+            //                 		userTreatmentAdd();
+            //                     break;
+            //                 case CMD_TREATMENT_GETALL:
+            //                 		userTreatmentGetAll();
+            //                     break;
+            //                 case CMD_TREATMENT_GET:
+            //                 		userTreatmentGet();
+            //                     break;
+            //                 case CMD_TREATMENT_UPDATE:
+            //                 		userTreatmentUpdate();
+            //                     break;
+            //                 case CMD_TEST_ADD:
+            //                 		userTestAdd();
+            //                     break;   
+            //                 case CMD_TEST_GETALL:
+            //                 		userTestGetAll();
+            //                     break;   
+            //                 case CMD_TEST_GET:
+            //                 		userTestGet();
+            //                     break;
+            //                 case CMD_TEST_UPDATE:
+            //                 		userTestUpdate();
+            //                     break;
+            //                 case CMD_CHECKIN_ADD:
+            //                 		userCheckinAdd();
+            //                     break;
+            //                 case CMD_CHECKIN_GETALL:
+            //                 		userCheckinGetAll();
+            //                     break;
+            //                 case CMD_CHECKIN_GET:
+            //                 		userCheckinGet();
+            //                     break;
+            //                 case CMD_QUIT:
+            //                     quit = true;
+            //                     break;
+            //                 default:
+            //                     // Remind the user about what commands are available
+            //                     System.out.println("\nCommand not recognized");
+            //                     printCommands(CMD_MEDICAL_RECORDS);
+            //                     break;     
+            //             }
+            //         case CMD_BILLING_ACCOUNTS:
+            //         //GG
+            //         	switch (command.toUpperCase()){
+            //               case CMD_BILLING_ACCT_ADD:
+            //               	userBillingAcctAdd();
+            //               	break;
+            //             	case CMD_BILLING_ACCT_GET:
+            //               	userBillingAcctGet();
+            //               	break;
+            //             	case CMD_BILLING_ACCT_UPDATE:
+            //               	userBillingAcctUpdate();
+            //               	break;
+            //             	case CMD_BILLING_ACCT_DELETE:
+            //               	userBillingAcctDelete();
+            //               	break;
+            //             	case CMD_QUIT:
+            //               	quit = true;
+            //               	break;
+            //             	default:
+            //               	System.out.println("\nCommand not recognized");
+            //               	printCommands(CMD_BILLING_ACCOUNTS);
+            //               	break;
+            //           }
+            //         case CMD_INFORMATION_PROCESSING:
+            //             switch (command.toUpperCase()) {
+            //                 case CMD_STAFF_ADD:
+            //                     userStaffAdd();
+            //                     break;
+            //               	case CMD_STAFF_UPDATE:
+            //                 		userStaffUpdate();
+            //                 		break;
+            //               	case CMD_STAFF_DELETE:
+            //                 		userStaffDelete();
+            //                 		break;
+            //               	case CMD_PATIENT_ADD:
+            //                 		userPatientAdd();
+            //                 		break;
+            //                 case CMD_PATIENT_UPDATE:
+            //                 		userPatientUpdate();
+            //                 		break;
+            //               	case CMD_PATIENT_DELETE:
+            //                 		userPatientDelete();
+            //                 		break;
+            //                 case CMD_WARD_ADD:
+            //                 		userWardAdd();
+            //                 		break;
+            //                 case CMD_WARD_UPDATE:
+            //                 		userWardUpdate();
+            //                 		break;
+            //               	case CMD_WARD_DELETE:
+            //                 		userWardDelete();
+            //                 		break;
+            //                 case CMD_WARD_CHECK:
+            //                 		userWardCheck();
+            //                 		break;
+            //               	case CMD_BED_CHECK:
+            //                 		userBedCheck();
+            //                 		break;
+            //                 case CMD_WARD_ASSIGN:
+            //                 		userWardAssign();
+            //                 		break;
+            //               	case CMD_BED_ASSIGN:
+            //                 		userBedAssign();
+            //                 		break;
+            //                 case CMD_WARD_RESERVE:
+            //                 		userWardReserve();
+            //                 		break;
+            //               	case CMD_BED_RESERVE:
+            //                 		userBedReserve();
+            //                 		break;
+            //                 case CMD_WARD_RELEASE:
+            //                 		userWardRelease();
+            //                 		break;
+            //               	case CMD_BED_RELEASE:
+            //                 		userBedRelease();
+            //                 		break;
+            //               	default:
+            //                 	  System.out.println("\nCommand not found");
+            //                 		printCommands(CMD_INFORMATION_PROCESSING);
+            //                 		break;
+            //             }
+			// 									break;
+            //         case CMD_REPORTS:
+            //             // Check user's input (case insensitively)
+            //             switch (command.toUpperCase()) {
+            //                 case CMD_REPORT_REVENUE:
+            //                     user_reportHotelRevenue();
+            //                 break;
+            //                 case CMD_REPORT_HOTELS:
+            //                     user_reportEntireTable("Hotels");
+            //                     break;
+            //                 case CMD_REPORT_ROOMS:
+            //                     user_reportEntireTable("Rooms");
+            //                     break;
+            //                 case CMD_REPORT_STAFF:
+            //                     user_reportEntireTable("Staff");
+            //                     break;
+            //                 case CMD_REPORT_CUSTOMERS:
+            //                     user_reportEntireTable("Customers");
+            //                     break;
+            //                 case CMD_REPORT_STAYS:
+            //                     user_reportEntireTable("Stays");
+            //                     break;
+            //                 case CMD_REPORT_SERVICES:
+            //                     user_reportEntireTable("ServiceTypes");
+            //                     break;
+            //                 case CMD_REPORT_PROVIDED:
+            //                     user_reportEntireTable("Provided");
+            //                     break;                           
+            //                 case CMD_REPORT_OCCUPANCY_BY_HOTEL:
+            //                     user_reportOccupancyByHotel();
+            //                     break;
+            //                 case CMD_REPORT_OCCUPANCY_BY_ROOM_TYPE:
+            //                     user_reportOccupancyByRoomType();
+            //                     break;
+            //                 case CMD_REPORT_OCCUPANCY_BY_DATE_RANGE:
+            //                     user_reportOccupancyByDateRange();
+            //                     break;
+            //                 case CMD_REPORT_OCCUPANCY_BY_CITY:
+            //                     user_reportOccupancyByCity();
+            //                     break;
+            //                 case CMD_REPORT_TOTAL_OCCUPANCY:
+            //                     user_reportTotalOccupancy();
+            //                     break;
+            //                 case CMD_REPORT_PERCENTAGE_OF_ROOMS_OCCUPIED:
+            //                     user_reportPercentageOfRoomsOccupied();
+            //                     break;
+            //                 case CMD_REPORT_STAFF_GROUPED_BY_ROLE:
+            //                     user_reportStaffGroupedByRole();
+            //                     break;
+            //                 case CMD_REPORT_STAFF_SERVING_DURING_STAY:
+            //                     user_reportStaffServingDuringStay();
+            //                     break;
+            //                 case CMD_MAIN:
+            //                     // Tell the user their options in this new menu
+            //                     startup_printAvailableCommands(CMD_MAIN);
+            //                     // Remember what menu we're in
+            //                     currentMenu = CMD_MAIN;
+            //                     break;
+            //                 case CMD_QUIT:
+            //                     quit = true;
+            //                     break;
+            //                 default:
+            //                     // Remind the user about what commands are available
+            //                     System.out.println("\nCommand not recognized");
+            //                     startup_printAvailableCommands(CMD_REPORTS);
+            //                     break;
+            //             }
+            //             break;
+            //         case CMD_MANAGE:
+            //             // Check user's input (case insensitively)
+            //             switch (command.toUpperCase()) {
+            //             case CMD_MANAGE_HOTEL_ADD:
+            //                 user_manageHotelAdd();
+            //                 break;
+            //             case CMD_MANAGE_HOTEL_UPDATE:
+            //                 user_manageHotelUpdate();
+            //                 break;
+            //             case CMD_MANAGE_HOTEL_DELETE:
+            //                 user_manageHotelDelete();
+            //                 break;
+            //             case CMD_MANAGE_STAFF_ADD:
+            //                 user_manageStaffAdd();
+            //                 break;
+            //             case CMD_MANAGE_STAFF_UPDATE:
+            //                 user_manageStaffUpdate();
+            //                 break;
+            //             case CMD_MANAGE_STAFF_DELETE:
+            //                 user_manageStaffDelete();
+            //                 break;
+            //             case CMD_MANAGE_ROOM_ADD:
+            //                 user_manageRoomAdd();
+            //                 break;
+            //             case CMD_MANAGE_ROOM_UPDATE:
+            //                 user_manageRoomUpdate();
+            //                 break;
+            //             case CMD_MANAGE_ROOM_DELETE:
+            //                 user_manageRoomDelete();
+            //                 break;
+            //             case CMD_MANAGE_CUSTOMER_ADD:
+            //                 user_manageCustomerAdd();
+            //                 break;
+            //             case CMD_MANAGE_CUSTOMER_UPDATE:
+            //                 user_manageCustomerUpdate();
+            //                 break;
+            //             case CMD_MANAGE_CUSTOMER_DELETE:
+            //                 user_manageCustomerDelete();
+            //                 break;
+            //             case CMD_MANAGE_SERVICE_COST_UPDATE:
+            //                 user_manageUpdateServiceCost();
+            //                 break;
+            //             case CMD_MAIN:
+            //                 // Tell the user their options in this new menu
+            //                 startup_printAvailableCommands(CMD_MAIN);
+            //                 // Remember what menu we're in
+            //                 currentMenu = CMD_MAIN;
+            //                 break;
+            //             case CMD_QUIT:
+            //                 quit = true;
+            //                 break;
+            //             default:
+            //                 // Remind the user about what commands are available
+            //                 System.out.println("\nCommand not recognized");
+            //                 startup_printAvailableCommands(CMD_MANAGE);
+            //                 break;
+            //             }
+            //             break;
+            //         default:
+            //             break;
+                // }
+            // }
             // Connection
-            jdbc_connection.close();
+            connection.close();
         
         }
         catch (Throwable err) {
