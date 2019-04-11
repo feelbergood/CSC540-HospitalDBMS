@@ -107,6 +107,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateWardsCapacity;
 	private static PreparedStatement prep_updateWardsCharge;
 	private static PreparedStatement prep_updateWardsNurse;
+	private static PreparedStatement prep_updateWardsPatientsID; // To reflect what is showed in demo data, but how?
 	private static PreparedStatement prep_deleteWards;
 	private static PreparedStatement prep_deleteWardInformation;
 	// Patients
@@ -116,6 +117,8 @@ public class WolfHospital {
 	private static PreparedStatement prep_updatePatientsAge;
 	private static PreparedStatement prep_updatePatientsPhone;
 	private static PreparedStatement prep_updatePatientsAddress;
+	private static PreparedStatement prep_updatePatientsTreatmentPlan; // To reflect what is showed in demo data
+	private static PreparedStatement prep_updatePatientsInWard; // To reflect what is showed in demo data
 	private static PreparedStatement prep_updatePatientsStatus;
 	private static PreparedStatement prep_deletePatients;
 
@@ -302,13 +305,13 @@ public class WolfHospital {
               System.out.println(CMD_BED_CHECK);
               System.out.println("\t- check available beds");
               System.out.println(CMD_WARD_ASSIGN);
-              System.out.println("\t- find available wards");
+              System.out.println("\t- assign available wards to patients");
               System.out.println(CMD_BED_ASSIGN);
-              System.out.println("\t- find available beds");
+              System.out.println("\t- assign available beds to patients");
               System.out.println(CMD_WARD_RESERVE);
-              System.out.println("\t- assign an available ward to patient");
+              System.out.println("\t- patient reserves a ward"); // Still unclear about the difference from assign
               System.out.println(CMD_BED_RESERVE);
-              System.out.println("\t- assign an available bed to patient");
+              System.out.println("\t- patient reserves a bed");
               System.out.println(CMD_WARD_RELEASE);
               System.out.println("\t- release an ward");
               System.out.println(CMD_BED_RELEASE);
@@ -385,9 +388,9 @@ public class WolfHospital {
 			sql = "UPDATE `PersonInfo`" + " SET `age` = ?"
 					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsAge = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo` p `ContactInfo` c" +
-					" SET p.phone=?, c.phone=?" +
-					" WHERE p.phone=c.phone AND p.SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			sql = "UPDATE `PersonInfo` p `ContactInfo` ci" +
+					" SET p.phone=?, ci.phone=?" +
+					" WHERE p.phone=ci.phone AND p.SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsPhone = connection.prepareStatement(sql);
 			sql = "UPDATE `ContactInfo`" +
 					" SET `address` = ?" +
@@ -860,9 +863,13 @@ public class WolfHospital {
 					break;
 				case "Patients":
 					addPatient("1001", "000-01-1234", "David", "1980-01-30", "Male", "39", "919-123-3324",
-							"69 ABC St , Raleigh NC 27730", "20", "001", "no");
+							"69 ABC St , Raleigh NC 27730", "20", "yes", "no");
 					addPatient("1002", "000-02-1234", "Sarah", "1971-01-30", "Female", "48", "919-563-3478",
-							"81 DEF St , Cary NC 27519", "20", "002", "no");
+							"81 DEF St , Cary NC 27519", "20", "yes", "no");
+					addPatient("1003", "000-03-1234", "Joseph", "1987-01-30", "Male", "32", "919-957-2199",
+							"31 OPG St , Cary NC 27519", "10", "yes", "no");
+					addPatient("1004", "000-04-1234", "Lucy", "1985-01-30", "Female", "34", "919-838-7123",
+							"10 TBC St , Raleigh NC 27730", "5", "no", "yes");
 					break;
 				case "Wards":
 					addWard("001", 4, 50, "102");
@@ -1120,7 +1127,7 @@ public class WolfHospital {
 	}
 	// Add a new patient
 	public static void addPatient(String patientID, String SSN, String name, String DOB, String gender, String age, String phone,
-								  String address, String treatmentPlan, String wardNum, String status) {
+								  String address, String treatmentPlan, String inWard, String status) {
 		try {
 			connection.setAutoCommit(false);
 			try {
@@ -1186,7 +1193,8 @@ public class WolfHospital {
 						break;
 					case "PHONE":
 						prep_updatePatientsPhone.setString(1, newValue);
-						prep_updatePatientsPhone.setString(2, patientID);
+						prep_updatePatientsPhone.setString(2, newValue);
+						prep_updatePatientsPhone.setString(3, patientID);
 						prep_updatePatientsPhone.executeUpdate();
 						break;
 					case "STATUS":
@@ -1230,13 +1238,13 @@ public class WolfHospital {
 		}
 	}
 	// Add a new ward
-	public static void addWard(String wardNumber, int capacity, int Daycharge, String responsibleNurse) {
+	public static void addWard(String wardNumber, String capacity, String Daycharge, String responsibleNurse) {
 		try {
 			connection.setAutoCommit(false);
 			try {
 				prep_addWards.setString(1, wardNumber);
-				prep_addWards.setInt(2, capacity);
-				prep_addWards.setInt(3, Daycharge);
+				prep_addWards.setInt(2, Integer.valueOf(capacity));
+				prep_addWards.setInt(3, Integer.valueOf(Daycharge));
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
@@ -2050,7 +2058,313 @@ public class WolfHospital {
 	/*
 	 * begin user-interaction methods
 	 * */
-	
+
+
+	/*
+	 * ChuWen - Information Processing
+	 * Enter information for a new staff
+	 * */
+	public static void userStaffAdd() {
+		//Declare local variables
+		String staffID;
+		String name;
+		String age;
+		String gender;
+		String jobTitle;
+		String profTitle;
+		String department;
+		String phone;
+		String address;
+		try {
+			//Get staff id for the new staff
+			System.out.println("\nEnter the staff ID of the new staff:\n");
+			staffID = scanner.nextLine();
+			//Get name
+			System.out.println("\nEnter the name of the new staff:\n");
+			name = scanner.nextLine();
+			//Get age
+			System.out.println("\nEnter the age of the new staff:\n");
+			age = scanner.nextLine();
+			//Get gender
+			System.out.println("\nEnter the gender of the new staff:\n");
+			gender = scanner.nextLine();
+			//Get job title
+			System.out.println("\nEnter the job title of the new staff:\n");
+			jobTitle = scanner.nextLine();
+			//Get professional title
+			System.out.println("\nEnter the professional title of the new staff:\n");
+			profTitle = scanner.nextLine();
+			//Get department
+			System.out.println("\nEnter the department of the new staff:\n");
+			department = scanner.nextLine();
+			//Get phone
+			System.out.println("\nEnter the phone of the new staff:\n");
+			phone = scanner.nextLine();
+			//Get address
+			System.out.println("\nEnter the address of the new staff:\n");
+			address = scanner.nextLine();
+			//call function that interacts with the Database
+			addStaff(staffID, name, age, gender, jobTitle, profTitle, department, phone, address);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Update an attribute of an appointed staff
+	 * */
+	public static void userStaffUpdate() {
+		//Declare local variables
+		String staffID;
+		String attrToChange;
+		String valueToChange;
+		try {
+			//Get staff id
+			System.out.println("\nEnter the staff id of the staff you want to update:\n");
+			staffID = scanner.nextLine();
+
+			//Print the staff information you plan to update
+			System.out.println("\nThe staff information you have chosen:\n");
+			getStaff(staffID);
+
+			//Get attribute to change
+			//Print all possible attributes can be changed
+			System.out.println("\nPlease select the attribute you wish to update[NAME, AGE, JOBTITLE, PROFESSIONAL TITLE, DEPARTMENT, PHONE, ADDRESS]:\n");
+			attrToChange = scanner.nextLine();
+			//Get value to change
+			System.out.println("\nEnter the new value:\n");
+			valueToChange = scanner.nextLine();
+			//Call method that interacts with the Database
+			updateStaff(staffID, attrToChange, valueToChange);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Delete an appointed staff
+	 * */
+	public static void userStaffDelete() {
+		//Declare local variables
+		String staffID;
+		try {
+			//Get staff id
+			System.out.println("\nEnter the staff id of the staff you want to delete:\n");
+			staffID = scanner.nextLine();
+			//Print the staff information you plan to delete
+			System.out.println("\nThe staff information you have chosen:\n");
+			getStaff(staffID);
+			//Call method that interacts with the Database
+			deleteStaff(staffID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Enter information for a new patient
+	 * */
+	public static void userPatientAdd() {
+		//Declare local variables
+		String patientID;
+		String SSN;
+		String name;
+		String gender;
+		String DOB;
+		String age;
+		String address;
+		String phone;
+		String treatmentPlan;
+		String inWard;
+		String CompletingTreatment;
+		try {
+			//Get patient id for the new patient
+			System.out.println("\nEnter the patient ID of the new patient:\n");
+			patientID = scanner.nextLine();
+			//Get SSN
+			System.out.println("\nEnter the SSN of the new patient:\n");
+			SSN = scanner.nextLine();
+			//Get name
+			System.out.println("\nEnter the name of the new patient:\n");
+			name = scanner.nextLine();
+			//Get gender
+			System.out.println("\nEnter the gender of the new patient:\n");
+			gender = scanner.nextLine();
+			//Get DOB
+			System.out.println("\nEnter the date of birth of the new patient:\n");
+			DOB = scanner.nextLine();
+			//Get age
+			System.out.println("\nEnter the age of the new patient:\n");
+			age = scanner.nextLine();
+			//Get address
+			System.out.println("\nEnter the address of the new patient:\n");
+			address = scanner.nextLine();
+			//Get phone
+			System.out.println("\nEnter the phone of the new patient:\n");
+			phone = scanner.nextLine();
+			//Get treatmentPlan
+			System.out.println("\nEnter the processing treatment plan of the new patient:\n");
+			treatmentPlan = scanner.nextLine();
+			//Get inWard
+			System.out.println("\nEnter the in ward status of the new patient:\n");
+			inWard = scanner.nextLine();
+			//Get CompletingTreatment
+			System.out.println("\nEnter the treatment status of the new patient:\n");
+			CompletingTreatment = scanner.nextLine();
+			//call function that interacts with the Database
+			addPatient(patientID, SSN, name, DOB, gender, age, phone,
+					address, treatmentPlan, inWard, CompletingTreatment);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Update an attribute of an appointed patient
+	 * */
+	public static void userPatientUpdate() {
+		//Declare local variables
+		String patientID;
+		String attrToChange;
+		String valueToChange;
+		try {
+			//Get patient id
+			System.out.println("\nEnter the patient id of the patient you want to update:\n");
+			patientID = scanner.nextLine();
+
+			//Print the patient information you plan to update
+			System.out.println("\nThe patient information you have chosen:\n");
+			getPatient(patientID);
+
+			//Get attribute to change
+			//Print all possible attributes can be changed
+			System.out.println("\nPlease select the attribute you wish to update[NAME, AGE, ADDRESS, PHONE, STATUS]:\n"); // need treatmentPlan and inWard too
+			attrToChange = scanner.nextLine();
+			//Get value to change
+			System.out.println("\nEnter the new value:\n");
+			valueToChange = scanner.nextLine();
+			//Call method that interacts with the Database
+			updatePatient(patientID, attrToChange, valueToChange);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Delete an appointed patient
+	 * */
+	public static void userPatientDelete() {
+		//Declare local variables
+		String patientID;
+		try {
+			//Get patient id
+			System.out.println("\nEnter the patient id of the patient you want to delete:\n");
+			patientID = scanner.nextLine();
+			//Print the patient information you plan to delete
+			System.out.println("\nThe patient information you have chosen:\n");
+			getPatient(patientID);
+			//Call method that interacts with the Database
+			deletePatient(patientID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Enter information for a new ward
+	 * */
+	public static void userWardAdd() {
+		//Declare local variables
+		String wardNumber;
+		String capacity;
+		String dayCharge;
+		String responsibleNurse;
+		try {
+			//Get ward number for the new ward
+			System.out.println("\nEnter the ward number of the new ward:\n");
+			wardNumber = scanner.nextLine();
+			//Get capacity
+			System.out.println("\nEnter the capacity of the new ward:\n");
+			capacity = scanner.nextLine();
+			//Get dayCharge
+			System.out.println("\nEnter the charge per day of the new ward:\n");
+			dayCharge = scanner.nextLine();
+			//Get responsibleNurse
+			System.out.println("\nEnter the nurse responsible for the new ward:\n");
+			responsibleNurse = scanner.nextLine();
+			addWard(wardNumber, capacity, dayCharge, String responsibleNurse);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Update an attribute of an appointed ward
+	 * */
+	public static void userWardUpdate() {
+		//Declare local variables
+		String wardNumber;
+		String attrToChange;
+		String valueToChange;
+		try {
+			//Get wardNumber
+			System.out.println("\nEnter the ward number of the ward you want to update:\n");
+			wardNumber = scanner.nextLine();
+
+			//Print the ward information you plan to update
+			System.out.println("\nThe ward information you have chosen:\n");
+			getWard(wardNumber);
+
+			//Get attribute to change
+			//Print all possible attributes can be changed
+			System.out.println("\nPlease select the attribute you wish to update[CAPACITY, CHARGE PER DAY, RESPONSIBLE NURSE]:\n"); // need patients' SSN too
+			attrToChange = scanner.nextLine();
+			//Get value to change
+			System.out.println("\nEnter the new value:\n");
+			valueToChange = scanner.nextLine();
+			//Call method that interacts with the Database
+			updateWard(wardNumber, attrToChange, valueToChange);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Delete an appointed ward
+	 * */
+	public static void userWardDelete() {
+		//Declare local variables
+		String wardNumber;
+		try {
+			//Get wardNumber
+			System.out.println("\nEnter the ward number of the ward you want to delete:\n");
+			wardNumber = scanner.nextLine();
+			//Print the ward information you plan to delete
+			System.out.println("\nThe ward information you have chosen:\n");
+			getWard(wardNumber);
+			//Call method that interacts with the Database
+			manageWardDelete(wardNumber);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
+	}
+
+	/*
+	 * Check available wards
+	 */
+	public static void userWardCheck() {
+		checkWardAvailability();
+	}
+
 	// GG
 	/*
 	 * user task: Enter a new billing account for a patient
