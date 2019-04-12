@@ -110,6 +110,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_getStaff;
 	private static PreparedStatement prep_updateStaffName;
 	private static PreparedStatement prep_updateStaffAge;
+	private static PreparedStatement prep_updateStaffGender;
 	private static PreparedStatement prep_updateStaffJobTitle;
 	private static PreparedStatement prep_updateStaffProfTitle;
 	private static PreparedStatement prep_updateStaffDepart;
@@ -117,6 +118,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_updateStaffAddress;
 	private static PreparedStatement prep_deleteStaff;
 	// Wards
+	// TODO: prep_updateWardsPatientsID
 	private static PreparedStatement prep_addWards;
 	private static PreparedStatement prep_getWards;
 	private static PreparedStatement prep_updateWardsCapacity;
@@ -136,7 +138,7 @@ public class WolfHospital {
 	private static PreparedStatement prep_updatePatientsPhone;
 	private static PreparedStatement prep_updatePatientsAddress;
 	private static PreparedStatement prep_updatePatientsTreatmentPlan; // To reflect what is showed in demo data
-	private static PreparedStatement prep_updatePatientsInWard; // To reflect what is showed in demo data
+	private static PreparedStatement prep_updatePatientsInWard;
 	private static PreparedStatement prep_updatePatientsStatus;
 	private static PreparedStatement prep_deletePatients;
 
@@ -212,6 +214,7 @@ public class WolfHospital {
 	// Management - Beds
 	private static PreparedStatement prep_assignBed;
 	private static PreparedStatement prep_checkBedAvailability;
+	private static PreparedStatement prep_checkBedinWardAvailability;    
 	// private static PreparedStatement prep_reserveBed;
 	private static PreparedStatement prep_releaseBed;
 //	private static PreparedStatement prep_deleteBedInfo;
@@ -324,11 +327,11 @@ public class WolfHospital {
               System.out.println(CMD_BED_CHECK);
               System.out.println("\t- check available beds");
               System.out.println(CMD_WARD_ASSIGN);
-              System.out.println("\t- assign available wards to patients");
+              System.out.println("\t- assign available wards based on patient's need");
               System.out.println(CMD_BED_ASSIGN);
               System.out.println("\t- assign available beds to patients");
               System.out.println(CMD_WARD_RESERVE);
-              System.out.println("\t- patient reserves a ward"); // Still unclear about the difference from assign
+              System.out.println("\t- patient reserves a ward");
               System.out.println(CMD_BED_RESERVE);
               System.out.println("\t- patient reserves a bed");
               System.out.println(CMD_WARD_RELEASE);
@@ -373,6 +376,8 @@ public class WolfHospital {
 			prep_updateStaffName = connection.prepareStatement(sql);
 			sql = "UPDATE `Staff`" + " SET `age` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffAge = connection.prepareStatement(sql);
+			sql = "UPDATE `Staff`" + " SET `gender` = ?" + " WHERE staffID = ?;";
+			prep_updateStaffGender = connection.prepareStatement(sql);
 			sql = "UPDATE `Staff`" + " SET `jobTitle` = ?" + " WHERE staffID = ?;";
 			prep_updateStaffJobTitle = connection.prepareStatement(sql);
 			sql = "UPDATE `Staff`" + " SET `profTitle` = ?" + " WHERE staffID = ?;";
@@ -423,7 +428,13 @@ public class WolfHospital {
 					" WHERE phone IN (SELECT phone FROM PersonInfo WHERE SSN" +
 					" IN (SELECT SSN FROM Patients WHERE patientID = ?));";
 			prep_updatePatientsAddress = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" + " SET `status` = ?"
+			sql = "UPDATE `PersonInfo`" + " SET `processing treatment plan` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			prep_updatePatientsTreatmentPlan = connection.prepareStatement(sql);
+			sql = "UPDATE `PersonInfo`" + " SET `in ward` = ?"
+					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			prep_updatePatientsInWard = connection.prepareStatement(sql);
+			sql = "UPDATE `PersonInfo`" + " SET `completing treatment` = ?"
 					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prep_updatePatientsStatus = connection.prepareStatement(sql);
 			// Delete basic information about patients
@@ -630,7 +641,7 @@ public class WolfHospital {
 			prep_deleteWardInfo = connection.prepareStatement(sql);
 			
 			// Check availability of wards
-			sql = "SELECT DISTINCT `ward number` " + "FROM `Beds`" + "WHERE ISNULL(patientID); ";
+			sql = "SELECT * FROM `Wards` WHERE `ward number` IN (SELECT DISTINCT `ward number` " + "FROM `Beds`" + "WHERE ISNULL(patientID)); ";
 			prep_checkWardAvailability = connection.prepareStatement(sql);
 
 			// Assign wards:
@@ -668,6 +679,10 @@ public class WolfHospital {
 			// Check availability of beds
 			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID); ";
 			prep_checkBedAvailability = connection.prepareStatement(sql);
+
+			// Check availability of beds in an appointed ward
+			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID) AND `ward number ` = ?; ";
+			prep_checkBedinWardAvailability = connection.prepareStatement(sql);
 
 			// Reserve beds
 			// sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`,
@@ -893,6 +908,7 @@ public class WolfHospital {
 	}
 	
 	public static void populateWardsTable() {
+		// TODO: how to add multiple patients' IDs?
 		addWard("001", "4", "50", "102");
 		addWard("002", "4", "50", "102");
 		addWard("003", "2", "100", "106");
@@ -975,8 +991,9 @@ public class WolfHospital {
 			String department = rs.getString("department");
 			String phone = rs.getString("phone");
 			String address = rs.getString("address");
-			System.out.println(staffID + "\t" + name + "\t" + age + "\t" + gender + "\t" + jobTitle + "\t" + profTitle
-					+ "\t" + department + "\t" + phone + "\t" + address);
+			System.out.println("Staff ID: " + staffID + ", name: " + name + ", age: " + age + ", gender: " + gender +
+					", job title: " + jobTitle + ", professional title: " + profTitle + ", department: " + department +
+					", phone: " + phone + ", address: " + address);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -992,10 +1009,14 @@ public class WolfHospital {
 			String gender = rs.getString("gender");
 			String DOB =  rs.getDate("DOB").toString();
 			int age = rs.getInt("age");
-			String status = rs.getString("status");
+			String processing = rs.getString("processing treatment plan");
+			String completing = rs.getString("completing treatment").equals("true")? "yes": "no";
+			String inWard = rs.getString("in ward").equals("true")? "yes": "no";
 			String phone = rs.getString("phone");
 			String address = rs.getString("address");
-			System.out.println(patientID + "\t" + SSN + "\t" + name + "\t" + gender + "\t" + DOB + "\t" + age + "\t"
+			System.out.println("Patient ID: " + patientID + ", SSN: " + SSN + ", name: " + name + ", date of birth: " + DOB +
+					", gender: " + gender + ", age: " + age + ", phone number: " + phone + ", address: " + address + ", processing treatment plan: " +
+					processing + ", in ward: " + inWard + ", completing treatment: " + completing);
 					+ phone + "\t" + address + "\t" + status);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -1006,11 +1027,12 @@ public class WolfHospital {
 	// Show an appointed row of wards
 	private static void printWardsRow(ResultSet rs) {
 		try {
+			// TODO: print patients' IDs too
 			String wardNumber = rs.getString("ward number");
 			int capacity = rs.getInt("capacity");
-			float dayCharge = rs.getFloat("charges per day");
+			int dayCharge = rs.getInt("charges per day");
 			String nurse = rs.getString("responsible nurse");
-			System.out.println(wardNumber + "\t" + capacity + "\t" + dayCharge + "\t" + nurse);
+			System.out.println("Ward number: " + wardNumber + ", capacity: " + capacity + ", charges per day: " + dayCharge + ", responsible nurse: " + nurse);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1060,7 +1082,7 @@ public class WolfHospital {
 	// update the value of an appointed field of an staff
 	public static void updateStaff(String staffID, String attributeToChange, String newValue) {
 		try {
-			connection.setAutoCommit(true);
+			connection.setAutoCommit(false);
 			try {
 				switch (attributeToChange.toUpperCase()) {
 
@@ -1073,6 +1095,11 @@ public class WolfHospital {
 						prep_updateStaffAge.setInt(1, Integer.parseInt(newValue));
 						prep_updateStaffAge.setString(2, staffID);
 						prep_updateStaffAge.executeUpdate();
+						break;
+					case "GENDER":
+						prep_updateStaffGender.setString(1, newValue);
+						prep_updateStaffGender.setString(2, staffID);
+						prep_updateStaffGender.executeUpdate();
 						break;
 					case "JOB TITLE":
 						prep_updateStaffJobTitle.setString(1, newValue);
@@ -1213,12 +1240,21 @@ public class WolfHospital {
 						prep_updatePatientsPhone.setString(3, patientID);
 						prep_updatePatientsPhone.executeUpdate();
 						break;
-					case "STATUS":
-						prep_updatePatientsStatus.setString(1, newValue);
+					case "PROCESSING TREATMENT PLAN":
+						prep_updatePatientsTreatmentPlan.setString(1, newValue);
+						prep_updatePatientsTreatmentPlan.setString(2, patientID);
+						prep_updatePatientsTreatmentPlan.executeUpdate();
+						break;
+					case "IN WARD":
+						prep_updatePatientsInWard.setBoolean(1, newValue.equals("yes")? true : false);
+						prep_updatePatientsInWard.setString(2, patientID);
+						prep_updatePatientsInWard.executeUpdate();
+						break;
+					case "COMPLETING TREATMENT":
+						prep_updatePatientsStatus.setBoolean(1, newValue.equals("yes")? true : false);
 						prep_updatePatientsStatus.setString(2, patientID);
 						prep_updatePatientsStatus.executeUpdate();
 						break;
-					// To-do: need to consider update of treatmentPlan and of wardNum, it seems no need to do this?!
 					default:
 						System.out.println("Cannot update the field " + attributeChanged + " for patient " + patientID + " .");
 						break;
@@ -1254,13 +1290,13 @@ public class WolfHospital {
 		}
 	}
 	// Add a new ward
-	public static void addWard(String wardNumber, String capacity, String Daycharge, String responsibleNurse) {
+	public static void addWard(String wardNumber, String capacity, String daycharge, String responsibleNurse) {
 		try {
 			connection.setAutoCommit(false);
 			try {
 				prep_addWards.setString(1, wardNumber);
 				prep_addWards.setInt(2, Integer.valueOf(capacity));
-				prep_addWards.setInt(3, Integer.valueOf(Daycharge));
+				prep_addWards.setInt(3, Integer.valueOf(daycharge));
 				prep_addWards.setString(4, responsibleNurse);
 				prep_addWards.executeUpdate();
 				connection.commit();
@@ -1296,12 +1332,12 @@ public class WolfHospital {
 				switch (attributeChanged.toUpperCase()) {
 
 					case "CAPACITY":
-						prep_updateWardsCapacity.setString(1, newValue);
+						prep_updateWardsCapacity.setInt(1, Integer.valueOf(newValue));
 						prep_updateWardsCapacity.setString(2, wardNumber);
 						prep_updateWardsCapacity.executeUpdate();
 						break;
 					case "CHARGE PER DAY":
-						prep_updateWardsCharge.setString(1, newValue);
+						prep_updateWardsCharge.setInt(1, Integer.valueOf(newValue));
 						prep_updateWardsCharge.setString(2, wardNumber);
 						prep_updateWardsCharge.executeUpdate();
 						break;
@@ -1310,6 +1346,7 @@ public class WolfHospital {
 						prep_updateWardsNurse.setString(2, wardNumber);
 						prep_updateWardsNurse.executeUpdate();
 						break;
+					// TODO: how to update patients' IDs
 					default:
 						System.out.println("Cannot update the field " + attributeChanged + " for ward " + wardNumber + " .");
 						break;
@@ -2188,6 +2225,7 @@ public class WolfHospital {
 			address = scanner.nextLine();
 			//call function that interacts with the Database
 			addStaff(staffID, name, age, gender, jobTitle, profTitle, department, phone, address);
+			System.out.println("A new staff is added successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2213,13 +2251,14 @@ public class WolfHospital {
 
 			//Get attribute to change
 			//Print all possible attributes can be changed
-			System.out.println("\nPlease select the attribute you wish to update[NAME, AGE, JOBTITLE, PROFESSIONAL TITLE, DEPARTMENT, PHONE, ADDRESS]:\n");
+			System.out.println("\nPlease select the attribute you wish to update[NAME, AGE, GENDER, JOBTITLE, PROFESSIONAL TITLE, DEPARTMENT, PHONE, ADDRESS]:\n");
 			attrToChange = scanner.nextLine();
 			//Get value to change
 			System.out.println("\nEnter the new value:\n");
 			valueToChange = scanner.nextLine();
 			//Call method that interacts with the Database
 			updateStaff(staffID, attrToChange, valueToChange);
+			System.out.println("The staff is updated successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2241,6 +2280,7 @@ public class WolfHospital {
 			getStaff(staffID);
 			//Call method that interacts with the Database
 			deleteStaff(staffID);
+			System.out.println("The staff is deleted successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2300,6 +2340,7 @@ public class WolfHospital {
 			//call function that interacts with the Database
 			addPatient(patientID, SSN, name, DOB, gender, age, phone,
 					address, treatmentPlan, inWard, CompletingTreatment);
+			System.out.println("A new patient is added successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2332,6 +2373,7 @@ public class WolfHospital {
 			valueToChange = scanner.nextLine();
 			//Call method that interacts with the Database
 			updatePatient(patientID, attrToChange, valueToChange);
+			System.out.println("The patient is updated successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2353,6 +2395,7 @@ public class WolfHospital {
 			getPatient(patientID);
 			//Call method that interacts with the Database
 			deletePatient(patientID);
+			System.out.println("The patient is deleted successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2381,7 +2424,8 @@ public class WolfHospital {
 			//Get responsibleNurse
 			System.out.println("\nEnter the nurse responsible for the new ward:\n");
 			responsibleNurse = scanner.nextLine();
-			addWard(wardNumber, capacity, dayCharge, String responsibleNurse);
+			addWard(wardNumber, capacity, dayCharge, responsibleNurse);
+			System.out.println("A new ward is added successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2414,6 +2458,7 @@ public class WolfHospital {
 			valueToChange = scanner.nextLine();
 			//Call method that interacts with the Database
 			updateWard(wardNumber, attrToChange, valueToChange);
+			System.out.println("The ward is updated successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2435,6 +2480,7 @@ public class WolfHospital {
 			getWard(wardNumber);
 			//Call method that interacts with the Database
 			manageWardDelete(wardNumber);
+			System.out.println("The ward is deleted successfully!");
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2445,7 +2491,90 @@ public class WolfHospital {
 	 * Check available wards
 	 */
 	public static void userWardCheck() {
-		checkWardAvailability();
+		try {
+			ResultSet rs = prep_checkWardAvailability.executeQuery();
+			rs.beforeFirst();
+			System.out.println("\nBelow is the list of available wards:");
+			while (rs.next()) {
+				String wardNumber = rs.getString("ward number");
+				String capacity = rs.getString("capacity");
+				System.out.println(capacity + "-bed Ward numbered " + wardNumber);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * Check available beds
+	 */
+	public static void userBedCheck() {
+		try {
+			ResultSet rs = prep_checkBedAvailability.executeQuery();
+			rs.beforeFirst();
+			System.out.println("\nBelow is the list of available beds:");
+			while (rs.next()) {
+				String wardNumber = rs.getString("ward number");
+				String bedNumber = rs.getString("bed number");
+				System.out.println("Bed numbered " + bedNumber + " in ward numbered " + wardNumber);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/*
+	 * Assumption: we assume that when assigning a bed to a patient, a ward is assigned to
+	 * the patient too, so there is no need to have a separate operation of assigning ward.
+	 *
+	 * Assign a bed and the ward of the bed to a patient according to his/her request
+	 */
+	public static void userBedAssign() {
+		System.out.println("\nPlease enter the patient ID of the patient you are assigning a ward/bed for.\n");
+		String patientID = scanner.nextLine();
+		userWardCheck(); // should print the capacity of each ward
+		System.out.println("\nPlease select a ward according to your need from the above ward\n");
+		String wardNumber = scanner.nextLine();
+		getWard(wardNumber);
+		String bedNumber;
+		try {
+			prep_addTreatmentRecord.setString(1, wardNumber);
+			ResultSet rs = prep_checkBedinWardAvailability.executeQuery();
+			rs.beforeFirst();
+			System.out.println("\nBelow is the list of available beds in ward numbered " + wardNumber + ": ");
+			while (rs.next()) {
+				if (wardNumber != rs.getString("ward number")) {
+					System.out.println("Warning: a bed in wrong ward is skipped!");
+					continue;
+				}
+				bedNumber = rs.getString("bed number");
+				System.out.println("Bed numbered " + bedNumber);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		System.out.println("\nPlease select a bed from the available bed list above\n");
+		bedNumber = scanner.nextLine();
+		manageBedAssign(patientID, wardNumber, bedNumber);
+		System.out.println("\nPatient " + patientID + " got the bed numbered " + bedNumber + " in ward numbered" +
+				wardNumber + " successfully.");
+	}
+
+	/*
+	 * Assumption: we assume that when releasing a bed from a patient, a ward is released from
+	 * the patient too, so there is no need to have a separate operation for releasing ward.
+	 *
+	 * Release a bed and the ward of the bed from a patient
+	 */
+	public static void userBedRelease() {
+		String wardNum;
+		String bedNum;
+		System.out.println("\nPlease enter the bed number of the bed to be released");
+		bedNum = scanner.nextLine();
+		System.out.println("\nPlease enter the ward number of the bed to be released");
+		wardNum = scanner.nextLine();
+		manageBedRelease(wardNum, bedNum);
+		System.out.println("\nBed numbered " + bedNum + "in ward numbered " + wardNum + " is released");
 	}
 
 	// GG
@@ -2741,8 +2870,8 @@ public class WolfHospital {
                     case CMD_INFORMATION_PROCESSING:
                         switch (command.toUpperCase()) {
                             case CMD_STAFF_ADD:
-                                userStaffAdd();
-                                break;
+                                	userStaffAdd();
+                                	break;
                           	case CMD_STAFF_UPDATE:
                             		userStaffUpdate();
                             		break;
@@ -2773,20 +2902,24 @@ public class WolfHospital {
                           	case CMD_BED_CHECK:
                             		userBedCheck();
                             		break;
+                            // Assumption: we assume that when assigning a bed to a patient, a ward is assigned to
+							// the patient too, so there is no need to have a separate operation of assigning a ward
                             case CMD_WARD_ASSIGN:
-                            		userWardAssign();
+                            		userBedAssign();
                             		break;
                           	case CMD_BED_ASSIGN:
                             		userBedAssign();
                             		break;
                             case CMD_WARD_RESERVE:
-                            		userWardReserve();
+									userBedAssign();
                             		break;
                           	case CMD_BED_RESERVE:
-                            		userBedReserve();
+									userBedAssign();
                             		break;
+							// Assumption: we assume that when releasing a bed from a patient, a ward is released from
+							// the patient too, so there is no need to have a separate operation for releasing ward.
                             case CMD_WARD_RELEASE:
-                            		userWardRelease();
+									userBedRelease();
                             		break;
                           	case CMD_BED_RELEASE:
                             		userBedRelease();
