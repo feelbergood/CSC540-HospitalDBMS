@@ -497,9 +497,7 @@ public class WolfHospital {
 			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
 			// `endDate`, `responsibleDoctor`) VALUES ('14', '5', '2019-07-01',
 			// '2019-07-02', '3');
-			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`) " + "VALUES (?, ?, ?); "
-					+ "INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`, `endDate`, `responsibleDoctor`) "
-					+ "VALUES (?, ?, ?, ?, ?);";
+			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`) " + "VALUES (?, ?, ?); ";
 			prep_addTestRecord = connection.prepareStatement(sql);
 
 			// Get all test records
@@ -946,23 +944,26 @@ public class WolfHospital {
 		addMedicalRecord("4", "1004", "2019-03-17", "2019-03-21", "103");
 	}
 	
-	public static void populatTreatmentTable() {
+	public static void populateTreatmentTable() {
 		manageTreatmentRecordAdd("1", "nervine", "Hospitalization");
 		manageTreatmentRecordAdd("2", "nervine", "Hospitalization");
 		manageTreatmentRecordAdd("3", "nervine", "Hospitalization");
 		manageTreatmentRecordAdd("4", "analgestic", "Surgeon, Hospitalization");
 	}
 	
-	public static void populatTestTable() {
-		
+	public static void populateTestTable() {
+//		manageTestRecordAdd("1","testA","success");
+//		manageTestRecordAdd("2","testA","success");
+//		manageTestRecordAdd("3","testA","success");
+//		manageTestRecordAdd("4","testB","unknown");
 	}
 	
 	// TO FIX: EMPTY DATE
-	public static void populatCheckinTable() {
-		manageCheckinRecordAdd("1", "001", "1", "1001", "2019-03-01", "2019-12-21", "104");
-		manageCheckinRecordAdd("2", "002", "1", "1002", "2019-03-10", "2019-12-21", "104");
-		manageCheckinRecordAdd("3", "001", "2", "1003", "2019-03-15", "2019-12-21", "104");
-		manageCheckinRecordAdd("4", "003", "1", "1004", "2019-03-17", "2019-03-21", "104");
+	public static void populateCheckinTable() {
+		manageCheckinRecordAdd("1", "001", "1");
+		manageCheckinRecordAdd("2", "002", "1");
+		manageCheckinRecordAdd("3", "001", "2");
+		manageCheckinRecordAdd("4", "003", "1");
 	}
 	
 	// TO FIX: EMPTY DOUBLE
@@ -1467,8 +1468,7 @@ public class WolfHospital {
 	}
 
 	// 4
-	public static void manageTestRecordAdd(String recordID, String testType, String testResult, String patientID,
-			String startDate, String endDate, String responsibleDoctor) {
+	public static void manageTestRecordAdd(String recordID, String testType, String testResult) {
 		// to be done: check success or not and report
 		try {
 
@@ -1479,11 +1479,6 @@ public class WolfHospital {
 				prep_addTestRecord.setString(1, recordID);
 				prep_addTestRecord.setString(2, testType);
 				prep_addTestRecord.setString(3, testResult);
-				prep_addTestRecord.setString(4, recordID);
-				prep_addTestRecord.setString(5, patientID);
-				prep_addTestRecord.setDate(6, java.sql.Date.valueOf(startDate));
-				prep_addTestRecord.setDate(7, java.sql.Date.valueOf(endDate));
-				prep_addTestRecord.setString(8, responsibleDoctor);
 				prep_addTestRecord.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
@@ -1580,8 +1575,7 @@ public class WolfHospital {
 	}
 
 	// 8
-	public static void manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber, String patientID,
-			String startDate, String endDate, String responsibleDoctor) {
+	public static void manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber) {
 		// to be done: check success or not and report
 		try {
 
@@ -2146,41 +2140,201 @@ public class WolfHospital {
 	//fhy
 	public static void userTreatmentAdd(){
 		//manageTreatmentRecordAdd(String recordID, String pres, String diag)
+		//addMedicalRecord(String recordID, String patientID, String startDate, String endDate, String resDoc)
+		try {
+			String recordID, pres, diag, patientID, startDate, endDate, resDoc;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			System.out.print("\nEnter prescription\n> ");
+			pres = scanner.nextLine();
+			System.out.print("\nEnter diagnosis\n> ");
+			diag = scanner.nextLine();
+			System.out.print("\nEnter patientID\n> ");
+			patientID = scanner.nextLine();
+			System.out.print("\nEnter startDate\n> ");
+			startDate = scanner.nextLine();
+			System.out.print("\nEnter endDate\n> ");
+			endDate = scanner.nextLine();
+			System.out.print("\nEnter responsible doctor\n> ");
+			resDoc = scanner.nextLine();
+			manageTreatmentRecordAdd(recordID, pres, diag);
+			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTreatmentGetAll(){
 		//showAllTreatmentRecords(String patientID)
+		try {
+			String patientID;
+			System.out.print("\nEnter patientID\n> ");
+			patientID = scanner.nextLine();
+			showAllTreatmentRecords(patientID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTreatmentGet(){
 		//showTreatmentRecord(String recordID)
+		try {
+			String recordID;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			showTreatmentRecord(recordID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTreatmentUpdate(){
 		//manageTreatmentUpdate(String recordID, String attributeToChange, String valueToChange)
+		try {
+			String recordID, attributeToChange, valueToChange;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			System.out.print("\nEnter attribute to change\n> ");
+			attributeToChange = scanner.nextLine();
+			System.out.print("\nEnter value to change\n> ");
+			valueToChange = scanner.nextLine();
+			manageTreatmentUpdate(recordID, attributeToChange,valueToChange);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTestAdd(){
-		//manageTestRecordAdd(String recordID, String testType, String testResult, String patientID,
-		//			String startDate, String endDate, String responsibleDoctor)
+		//manageTestRecordAdd(String recordID, String testType, String testResult)
+		//addMedicalRecord(String recordID, String patientID, String startDate, String endDate, String resDoc)
+		try {
+			String recordID,testType, testResult, patientID, startDate, endDate, resDoc;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			System.out.print("\nEnter testType\n> ");
+			testType = scanner.nextLine();
+			System.out.print("\nEnter testResult\n> ");
+			testResult = scanner.nextLine();
+			System.out.print("\nEnter patientID\n> ");
+			patientID = scanner.nextLine();
+			System.out.print("\nEnter startDate\n> ");
+			startDate = scanner.nextLine();
+			System.out.print("\nEnter endDate\n> ");
+			endDate = scanner.nextLine();
+			System.out.print("\nEnter responsible doctor\n> ");
+			resDoc = scanner.nextLine();
+			manageTestRecordAdd(recordID, testType, testResult);
+			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTestGetAll(){
 		//showAllTestRecords(String patientID)
+		try {
+			String patientID;
+			System.out.print("\nEnter patientID\n> ");
+			patientID = scanner.nextLine();
+			showAllTestRecords(patientID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTestGet(){
 		//showTestRecord(String recordID)
+		try {
+			String recordID;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			showTestRecord(recordID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userTestUpdate(){
 		//manageTestUpdate(String recordID, String attributeToChange, String valueToChange)
+		try {
+			String recordID, attributeToChange, valueToChange;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			System.out.print("\nEnter attribute to change\n> ");
+			attributeToChange = scanner.nextLine();
+			System.out.print("\nEnter value to change\n> ");
+			valueToChange = scanner.nextLine();
+			manageTestUpdate(recordID, attributeToChange,valueToChange);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userCheckinAdd(){
-		//manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber, String patientID,
-		//			String startDate, String endDate, String responsibleDoctor)
+		//manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber)
+		//addMedicalRecord(String recordID, String patientID, String startDate, String endDate, String resDoc)
+		try {
+			String recordID,wardNumber, bedNumber, patientID, startDate, endDate, resDoc;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			System.out.print("\nEnter wardNumber\n> ");
+			wardNumber = scanner.nextLine();
+			System.out.print("\nEnter bedNumber\n> ");
+			bedNumber = scanner.nextLine();
+			System.out.print("\nEnter patientID\n> ");
+			patientID = scanner.nextLine();
+			System.out.print("\nEnter startDate\n> ");
+			startDate = scanner.nextLine();
+			System.out.print("\nEnter endDate\n> ");
+			endDate = scanner.nextLine();
+			System.out.print("\nEnter responsible doctor\n> ");
+			resDoc = scanner.nextLine();
+			manageCheckinRecordAdd(recordID, wardNumber, bedNumber);
+			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userCheckinGetAll(){
 		//showAllCheckinRecords(String patientID)
+		try {
+			String patientID;
+			System.out.print("\nEnter patientID\n> ");
+			patientID = scanner.nextLine();
+			showAllCheckinRecords(patientID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userCheckinGet(){
 		//showCheckinRecord(String recordID)
+		try {
+			String recordID;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			showCheckinRecord(recordID);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 	public static void userCheckinUpdate(){
 		//manageCheckinUpdate(String recordID, String attributeToChange, String valueToChange)
+		try {
+			String recordID, attributeToChange, valueToChange;
+			System.out.print("\nEnter recordID\n> ");
+			recordID = scanner.nextLine();
+			System.out.print("\nEnter attribute to change\n> ");
+			attributeToChange = scanner.nextLine();
+			System.out.print("\nEnter value to change\n> ");
+			valueToChange = scanner.nextLine();
+			manageCheckinUpdate(recordID, attributeToChange,valueToChange);
+		}
+		catch (Throwable err) {
+			error_handler(err);
+		}
 	}
 
 
@@ -2751,9 +2905,9 @@ public class WolfHospital {
 			populatePatientsTable();
 			populateWardsTable();
 			populateMedicalRecordsTable();
-			populatTreatmentTable();
-			populatTestTable();
-			populatCheckinTable();
+			populateTreatmentTable();
+			populateTestTable();
+			populateCheckinTable();
 			populateBillingAccountsTable();
 			populateBedsTable();
 			populateAssignedTable();
