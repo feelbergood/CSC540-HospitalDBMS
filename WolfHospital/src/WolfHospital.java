@@ -2997,19 +2997,19 @@ public class WolfHospital {
            
             connectToDatabase();
             generatePreparedStatements();
-            dropAllExistingTables();
-            generateTables();
-			
-			populateStaffTable();
-			populatePatientsTable();
-			populateWardsTable();
-			populateMedicalRecordsTable();
-			populateTreatmentTable();
-			populateTestTable();
-			populateCheckinTable();
-			populateBillingAccountsTable();
-			populateBedsTable();
-			populateAssignedTable();
+//            dropAllExistingTables();
+//            generateTables();
+//			
+//			populateStaffTable();
+//			populatePatientsTable();
+//			populateWardsTable();
+//			populateMedicalRecordsTable();
+//			populateTreatmentTable();
+//			populateTestTable();
+//			populateCheckinTable();
+//			populateBillingAccountsTable();
+//			populateBedsTable();
+//			populateAssignedTable();
             
             // Print available commands
             printCommands(CMD_MAIN);
@@ -3195,14 +3195,6 @@ public class WolfHospital {
 						break;
                     case CMD_REPORTS:
 						// Check user's input (case insensitively)
-						// private static final String CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT = "MEDICAL HISTORY I";
-						// private static final String CMD_MEDICAL_HISTORY_BY_TIME_REPORT = "MEDICAL HISTORY II";
-						// private static final String CMD_WARD_USAGE_STATUS_REPORT = "WARD USAGE STATUS";
-						// private static final String CMD_BED_USAGE_STATUS_REPORT = "BED USAGE STATUS";
-						// private static final String CMD_NUMBER_PATIENTS_REPORT = "NUMBER OF PATIENTS";
-						// private static final String CMD_WARD_USAGE_PERCENT_REPORT = "WARD USAGE PERCENTAGE";
-						// private static final String CMD_DOCTOR_RESPONS_REPORT = "DOCTOR REPONSIBLITIES";
-						// private static final String CMD_STAFF_INFO_REPORT = "STAFF INFORMATION";
                         switch (command.toUpperCase()) {
                             case CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT:
                                 userReportHistoryByPatient();
