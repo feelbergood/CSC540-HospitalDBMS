@@ -2997,8 +2997,8 @@ public class WolfHospital {
            
             connectToDatabase();
             generatePreparedStatements();
-            dropAllExistingTables();
-            generateTables();
+    //        dropAllExistingTables();
+     //       generateTables();
 			
 			populateStaffTable();
 			populatePatientsTable();
@@ -3033,18 +3033,18 @@ public class WolfHospital {
                                  break;
                             //GG
                            	case CMD_BILLING_ACCOUNTS: 
-                             	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
+                             	printCommands(CMD_BILLING_ACCOUNTS);
                              	currentMenu = CMD_BILLING_ACCOUNTS;
                              	break;
                             case CMD_INFORMATION_PROCESSING:
                                 // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_INFORMATION_PROCESSING);
+                                printCommands(CMD_INFORMATION_PROCESSING);
                                 // Remember what menu we're in
                                 currentMenu = CMD_INFORMATION_PROCESSING;
                                 break;
                             case CMD_REPORTS:
                                 // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_REPORTS);
+                                printCommands(CMD_REPORTS);
                                 // Remember what menu we're in
                                 currentMenu = CMD_REPORTS;
                                 break;                                
@@ -3107,6 +3107,7 @@ public class WolfHospital {
                                 printCommands(CMD_MEDICAL_RECORDS);
                                 break;     
                         }
+                        break;
                     case CMD_BILLING_ACCOUNTS:
                     //GG
                     	switch (command.toUpperCase()){
@@ -3130,6 +3131,7 @@ public class WolfHospital {
                           	printCommands(CMD_BILLING_ACCOUNTS);
                           	break;
                       }
+                    	break;
                     case CMD_INFORMATION_PROCESSING:
                         switch (command.toUpperCase()) {
                             case CMD_STAFF_ADD:
