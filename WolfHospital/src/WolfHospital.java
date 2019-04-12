@@ -1379,8 +1379,8 @@ public class WolfHospital {
 		boolean success = false;
 
 		try {
-			prep_getAllTreatmentRecords.setString(1, patientID);
-			result = prep_getAllTreatmentRecords.executeQuery();
+			prepGetAllTreatmentRecords.setString(1, patientID);
+			result = prepGetAllTreatmentRecords.executeQuery();
 			result.beforeFirst();
 			System.out.println("\nshowAllTreatmentRecords\n");
 			while (result.next()) {
