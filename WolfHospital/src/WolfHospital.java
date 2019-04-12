@@ -1017,8 +1017,8 @@ public class WolfHospital {
 			String address = rs.getString("address");
 			System.out.println("Patient ID: " + patientID + ", SSN: " + SSN + ", name: " + name + ", date of birth: " + DOB +
 					", gender: " + gender + ", age: " + age + ", phone number: " + phone + ", address: " + address + ", processing treatment plan: " +
-					processing + ", in ward: " + inWard + ", completing treatment: " + completing);
-					+ phone + "\t" + address + "\t" + status);
+					processing + ", in ward: " + inWard + ", completing treatment: " + completing +
+					phone + "\t" + address + "\t");
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1687,9 +1687,10 @@ public class WolfHospital {
 		try {
 			result = prep_reportCurrentWardUsageStatus.executeQuery();
 			if (result.next()) {
-				success = true;
+				
 				result.beforeFirst();
 			}
+			success = true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -1766,10 +1767,19 @@ public class WolfHospital {
 		boolean success = false;
 		try {
 			result = prep_reportStaffInformation.executeQuery();
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
+			result.beforeFirst();
+			while (result.next()) {
+				System.out.print("staff ID :" + result.getString("staffID") + " ");
+				System.out.print("name :" + result.getString("name") + " ");
+				System.out.print("age :" + result.getInt("age") + " ");
+				System.out.print("gender :" + result.getString("gender") + " ");
+				System.out.print("job title :" + result.getString("jobTitle") + " ");
+				System.out.print("professional title:" + result.getString("profTitle") + " ");
+				System.out.print("department :" + result.getString("department"));
+				System.out.print("phone :" + result.getString("phone"));
+				System.out.print("address:" + result.getString("address"));
 			}
+			success = true;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -2906,49 +2916,49 @@ public class WolfHospital {
             printCommands(CMD_MAIN);
 
             // Watch for user input
-            // currentMenu = CMD_MAIN;
-            // scanner = new Scanner(System.in);
-            // while (quit == false) {
-            //     System.out.print("user -> ");
-            //     command = scanner.nextLine();
-            //     switch (currentMenu) {
-            //         case CMD_MAIN:
-            //             // Check user's input (case insensitively)
-            //             switch (command.toUpperCase()) {
-            //                 //fhy
-            //                 case CMD_MEDICAL_RECORDS:
-            //                     // Tell the user their options in this new menu
-            //                     printCommands(CMD_MEDICAL_RECORDS);
-            //                     // Remember what menu we're in
-            //                     currentMenu = CMD_MEDICAL_RECORDS;
-            //                     break;
-            //               	case CMD_BILLING_ACCOUNTS:
-            //                 //GG
-            //                 	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
-            //                 	currentMenu = CMD_BILLING_ACCOUNTS;
-            //                 	break;
-            //                 case CMD_PATIENTS:
-            //                     // Tell the user their options in this new menu
-            //                     startup_printAvailableCommands(CMD_PATIENTS);
-            //                     // Remember what menu we're in
-            //                     currentMenu = CMD_PATIENTS;
-            //                     break;
-            //                 case CMD_ADMIN:
-            //                     // Tell the user their options in this new menu
-            //                     startup_printAvailableCommands(CMD_MANAGE);
-            //                     // Remember what menu we're in
-            //                     currentMenu = CMD_MANAGE;
-            //                     break;                                
-            //                 case CMD_QUIT:
-            //                     quit = true;
-            //                     break;
-            //                 default:
-            //                     // Remind the user about what commands are available
-            //                     System.out.println("\nCommand not recognized");
-            //                     startup_printAvailableCommands(CMD_MAIN);
-            //                     break;
-            //             }
-            //             break;
+            currentMenu = CMD_MAIN;
+            scanner = new Scanner(System.in);
+            while (quit == false) {
+            	System.out.print("user -> ");
+                command = scanner.nextLine();
+                switch (currentMenu) {
+                    case CMD_MAIN:
+                         // Check user's input (case insensitively)
+                         switch (command.toUpperCase()) {
+                             //fhy
+                             case CMD_MEDICAL_RECORDS:
+                                 // Tell the user their options in this new menu
+                                 printCommands(CMD_MEDICAL_RECORDS);
+                                 // Remember what menu we're in
+                                 currentMenu = CMD_MEDICAL_RECORDS;
+                                 break;
+                            //GG
+                           	case CMD_BILLING_ACCOUNTS: 
+                             	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
+                             	currentMenu = CMD_BILLING_ACCOUNTS;
+                             	break;
+                            case CMD_INFORMATION_PROCESSING:
+                                // Tell the user their options in this new menu
+                                startup_printAvailableCommands(CMD_INFORMATION_PROCESSING);
+                                // Remember what menu we're in
+                                currentMenu = CMD_INFORMATION_PROCESSING;
+                                break;
+                            case CMD_REPORTS:
+                                // Tell the user their options in this new menu
+                                startup_printAvailableCommands(CMD_REPORTS);
+                                // Remember what menu we're in
+                                currentMenu = CMD_REPORTS;
+                                break;                                
+                            case CMD_QUIT:
+                                quit = true;
+                                break;
+                            default:
+                                // Remind the user about what commands are available
+                                System.out.println("\nCommand not recognized");
+                                startup_printAvailableCommands(CMD_MAIN);
+                                break;
+                        }
+                        break;
       
                     //fhy
                     case CMD_MEDICAL_RECORDS:
@@ -3001,7 +3011,7 @@ public class WolfHospital {
                     case CMD_BILLING_ACCOUNTS:
                     //GG
                     	switch (command.toUpperCase()){
-                          case CMD_BILLING_ACCT_ADD：
+                          case CMD_BILLING_ACCT_ADD:
                           	userBillingAcctAdd();
                           	break;
                         	case CMD_BILLING_ACCT_GET:
@@ -3085,55 +3095,39 @@ public class WolfHospital {
                         }
 												break;
                     case CMD_REPORTS:
-                        // Check user's input (case insensitively)
+						// Check user's input (case insensitively)
+						// private static final String CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT = "MEDICAL HISTORY I";
+						// private static final String CMD_MEDICAL_HISTORY_BY_TIME_REPORT = "MEDICAL HISTORY II";
+						// private static final String CMD_WARD_USAGE_STATUS_REPORT = "WARD USAGE STATUS";
+						// private static final String CMD_BED_USAGE_STATUS_REPORT = "BED USAGE STATUS";
+						// private static final String CMD_NUMBER_PATIENTS_REPORT = "NUMBER OF PATIENTS";
+						// private static final String CMD_WARD_USAGE_PERCENT_REPORT = "WARD USAGE PERCENTAGE";
+						// private static final String CMD_DOCTOR_RESPONS_REPORT = "DOCTOR REPONSIBLITIES";
+						// private static final String CMD_STAFF_INFO_REPORT = "STAFF INFORMATION";
                         switch (command.toUpperCase()) {
-                            case CMD_REPORT_REVENUE:
-                                user_reportHotelRevenue();
+                            case CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT:
+                                userReportHistoryByPatient();
                             break;
-                            case CMD_REPORT_HOTELS:
-                                user_reportEntireTable("Hotels");
+                            case CMD_MEDICAL_HISTORY_BY_TIME_REPORT:
+								userReportHistoryByTime();
                                 break;
-                            case CMD_REPORT_ROOMS:
-                                user_reportEntireTable("Rooms");
+                            case CMD_WARD_USAGE_STATUS_REPORT:
+                                userReportWardUsageStatus();
                                 break;
-                            case CMD_REPORT_STAFF:
-                                user_reportEntireTable("Staff");
+                            case CMD_BED_USAGE_STATUS_REPORT:
+                                userReportBedUsageStatus();
                                 break;
-                            case CMD_REPORT_CUSTOMERS:
-                                user_reportEntireTable("Customers");
+                            case CMD_NUMBER_PATIENTS_REPORT:
+                                userReportNumberOfPatients();
                                 break;
-                            case CMD_REPORT_STAYS:
-                                user_reportEntireTable("Stays");
+                            case CMD_WARD_USAGE_PERCENT_REPORT:
+                                userReportWardUsagePercentage();
                                 break;
-                            case CMD_REPORT_SERVICES:
-                                user_reportEntireTable("ServiceTypes");
+                            case CMD_DOCTOR_RESPONS_REPORT:
+                                userReportDoctorResponse();
                                 break;
-                            case CMD_REPORT_PROVIDED:
-                                user_reportEntireTable("Provided");
-                                break;                           
-                            case CMD_REPORT_OCCUPANCY_BY_HOTEL:
-                                user_reportOccupancyByHotel();
-                                break;
-                            case CMD_REPORT_OCCUPANCY_BY_ROOM_TYPE:
-                                user_reportOccupancyByRoomType();
-                                break;
-                            case CMD_REPORT_OCCUPANCY_BY_DATE_RANGE:
-                                user_reportOccupancyByDateRange();
-                                break;
-                            case CMD_REPORT_OCCUPANCY_BY_CITY:
-                                user_reportOccupancyByCity();
-                                break;
-                            case CMD_REPORT_TOTAL_OCCUPANCY:
-                                user_reportTotalOccupancy();
-                                break;
-                            case CMD_REPORT_PERCENTAGE_OF_ROOMS_OCCUPIED:
-                                user_reportPercentageOfRoomsOccupied();
-                                break;
-                            case CMD_REPORT_STAFF_GROUPED_BY_ROLE:
-                                user_reportStaffGroupedByRole();
-                                break;
-                            case CMD_REPORT_STAFF_SERVING_DURING_STAY:
-                                user_reportStaffServingDuringStay();
+                            case CMD_STAFF_INFO_REPORT:
+                                userReportStaffInfo();
                                 break;
                             case CMD_MAIN:
                                 // Tell the user their options in this new menu
@@ -3151,64 +3145,6 @@ public class WolfHospital {
                                 break;
                         }
                         break;
-                    case CMD_MANAGE:
-                        // Check user's input (case insensitively)
-                        switch (command.toUpperCase()) {
-                        case CMD_MANAGE_HOTEL_ADD:
-                            user_manageHotelAdd();
-                            break;
-                        case CMD_MANAGE_HOTEL_UPDATE:
-                            user_manageHotelUpdate();
-                            break;
-                        case CMD_MANAGE_HOTEL_DELETE:
-                            user_manageHotelDelete();
-                            break;
-                        case CMD_MANAGE_STAFF_ADD:
-                            user_manageStaffAdd();
-                            break;
-                        case CMD_MANAGE_STAFF_UPDATE:
-                            user_manageStaffUpdate();
-                            break;
-                        case CMD_MANAGE_STAFF_DELETE:
-                            user_manageStaffDelete();
-                            break;
-                        case CMD_MANAGE_ROOM_ADD:
-                            user_manageRoomAdd();
-                            break;
-                        case CMD_MANAGE_ROOM_UPDATE:
-                            user_manageRoomUpdate();
-                            break;
-                        case CMD_MANAGE_ROOM_DELETE:
-                            user_manageRoomDelete();
-                            break;
-                        case CMD_MANAGE_CUSTOMER_ADD:
-                            user_manageCustomerAdd();
-                            break;
-                        case CMD_MANAGE_CUSTOMER_UPDATE:
-                            user_manageCustomerUpdate();
-                            break;
-                        case CMD_MANAGE_CUSTOMER_DELETE:
-                            user_manageCustomerDelete();
-                            break;
-                        case CMD_MANAGE_SERVICE_COST_UPDATE:
-                            user_manageUpdateServiceCost();
-                            break;
-                        case CMD_MAIN:
-                            // Tell the user their options in this new menu
-                            startup_printAvailableCommands(CMD_MAIN);
-                            // Remember what menu we're in
-                            currentMenu = CMD_MAIN;
-                            break;
-                        case CMD_QUIT:
-                            quit = true;
-                            break;
-                        default:
-                            // Remind the user about what commands are available
-                            System.out.println("\nCommand not recognized");
-                            startup_printAvailableCommands(CMD_MANAGE);
-                            break;
-                        }
-                        break;
                     default:
                         break;
                 }
@@ -3220,6 +3156,41 @@ public class WolfHospital {
         catch (Throwable err) {
             error_handler(err);
         }
+	}
+
+	private static void userReportStaffInfo() {
+		try {
+			System.out.println("\nReport staff information grouped by role");
+
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+	}
+
+	private static void userReportDoctorResponse() {
+	}
+
+	private static void userReportWardUsagePercentage() {
+	}
+
+	private static void userReportNumberOfPatients() {
+	}
+
+	private static void userReportBedUsageStatus() {
+	}
+
+	private static void userReportWardUsageStatus() {
+	}
+
+	private static void userReportHistoryByTime() {
+	}
+
+	private static void userReportHistoryByPatient() {
+	}
+
+	private static void startup_printAvailableCommands(String cmdBillingAccounts) {
+		// TODO Auto-generated method stub
+		
 	}
 
 	public static void error_handler(Throwable error) {
