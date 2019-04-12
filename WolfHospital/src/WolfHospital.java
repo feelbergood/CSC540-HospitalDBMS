@@ -1371,13 +1371,19 @@ public class WolfHospital {
 		try {
 			prep_getAllTreatmentRecords.setString(1, patientID);
 			result = prep_getAllTreatmentRecords.executeQuery();
-
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
-			}
-
+			result.beforeFirst();
 			System.out.println("\nshowAllTreatmentRecords\n");
+			while (result.next()) {
+				System.out.println("\t record ID"+result.getString("recordID")+" ");
+				System.out.println("patient ID"+result.getString("patientID")+" ");
+				System.out.println("start date"+result.getString("startDate")+" ");
+				System.out.println("end date"+result.getString("endDate")+" ");
+				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
+				System.out.println("prescription"+result.getString("prescription")+" ");
+				System.out.println("diagnosis details"+result.getString("diagnosisDetails")+" ");
+			}
+			success = true;
+
 			// support_printQueryResultSet(result);
 
 		} catch (Throwable err) {
@@ -1395,12 +1401,19 @@ public class WolfHospital {
 			prep_getTreatmentRecord.setString(1, recordID);
 			result = prep_getTreatmentRecord.executeQuery();
 
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
-			}
-
+			result.beforeFirst();
 			System.out.println("\nshowTreatmentRecord\n");
+			if (result.next()) {
+				System.out.println("\t record ID"+result.getString("recordID")+" ");
+				System.out.println("patient ID"+result.getString("patientID")+" ");
+				System.out.println("start date"+result.getString("startDate")+" ");
+				System.out.println("end date"+result.getString("endDate")+" ");
+				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
+				System.out.println("prescription"+result.getString("prescription")+" ");
+				System.out.println("diagnosis details"+result.getString("diagnosisDetails")+" ");
+			}
+			success = true;
+
 			// support_printQueryResultSet(result);
 
 		} catch (Throwable err) {
@@ -1506,12 +1519,19 @@ public class WolfHospital {
 			prep_getAllTestRecords.setString(1, patientID);
 			result = prep_getAllTestRecords.executeQuery();
 
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
-			}
-
+			result.beforeFirst();
 			System.out.println("\nshowAllTestRecords\n");
+			while (result.next()) {
+				System.out.println("\t record ID"+result.getString("recordID")+" ");
+				System.out.println("patient ID"+result.getString("patientID")+" ");
+				System.out.println("start date"+result.getString("startDate")+" ");
+				System.out.println("end date"+result.getString("endDate")+" ");
+				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
+				System.out.println("test type"+result.getString("testType")+" ");
+				System.out.println("test result"+result.getString("testResult")+" ");
+			}
+			success = true;
+
 			// support_printQueryResultSet(result);
 
 		} catch (Throwable err) {
@@ -1529,12 +1549,18 @@ public class WolfHospital {
 			prep_getTestRecord.setString(1, recordID);
 			result = prep_getTestRecord.executeQuery();
 
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
-			}
-
+			result.beforeFirst();
 			System.out.println("\nshowTestRecord\n");
+			if (result.next()) {
+				System.out.println("\t record ID"+result.getString("recordID")+" ");
+				System.out.println("patient ID"+result.getString("patientID")+" ");
+				System.out.println("start date"+result.getString("startDate")+" ");
+				System.out.println("end date"+result.getString("endDate")+" ");
+				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
+				System.out.println("test type"+result.getString("testType")+" ");
+				System.out.println("test result"+result.getString("testResult")+" ");
+			}
+			success = true;
 			// support_printQueryResultSet(result);
 
 		} catch (Throwable err) {
@@ -1612,12 +1638,18 @@ public class WolfHospital {
 			prep_getAllCheckinRecords.setString(1, patientID);
 			result = prep_getAllCheckinRecords.executeQuery();
 
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
-			}
-
+			result.beforeFirst();
 			System.out.println("\nshowAllCheckinRecords\n");
+			while (result.next()) {
+				System.out.println("\t record ID"+result.getString("recordID")+" ");
+				System.out.println("patient ID"+result.getString("patientID")+" ");
+				System.out.println("start date"+result.getString("startDate")+" ");
+				System.out.println("end date"+result.getString("endDate")+" ");
+				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
+				System.out.println("ward number"+result.getString("wardNumber")+" ");
+				System.out.println("bed number"+result.getString("bedNumber")+" ");
+			}
+			success = true;
 			// support_printQueryResultSet(result);
 
 		} catch (Throwable err) {
@@ -1635,12 +1667,18 @@ public class WolfHospital {
 			prep_getCheckinRecord.setString(1, recordID);
 			result = prep_getCheckinRecord.executeQuery();
 
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
-			}
-
+			result.beforeFirst();
 			System.out.println("\nshowCheckinRecord\n");
+			if (result.next()) {
+				System.out.println("\t record ID"+result.getString("recordID")+" ");
+				System.out.println("patient ID"+result.getString("patientID")+" ");
+				System.out.println("start date"+result.getString("startDate")+" ");
+				System.out.println("end date"+result.getString("endDate")+" ");
+				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
+				System.out.println("ward number"+result.getString("wardNumber")+" ");
+				System.out.println("bed number"+result.getString("bedNumber")+" ");
+			}
+			success = true;
 			// support_printQueryResultSet(result);
 
 		} catch (Throwable err) {
