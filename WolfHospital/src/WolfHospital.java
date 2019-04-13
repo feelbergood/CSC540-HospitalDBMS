@@ -604,28 +604,27 @@ public class WolfHospital {
 					+ "`medicationPrescribed`, `accommandationFee`) " + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 			prepAddBillingAccount = connection.prepareStatement(sql);
 
-			sql = "INSERT INTO `PayerInfo` (`SSN`, `billingAddress`) " + "VALUES (?, ?);";
+			sql = "INSERT IGNORE INTO `PayerInfo` (`SSN`, `billingAddress`) " + "VALUES (?, ?);";
 			prepAddPayerInfo = connection.prepareStatement(sql);
 			
 			// Get billing account
 			sql = "SELECT b.accountID, b.patientID, b.visitDate, "
-					+ "b.payerSSN, b.paymentMethod, b.cardNumber, b.registrationFee "
+					+ "b.payerSSN, b.paymentMethod, b.cardNumber, b.registrationFee, "
 					+ "b.medicationPrescribed, b.accommandationFee, p.billingAddress "
-					+ "FROM `Billing Accounts` b JOIN `PayerInfo` p " + "ON m.payerSSN=b.SSN "
+					+ "FROM `Billing Accounts` b JOIN `PayerInfo` p " + "ON b.payerSSN=p.SSN "
 					+ "WHERE `accountID` = ?;";
 			prepGetBillingAccount = connection.prepareStatement(sql);
 
 			// Update billing account
-			sql = "UPDATE `PayerInfo` " + "SET `billingAddress` = ? " + "WHERE payerSSN IN ( " + "SELECT b.SSN "
-					+ "FROM `Billing Accounts` b JOIN `PayerInfo` p " + "ON m.payerSSN=b.SSN "
-					+ "WHERE accountID = ?);";
+			sql = "UPDATE `PayerInfo` SET `billingAddress` = ? WHERE SSN IN ( " +
+					"SELECT `payerSSN` FROM `Billing Accounts` WHERE accountID =?);";
 			prepUpdateBillingAccountAddress = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Billing Accounts` " + "SET `paymentMethod` = ? " + "WHERE accountID = ?;";
 			prepUpdateBillingAccountPaymentType = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Billing Accounts` " + "SET `cardNumber` = ? " + "WHERE accountID = ? "
-					+ "AND paymentMethod = `Credit Card`;";
+					+ "AND paymentMethod = 'Credit Card';";
 			prepUpdateBillingAccountCardNumber = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Billing Accounts` " + "SET `registrationFee` = ? " + "WHERE accountID = ?;";
@@ -1933,12 +1932,22 @@ public class WolfHospital {
 		try {
 			prepGetBillingAccount.setString(1, accountID);
 			result = prepGetBillingAccount.executeQuery();
+			result.beforeFirst();
 			// Process resultSet
-			if (result.next()) {
-				success = true;
-				result.beforeFirst();
+			while (result.next()) {
+				System.out.print("Account ID :" + result.getString("accountID") + " | ");
+				System.out.print("Patient ID :" + result.getString("patientID") + " | ");
+				System.out.print("Visit Date :" + result.getString("visitDate") + " | ");
+				System.out.print("Payer SSN :" + result.getString("payerSSN") + " | ");
+				System.out.print("Payment Method :" + result.getString("paymentMethod") + " | ");
+				System.out.print("Card Number :" + result.getString("cardNumber") + " | ");
+				System.out.print("Registration Fee :" + result.getString("registrationFee") + " | ");
+				System.out.print("Medication Prescribed :" + result.getString("medicationPrescribed") + " | ");
+				System.out.print("Accommandation Fee :" + result.getString("accommandationFee") + " | ");
+				System.out.print("Billing Address :" + result.getString("billingAddress") + " | ");
 			}
-			System.out.println("\nshowBillingAccount\n");
+			success = true;
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -1951,9 +1960,9 @@ public class WolfHospital {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()){
 				case "BILLINGADDRESS":
-					prepUpdateCheckinEndDate.setString(1, valueToChange);
-					prepUpdateCheckinEndDate.setString(2, accountID);
-					prepUpdateTestEndDate.executeUpdate();
+					prepUpdateBillingAccountAddress.setString(1, valueToChange);
+					prepUpdateBillingAccountAddress.setString(2, accountID);
+					prepUpdateBillingAccountAddress.executeUpdate();
 					break;
 				case "PAYMENTTYPE":
 					prepUpdateBillingAccountPaymentType.setString(1, valueToChange);
@@ -1969,18 +1978,22 @@ public class WolfHospital {
 					prepUpdateBillingAccountRegistrationFee.setDouble(1, Double.parseDouble(valueToChange));
 					prepUpdateBillingAccountRegistrationFee.setString(2, accountID);
 					prepUpdateBillingAccountRegistrationFee.executeUpdate();
+					break;
 				case "ACCOMMANDATIONFEE":
 					prepUpdateBillingAccountAccommandationFee.setDouble(1, Double.parseDouble(valueToChange));
 					prepUpdateBillingAccountAccommandationFee.setString(2, accountID);
 					prepUpdateBillingAccountAccommandationFee.executeUpdate();
+					break;
 				case "MEDICATIONPRESCRIBED":
 					prepUpdateBillingAccountMedicationPrescribed.setBoolean(1, Boolean.parseBoolean(valueToChange));
 					prepUpdateBillingAccountMedicationPrescribed.setString(2, accountID);
 					prepUpdateBillingAccountMedicationPrescribed.executeUpdate();
-				case "VISITDATE":
+					break;
+					case "VISITDATE":
 					prepUpdateBillingAccountVisitDate.setDate(1, java.sql.Date.valueOf(valueToChange));
 					prepUpdateBillingAccountVisitDate.setString(2, accountID);
 					prepUpdateBillingAccountVisitDate.executeUpdate();
+					break;
 				default:
 					System.out.println("\nCannot update the '" + attributeToChange);
 					break;
@@ -1988,6 +2001,7 @@ public class WolfHospital {
 		}
 		catch (Throwable err) {
 			// error_handler(err);
+			err.printStackTrace();
 		}
 		
 	}
@@ -2943,7 +2957,7 @@ public class WolfHospital {
 				
 			//Print the billing account information you plan to update
 			System.out.println("\nThe billing account information you have chosen:\n");
-			result.beforeFirst();
+			//result.beforeFirst();
 			showBillingAccount(accountID);
 			
 			//Get attribute to change
@@ -2959,7 +2973,8 @@ public class WolfHospital {
 			
 		}
 		catch (Throwable err) {
-			error_handler(err);
+			//error_handler(err);
+			err.printStackTrace();
 		}
 	}
 	
