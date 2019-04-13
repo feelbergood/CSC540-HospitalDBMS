@@ -639,7 +639,7 @@ public class WolfHospital {
 
 			sql = "SELECT * FROM `Wards` WHERE `ward number` IN (SELECT DISTINCT `ward number` " + "FROM `Beds` "
 					+ "WHERE ISNULL(patientID)); ";
-			prep_checkWardAvailability = connection.prepareStatement(sql);
+			prepCheckWardAvailability = connection.prepareStatement(sql);
 
 			// Assign wards:
 			// sql = "SELECT COUNT(`bed number`) FROM `Beds` WHERE `ward number` = ?; ";
