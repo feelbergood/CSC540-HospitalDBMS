@@ -1,4 +1,3 @@
-import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -137,7 +136,6 @@ public class WolfHospital {
 	private static PreparedStatement prepGetAllTreatmentRecords;
 	private static PreparedStatement prepGetTreatmentRecord;
 
-	// private static PreparedStatement prepUpdateTreatmentRecord;
 	private static PreparedStatement prepUpdateTreatmentEndDate;
 	private static PreparedStatement prepUpdateTreatmentPrescription;
 	private static PreparedStatement prepUpdateTreatmentDiagnosisDetails;
@@ -147,7 +145,6 @@ public class WolfHospital {
 	private static PreparedStatement prepGetAllTestRecords;
 	private static PreparedStatement prepGetTestRecord;
 
-	// private static PreparedStatement prepUpdateTestRecord;
 	private static PreparedStatement prepUpdateTestEndDate;
 	private static PreparedStatement prepUpdateTestTestType;
 	private static PreparedStatement prepUpdateTestTestResult;
@@ -190,9 +187,6 @@ public class WolfHospital {
 	// Basic Information - Wards(partial, the rest should be done by others)
 	private static PreparedStatement prepDeleteWardInfo;
 	private static PreparedStatement prep_checkWardAvailability;
-	// private static PreparedStatement prepAssignWard;
-	// private static PreparedStatement prepReserveWard;
-	// private static PreparedStatement prepReleaseWard;
 
 	// Basic Information - Beds
 	private static PreparedStatement prepAddBedInfo;
@@ -202,10 +196,8 @@ public class WolfHospital {
 	// Management - Beds
 	private static PreparedStatement prepAssignBed;
 	private static PreparedStatement prep_checkBedAvailability;
-	private static PreparedStatement prep_checkBedinWardAvailability;
-	// private static PreparedStatement prepReserveBed;
+	private static PreparedStatement prep_checkBedinWardAvailability;    
 	private static PreparedStatement prepReleaseBed;
-	// private static PreparedStatement prepDeleteBedInfo;
 	private static PreparedStatement prepAddAssigned;
 
 	// Payer Info
@@ -469,21 +461,14 @@ public class WolfHospital {
 			prepAddMedicalRecord = connection.prepareStatement(sql);
 
 			// Get all treatment records
-			// SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID
-			// WHERE patientID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE patientID=?;";
 			prepGetAllTreatmentRecords = connection.prepareStatement(sql);
 
 			// Get treatment record
-			// SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID
-			// WHERE t.recordID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Treatment` t ON m.recordID=t.recordID WHERE t.recordID=?;";
 			prepGetTreatmentRecord = connection.prepareStatement(sql);
 
 			// Update treatment record
-			// UPDATE `Medical Records` SET `endDate` = '2020-01-01' WHERE recordID = 13;
-			// UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle'
-			// WHERE recordID = '13';
 			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID = ? " + "AND EXISTS "
 					+ "(SELECT * FROM `Treatment` " + "WHERE recordID = ?);";
 			prepUpdateTreatmentEndDate = connection.prepareStatement(sql);
@@ -495,31 +480,18 @@ public class WolfHospital {
 			prepUpdateTreatmentDiagnosisDetails = connection.prepareStatement(sql);
 
 			// Create new test record
-			// INSERT INTO `Test` (`recordID`, `testType`, `testResult`)VALUES ('14',
-			// 'testType5', 'testResult5');
-			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-			// `endDate`, `responsibleDoctor`) VALUES ('14', '5', '2019-07-01',
-			// '2019-07-02', '3');
 			sql = "INSERT INTO `Test` (`recordID`, `testType`, `testResult`) " + "VALUES (?, ?, ?); ";
 			prepAddTestRecord = connection.prepareStatement(sql);
 
 			// Get all test records
-			// SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID
-			// WHERE patientID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE patientID=?;";
 			prepGetAllTestRecords = connection.prepareStatement(sql);
 
 			// Get test record
-			// SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID
-			// WHERE t.recordID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Test` t ON m.recordID=t.recordID WHERE t.recordID=?;";
 			prepGetTestRecord = connection.prepareStatement(sql);
 
 			// Update test record
-			// UPDATE `Medical Records` SET `endDate` = '2020-01-01' WHERE recordID=14;
-			// UPDATE `Test` SET `testType` = 'Influenza B Rapid Assay', `testResult` =
-			// 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID =
-			// '14';
 			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID= ? " + "AND EXISTS "
 					+ "(SELECT * FROM `Test` " + "WHERE recordID = ?);";
 			prepUpdateTestEndDate = connection.prepareStatement(sql);
@@ -531,23 +503,14 @@ public class WolfHospital {
 			prepUpdateTestTestResult = connection.prepareStatement(sql);
 
 			// Create check-in record
-			// INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`)VALUES ('15',
-			// NULL, NULL);
-			// INSERT INTO `Medical Records` (`recordID`, `patientID`, `startDate`,
-			// `endDate`, `responsibleDoctor` ) VALUES ('15', '5', '2019-07-01',
-			// '2019-07-07', '4');
 			sql = "INSERT INTO `Check-ins` (`recordID`, `wardNumber`, `bedNumber`) " + "VALUES (?, ?, ?); ";
 			prepAddCheckinRecord = connection.prepareStatement(sql);
 
 			// Get all check-in records
-			// SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID
-			// WHERE patientID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE patientID=?;";
 			prepGetAllCheckinRecords = connection.prepareStatement(sql);
 
 			// Get check-in record
-			// SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID
-			// WHERE c.recordID=1;
 			sql = "SELECT * FROM `Medical Records` m JOIN `Check-ins` c ON m.recordID=c.recordID WHERE c.recordID=?;";
 			prepGetCheckinRecord = connection.prepareStatement(sql);
 
@@ -1331,9 +1294,7 @@ public class WolfHospital {
 		}
 	}
 
-	// fhy support_printQueryResultSet, error_handler not yet implemented
-	// 1
-	public static boolean showAllTreatmentRecords(String patientID) {
+	public static boolean showAllTreatmentRecords(String patientID){
 		boolean success = false;
 
 		try {
@@ -1352,9 +1313,6 @@ public class WolfHospital {
 
 			}
 			success = true;
-
-			// support_printQueryResultSet(result);
-
 		} catch (Throwable err) {
 			error_handler(err);
 		}
@@ -1362,7 +1320,6 @@ public class WolfHospital {
 		return success;
 	}
 
-	// 2
 	public static boolean showTreatmentRecord(String recordID) {
 		boolean success = false;
 
@@ -1382,9 +1339,6 @@ public class WolfHospital {
 				System.out.println("diagnosis details: " + result.getString("diagnosisDetails") + " ");
 			}
 			success = true;
-
-			// support_printQueryResultSet(result);
-
 		} catch (Throwable err) {
 			error_handler(err);
 		}
@@ -1392,7 +1346,6 @@ public class WolfHospital {
 		return success;
 	}
 
-	// 3
 	public static void manageTreatmentUpdate(String recordID, String attributeToChange, String valueToChange) {
 		try {
 			connection.setAutoCommit(true);
@@ -1418,7 +1371,6 @@ public class WolfHospital {
 				break;
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
 			err.printStackTrace();
 		}
 	}
@@ -1453,7 +1405,6 @@ public class WolfHospital {
 
 	// 4
 	public static void manageTestRecordAdd(String recordID, String testType, String testResult) {
-		// to be done: check success or not and report
 		try {
 
 			// Start transaction
@@ -1502,9 +1453,6 @@ public class WolfHospital {
 				System.out.println("test result: " + result.getString("testResult") + " ");
 			}
 			success = true;
-
-			// support_printQueryResultSet(result);
-
 		} catch (Throwable err) {
 			// error_handler(err);
 		}
@@ -1532,8 +1480,6 @@ public class WolfHospital {
 				System.out.println("test result: " + result.getString("testResult") + " ");
 			}
 			success = true;
-			// support_printQueryResultSet(result);
-
 		} catch (Throwable err) {
 			// error_handler(err);
 		}
@@ -1573,7 +1519,6 @@ public class WolfHospital {
 
 	// 8
 	public static void manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber) {
-		// to be done: check success or not and report
 		try {
 
 			// Start transaction
@@ -1621,8 +1566,6 @@ public class WolfHospital {
 				System.out.println("bed number: " + result.getString("bedNumber") + " ");
 			}
 			success = true;
-			// support_printQueryResultSet(result);
-
 		} catch (Throwable err) {
 			// error_handler(err);
 		}
@@ -1650,8 +1593,6 @@ public class WolfHospital {
 				System.out.println("bed number: " + result.getString("bedNumber") + " ");
 			}
 			success = true;
-			// support_printQueryResultSet(result);
-
 		} catch (Throwable err) {
 			// error_handler(err);
 		}
@@ -2229,11 +2170,8 @@ public class WolfHospital {
 		}
 	}
 
-	// fhy
-	public static void userTreatmentAdd() {
-		// manageTreatmentRecordAdd(String recordID, String pres, String diag)
-		// addMedicalRecord(String recordID, String patientID, String startDate, String
-		// endDate, String resDoc)
+	//fhy
+	public static void userTreatmentAdd(){
 		try {
 			String recordID, pres, diag, patientID, startDate, endDate, resDoc;
 			System.out.print("\nEnter recordID\n> ");
@@ -2256,9 +2194,8 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
-
-	public static void userTreatmentGetAll() {
-		// showAllTreatmentRecords(String patientID)
+  
+  public static void userTreatmentGetAll(){
 		try {
 			String patientID;
 			System.out.print("\nEnter patientID\n> ");
@@ -2268,9 +2205,8 @@ public class WolfHospital {
 			error_handler(err);
 		}
 	}
-
-	public static void userTreatmentGet() {
-		// showTreatmentRecord(String recordID)
+  
+	public static void userTreatmentGet(){
 		try {
 			String recordID;
 			System.out.print("\nEnter recordID\n> ");
@@ -2281,9 +2217,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userTreatmentUpdate() {
-		// manageTreatmentUpdate(String recordID, String attributeToChange, String
-		// valueToChange)
+  public static void userTreatmentUpdate(){
 		try {
 			String recordID, attributeToChange, valueToChange;
 			System.out.print("\nEnter recordID\n> ");
@@ -2298,10 +2232,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userTestAdd() {
-		// manageTestRecordAdd(String recordID, String testType, String testResult)
-		// addMedicalRecord(String recordID, String patientID, String startDate, String
-		// endDate, String resDoc)
+  public static void userTestAdd(){
 		try {
 			String recordID, testType, testResult, patientID, startDate, endDate, resDoc;
 			System.out.print("\nEnter recordID\n> ");
@@ -2325,8 +2256,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userTestGetAll() {
-		// showAllTestRecords(String patientID)
+  public static void userTestGetAll(){
 		try {
 			String patientID;
 			System.out.print("\nEnter patientID\n> ");
@@ -2337,8 +2267,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userTestGet() {
-		// showTestRecord(String recordID)
+  public static void userTestGet(){
 		try {
 			String recordID;
 			System.out.print("\nEnter recordID\n> ");
@@ -2349,9 +2278,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userTestUpdate() {
-		// manageTestUpdate(String recordID, String attributeToChange, String
-		// valueToChange)
+  public static void userTestUpdate(){
 		try {
 			String recordID, attributeToChange, valueToChange;
 			System.out.print("\nEnter recordID\n> ");
@@ -2366,10 +2293,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userCheckinAdd() {
-		// manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber)
-		// addMedicalRecord(String recordID, String patientID, String startDate, String
-		// endDate, String resDoc)
+  public static void userCheckinAdd(){
 		try {
 			String recordID, wardNumber, bedNumber, patientID, startDate, endDate, resDoc;
 			System.out.print("\nEnter recordID\n> ");
@@ -2393,8 +2317,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userCheckinGetAll() {
-		// showAllCheckinRecords(String patientID)
+  public static void userCheckinGetAll(){
 		try {
 			String patientID;
 			System.out.print("\nEnter patientID\n> ");
@@ -2405,8 +2328,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userCheckinGet() {
-		// showCheckinRecord(String recordID)
+  public static void userCheckinGet(){
 		try {
 			String recordID;
 			System.out.print("\nEnter recordID\n> ");
@@ -2417,9 +2339,7 @@ public class WolfHospital {
 		}
 	}
 
-	public static void userCheckinUpdate() {
-		// manageCheckinUpdate(String recordID, String attributeToChange, String
-		// valueToChange)
+  public static void userCheckinUpdate(){
 		try {
 			String recordID, attributeToChange, valueToChange;
 			System.out.print("\nEnter recordID\n> ");
