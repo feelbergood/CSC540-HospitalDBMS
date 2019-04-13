@@ -463,14 +463,14 @@ public class WolfHospital {
 					+ " VALUES (?, ?, ?, ?);";
 			prepAddWards = connection.prepareStatement(sql);
 			// Retrieve basic information about wards
-			sql = "SELECT * FROM `Wards`" + " WHERE ward number = ?;";
+			sql = "SELECT * FROM `Wards` WHERE `ward number` = ?;";
 			prepGetWards = connection.prepareStatement(sql);
 			// Update basic information about wards
-			sql = "UPDATE `Wards`" + " SET `capacity` = ?" + " WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `capacity` = ?" + " WHERE `ward number` = ?;";
 			prepUpdateWardsCapacity = connection.prepareStatement(sql);
-			sql = "UPDATE `Wards`" + " SET `charges per day` = ?" + " WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `charges per day` = ?" + " WHERE `ward number` = ?;";
 			prepUpdateWardsCharge = connection.prepareStatement(sql);
-			sql = "UPDATE `Wards`" + " SET `responsible nurse` = ?" + " WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `responsible nurse` = ?" + " WHERE `ward number` = ?;";
 			prepUpdateWardsNurse = connection.prepareStatement(sql);
 			// fhy
 			
