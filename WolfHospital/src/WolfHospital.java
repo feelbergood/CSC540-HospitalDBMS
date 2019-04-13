@@ -284,7 +284,9 @@ public class WolfHospital {
 			System.out.println("\t-- - retrieve a check-in record");
 			System.out.println("12 - " + CMD_CHECKIN_UPDATE);
 			System.out.println("\t-- - update check-in record");
-			System.out.println("13 - " + CMD_QUIT);
+			System.out.println("13 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("14 - " + CMD_QUIT);
 			System.out.println("\t-- exit the program");
 			break;
 		case CMD_BILLING_ACCOUNTS:
@@ -297,6 +299,10 @@ public class WolfHospital {
 			System.out.println("\t-- update billing account");
 			System.out.println("4 - " + CMD_BILLING_ACCT_DELETE);
 			System.out.println("\t-- delete billing account");
+			System.out.println("5 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("6 - " + CMD_QUIT);
+			System.out.println("\t-- exit the program");
 			break;
 		case CMD_INFORMATION_PROCESSING:
 			System.out.println("1 - " + CMD_STAFF_ADD);
@@ -333,7 +339,9 @@ public class WolfHospital {
 			System.out.println("\t-- release an ward");
 			System.out.println("17 - " + CMD_BED_RELEASE);
 			System.out.println("\t-- release a bed");
-			System.out.println("18 - " + CMD_QUIT);
+			System.out.println("18 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("19 - " + CMD_QUIT);
 			System.out.println("\t-- exit the program");
 			break;
 		case CMD_REPORTS:
@@ -353,7 +361,9 @@ public class WolfHospital {
 			System.out.println("\t-- report doctors' responsibility");
 			System.out.println("8 - " + CMD_STAFF_INFO_REPORT);
 			System.out.println("\t-- report staff information grouped by role");
-			System.out.println("9 - " + CMD_QUIT);
+			System.out.println("9 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("10 - " + CMD_QUIT);
 			System.out.println("\t-- exit the program");
 		}
 	}
@@ -3033,6 +3043,10 @@ public class WolfHospital {
 						currentMenu = CMD_REPORTS;
 						break;
 					case "5":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "6":
 						quit = true;
 						break;
 					default:
@@ -3083,6 +3097,10 @@ public class WolfHospital {
 						userCheckinUpdate();
 						break;
 					case "13":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "14":
 						quit = true;
 						break;
 					default:
@@ -3095,19 +3113,23 @@ public class WolfHospital {
 				case CMD_BILLING_ACCOUNTS:
 					// GG
 					switch (command.toUpperCase()) {
-					case CMD_BILLING_ACCT_ADD:
+					case "1":
 						userBillingAcctAdd();
 						break;
-					case CMD_BILLING_ACCT_GET:
+					case "2":
 						userBillingAcctGet();
 						break;
-					case CMD_BILLING_ACCT_UPDATE:
+					case "3":
 						userBillingAcctUpdate();
 						break;
-					case CMD_BILLING_ACCT_DELETE:
+					case "4":
 						userBillingAcctDelete();
 						break;
-					case CMD_QUIT:
+					case "5":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "6":
 						quit = true;
 						break;
 					default:
@@ -3118,64 +3140,71 @@ public class WolfHospital {
 					break;
 				case CMD_INFORMATION_PROCESSING:
 					switch (command.toUpperCase()) {
-					case CMD_STAFF_ADD:
+					case "1":
 						userStaffAdd();
 						break;
-					case CMD_STAFF_UPDATE:
+					case "2":
 						userStaffUpdate();
 						break;
-					case CMD_STAFF_DELETE:
+					case "3":
 						userStaffDelete();
 						break;
-					case CMD_PATIENT_ADD:
+					case "4":
 						userPatientAdd();
 						break;
-					case CMD_PATIENT_UPDATE:
+					case "5":
 						userPatientUpdate();
 						break;
-					case CMD_PATIENT_DELETE:
+					case "6":
 						userPatientDelete();
 						break;
-					case CMD_WARD_ADD:
+					case "7":
 						userWardAdd();
 						break;
-					case CMD_WARD_UPDATE:
+					case "8":
 						userWardUpdate();
 						break;
-					case CMD_WARD_DELETE:
+					case "9":
 						userWardDelete();
 						break;
-					case CMD_WARD_CHECK:
+					case "10":
 						userWardCheck();
 						break;
-					case CMD_BED_CHECK:
+					case "11":
 						userBedCheck();
 						break;
 					// Assumption: we assume that when assigning a bed to a patient, a ward is
 					// assigned to
 					// the patient too, so there is no need to have a separate operation of
 					// assigning a ward
-					case CMD_WARD_ASSIGN:
+					case "12":
 						userBedAssign();
 						break;
-					case CMD_BED_ASSIGN:
+					case "13":
 						userBedAssign();
 						break;
-					case CMD_WARD_RESERVE:
+					case "14":
 						userBedAssign();
 						break;
-					case CMD_BED_RESERVE:
+					case "15":
 						userBedAssign();
 						break;
 					// Assumption: we assume that when releasing a bed from a patient, a ward is
 					// released from
 					// the patient too, so there is no need to have a separate operation for
 					// releasing ward.
-					case CMD_WARD_RELEASE:
+					case "16":
 						userBedRelease();
 						break;
-					case CMD_BED_RELEASE:
+					case "17":
 						userBedRelease();
+						break;
+					case "18":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "19":
+						quit = true;
 						break;
 					default:
 						System.out.println("\nCommand not found");
@@ -3186,41 +3215,38 @@ public class WolfHospital {
 				case CMD_REPORTS:
 					// Check user's input (case insensitively)
 					switch (command.toUpperCase()) {
-					case CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT:
+					case "1":
 						userReportHistoryByPatient();
 						break;
-					case CMD_MEDICAL_HISTORY_BY_TIME_REPORT:
+					case "2":
 						userReportHistoryByTime();
 						break;
-					case CMD_WARD_USAGE_STATUS_REPORT:
+					case "3":
 						userReportWardUsageStatus();
 						break;
-					case CMD_BED_USAGE_STATUS_REPORT:
+					case "4":
 						userReportBedUsageStatus();
 						break;
-					case CMD_NUMBER_PATIENTS_REPORT:
+					case "5":
 						userReportNumberOfPatients();
 						break;
-					case CMD_WARD_USAGE_PERCENT_REPORT:
+					case "6":
 						userReportWardUsagePercentage();
 						break;
-					case CMD_DOCTOR_RESPONS_REPORT:
+					case "7":
 						userReportDoctorResponse();
 						break;
-					case CMD_STAFF_INFO_REPORT:
+					case "8":
 						userReportStaffInfo();
 						break;
-					case CMD_MAIN:
-						// Tell the user their options in this new menu
+					case "9":
 						printCommands(CMD_MAIN);
-						// Remember what menu we're in
 						currentMenu = CMD_MAIN;
 						break;
-					case CMD_QUIT:
+					case "10":
 						quit = true;
 						break;
 					default:
-						// Remind the user about what commands are available
 						System.out.println("\nCommand not recognized");
 						printCommands(CMD_REPORTS);
 						break;
