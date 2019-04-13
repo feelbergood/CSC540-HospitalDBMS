@@ -636,9 +636,10 @@ public class WolfHospital {
 			prepDeleteWardInfo = connection.prepareStatement(sql);
 
 			// Check availability of wards
-
-			sql = "SELECT * FROM `Wards` WHERE `ward number` IN (SELECT DISTINCT `ward number` " + "FROM `Beds` "
-					+ "WHERE ISNULL(patientID)); ";
+			sql = "SELECT `ward number`, `bed number`, `patiendID` " +
+					"FROM `Beds` LEFT JOIN `Assigned` ON " +
+					"Beds.`ward number`=Assigned.`ward number` AND "+
+					"Beds.`bed number`=Assigned.`bed number` AND ISNULL(patientID);";
 			prepCheckWardAvailability = connection.prepareStatement(sql);
 
 			// Assign wards:
