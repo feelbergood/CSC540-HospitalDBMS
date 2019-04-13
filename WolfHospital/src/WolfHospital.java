@@ -261,37 +261,44 @@ public class WolfHospital {
         switch (menu) {
           case CMD_MAIN:
               System.out.println(CMD_INFORMATION_PROCESSING);
-              System.out.println(CMD_MEDICAL_RECORDS);
-              System.out.println(CMD_BILLING_ACCOUNTS);
-              System.out.println(CMD_REPORTS);
-              System.out.println(CMD_QUIT);
-              break;
+			  System.out.println("1	- process information");
+			  System.out.println(CMD_MEDICAL_RECORDS);
+			  System.out.println("2	- manage medical records");
+			  System.out.println(CMD_BILLING_ACCOUNTS);
+			  System.out.println("3	- manage billing accounts");
+			  System.out.println(CMD_REPORTS);
+			  System.out.println("4	- generate reports");
+			  System.out.println(CMD_QUIT);
+			  System.out.println("5	- exit the program");
+			  break;
           case CMD_MEDICAL_RECORDS:
               //fhy      
               System.out.println(CMD_TREATMENT_ADD);
-              System.out.println("\t- add a new treatment record");
+              System.out.println("1	- add a new treatment record");
               System.out.println(CMD_TREATMENT_GETALL);
-              System.out.println("\t- retrieve all treatment records");
+              System.out.println("2	- retrieve all treatment records");
               System.out.println(CMD_TREATMENT_GET);
-              System.out.println("\t- retrieve a treatment record");
+              System.out.println("3	- retrieve a treatment record");
               System.out.println(CMD_TREATMENT_UPDATE);
-              System.out.println("\t- update treatment record");
+              System.out.println("4	- update treatment record");
               System.out.println(CMD_TEST_ADD);
-              System.out.println("\t- add a new test record");
+              System.out.println("5	- add a new test record");
               System.out.println(CMD_TEST_GETALL);
-              System.out.println("\t- retrieve all test records");
+              System.out.println("6	- retrieve all test records");
               System.out.println(CMD_TEST_GET);
-              System.out.println("\t- retrieve a test record");
+              System.out.println("7	- retrieve a test record");
               System.out.println(CMD_TEST_UPDATE);
-              System.out.println("\t- update test record");
+              System.out.println("8	- update test record");
               System.out.println(CMD_CHECKIN_ADD);
-              System.out.println("\t- add a check-in record");  
+              System.out.println("9	- add a check-in record");
               System.out.println(CMD_CHECKIN_GETALL);
-              System.out.println("\t- retrieve all check-in records");
+              System.out.println("10	- retrieve all check-in records");
               System.out.println(CMD_CHECKIN_GET);
-              System.out.println("\t- retrieve a check-in record");     
+              System.out.println("11	- retrieve a check-in record");
+			  System.out.println(CMD_CHECKIN_UPDATE);
+			  System.out.println("12	- update check-in record");
               System.out.println(CMD_QUIT);
-              System.out.println("\t- exit the program");
+              System.out.println("13	- exit the program");
               break;
           case CMD_BILLING_ACCOUNTS:
               //GG    
@@ -485,7 +492,7 @@ public class WolfHospital {
 			// UPDATE `Treatment` SET `prescription` = 'Use', `diagnosisDetails` = 'Muscle'
 			// WHERE recordID = '13';
 			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID = ? " + "AND EXISTS "
-					+ "(SELECT * FROM `Treatment` " + "WHERE recordID = ?;)";
+					+ "(SELECT * FROM `Treatment` " + "WHERE recordID = ?);";
 			prepUpdateTreatmentEndDate = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Treatment` " + "SET `prescription` = ? " + "WHERE recordID = ?;";
@@ -521,7 +528,7 @@ public class WolfHospital {
 			// 'Influenza B Antigen value: positive, ref range: negative' WHERE recordID =
 			// '14';
 			sql = "UPDATE `Medical Records` " + "SET `endDate` = ? " + "WHERE recordID= ? " + "AND EXISTS "
-					+ "(SELECT * FROM `Test` " + "WHERE recordID = ?;)";
+					+ "(SELECT * FROM `Test` " + "WHERE recordID = ?);";
 			prepUpdateTestEndDate = connection.prepareStatement(sql);
 
 			sql = "UPDATE `Test` " + "SET `testType` = ? " + "WHERE recordID = ?;";
@@ -1390,13 +1397,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllTreatmentRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID"+result.getString("recordID")+" ");
-				System.out.println("patient ID"+result.getString("patientID")+" ");
-				System.out.println("start date"+result.getString("startDate")+" ");
-				System.out.println("end date"+result.getString("endDate")+" ");
-				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
-				System.out.println("prescription"+result.getString("prescription")+" ");
-				System.out.println("diagnosis details"+result.getString("diagnosisDetails")+" ");
+				System.out.println("\t record ID: "+result.getString("recordID")+" ");
+				System.out.println("patient ID: "+result.getString("patientID")+" ");
+				System.out.println("start date: "+result.getString("startDate")+" ");
+				System.out.println("end date: "+result.getString("endDate")+" ");
+				System.out.println("responsible doctor: "+result.getString("responsibleDoctor")+" ");
+				System.out.println("prescription: "+result.getString("prescription")+" ");
+				System.out.println("diagnosis details: "+result.getString("diagnosisDetails")+" ");
 
 			}
 			success = true;
@@ -1420,14 +1427,14 @@ public class WolfHospital {
 
 			result.beforeFirst();
 			System.out.println("\nshowTreatmentRecord\n");
-			if (result.next()) {
-				System.out.println("\t record ID"+result.getString("recordID")+" ");
-				System.out.println("patient ID"+result.getString("patientID")+" ");
-				System.out.println("start date"+result.getString("startDate")+" ");
-				System.out.println("end date"+result.getString("endDate")+" ");
-				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
-				System.out.println("prescription"+result.getString("prescription")+" ");
-				System.out.println("diagnosis details"+result.getString("diagnosisDetails")+" ");
+			while (result.next()) {
+				System.out.println("\t record ID: "+result.getString("recordID")+" ");
+				System.out.println("patient ID: "+result.getString("patientID")+" ");
+				System.out.println("start date: "+result.getString("startDate")+" ");
+				System.out.println("end date: "+result.getString("endDate")+" ");
+				System.out.println("responsible doctor: "+result.getString("responsibleDoctor")+" ");
+				System.out.println("prescription: "+result.getString("prescription")+" ");
+				System.out.println("diagnosis details: "+result.getString("diagnosisDetails")+" ");
 			}
 			success = true;
 
@@ -1446,7 +1453,7 @@ public class WolfHospital {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()) {
 			case "ENDDATE":
-				prepUpdateTreatmentEndDate.setString(1, valueToChange);
+				prepUpdateTreatmentEndDate.setDate(1, java.sql.Date.valueOf(valueToChange));
 				prepUpdateTreatmentEndDate.setString(2, recordID);
 				prepUpdateTreatmentEndDate.setString(3, recordID);
 				prepUpdateTreatmentEndDate.executeUpdate();
@@ -1467,6 +1474,7 @@ public class WolfHospital {
 			}
 		} catch (Throwable err) {
 			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 	
@@ -1539,13 +1547,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllTestRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID"+result.getString("recordID")+" ");
-				System.out.println("patient ID"+result.getString("patientID")+" ");
-				System.out.println("start date"+result.getString("startDate")+" ");
-				System.out.println("end date"+result.getString("endDate")+" ");
-				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
-				System.out.println("test type"+result.getString("testType")+" ");
-				System.out.println("test result"+result.getString("testResult")+" ");
+				System.out.println("\t record ID: "+result.getString("recordID")+" ");
+				System.out.println("patient ID: "+result.getString("patientID")+" ");
+				System.out.println("start date: "+result.getString("startDate")+" ");
+				System.out.println("end date: "+result.getString("endDate")+" ");
+				System.out.println("responsible doctor: "+result.getString("responsibleDoctor")+" ");
+				System.out.println("test type: "+result.getString("testType")+" ");
+				System.out.println("test result: "+result.getString("testResult")+" ");
 			}
 			success = true;
 
@@ -1568,14 +1576,14 @@ public class WolfHospital {
 
 			result.beforeFirst();
 			System.out.println("\nshowTestRecord\n");
-			if (result.next()) {
-				System.out.println("\t record ID"+result.getString("recordID")+" ");
-				System.out.println("patient ID"+result.getString("patientID")+" ");
-				System.out.println("start date"+result.getString("startDate")+" ");
-				System.out.println("end date"+result.getString("endDate")+" ");
-				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
-				System.out.println("test type"+result.getString("testType")+" ");
-				System.out.println("test result"+result.getString("testResult")+" ");
+			while (result.next()) {
+				System.out.println("\t record ID: "+result.getString("recordID")+" ");
+				System.out.println("patient ID: "+result.getString("patientID")+" ");
+				System.out.println("start date: "+result.getString("startDate")+" ");
+				System.out.println("end date: "+result.getString("endDate")+" ");
+				System.out.println("responsible doctor: "+result.getString("responsibleDoctor")+" ");
+				System.out.println("test type: "+result.getString("testType")+" ");
+				System.out.println("test result: "+result.getString("testResult")+" ");
 			}
 			success = true;
 			// support_printQueryResultSet(result);
@@ -1593,7 +1601,7 @@ public class WolfHospital {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()) {
 			case "ENDDATE":
-				prepUpdateTestEndDate.setString(1, valueToChange);
+				prepUpdateTestEndDate.setDate(1, java.sql.Date.valueOf(valueToChange));
 				prepUpdateTestEndDate.setString(2, recordID);
 				prepUpdateTestEndDate.setString(3, recordID);
 				prepUpdateTestEndDate.executeUpdate();
@@ -1658,13 +1666,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllCheckinRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID"+result.getString("recordID")+" ");
-				System.out.println("patient ID"+result.getString("patientID")+" ");
-				System.out.println("start date"+result.getString("startDate")+" ");
-				System.out.println("end date"+result.getString("endDate")+" ");
-				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
-				System.out.println("ward number"+result.getString("wardNumber")+" ");
-				System.out.println("bed number"+result.getString("bedNumber")+" ");
+				System.out.println("\t record ID: "+result.getString("recordID")+" ");
+				System.out.println("patient ID: "+result.getString("patientID")+" ");
+				System.out.println("start date: "+result.getString("startDate")+" ");
+				System.out.println("end date: "+result.getString("endDate")+" ");
+				System.out.println("responsible doctor: "+result.getString("responsibleDoctor")+" ");
+				System.out.println("ward number: "+result.getString("wardNumber")+" ");
+				System.out.println("bed number: "+result.getString("bedNumber")+" ");
 			}
 			success = true;
 			// support_printQueryResultSet(result);
@@ -1686,14 +1694,14 @@ public class WolfHospital {
 
 			result.beforeFirst();
 			System.out.println("\nshowCheckinRecord\n");
-			if (result.next()) {
-				System.out.println("\t record ID"+result.getString("recordID")+" ");
-				System.out.println("patient ID"+result.getString("patientID")+" ");
-				System.out.println("start date"+result.getString("startDate")+" ");
-				System.out.println("end date"+result.getString("endDate")+" ");
-				System.out.println("responsible doctor"+result.getString("responsibleDoctor")+" ");
-				System.out.println("ward number"+result.getString("wardNumber")+" ");
-				System.out.println("bed number"+result.getString("bedNumber")+" ");
+			while (result.next()) {
+				System.out.println("\t record ID: "+result.getString("recordID")+" ");
+				System.out.println("patient ID: "+result.getString("patientID")+" ");
+				System.out.println("start date: "+result.getString("startDate")+" ");
+				System.out.println("end date: "+result.getString("endDate")+" ");
+				System.out.println("responsible doctor: "+result.getString("responsibleDoctor")+" ");
+				System.out.println("ward number: "+result.getString("wardNumber")+" ");
+				System.out.println("bed number: "+result.getString("bedNumber")+" ");
 			}
 			success = true;
 			// support_printQueryResultSet(result);
@@ -1712,7 +1720,7 @@ public class WolfHospital {
 			connection.setAutoCommit(true);
 			switch (attributeToChange.toUpperCase()) {
 			case "ENDDATE":
-				prepUpdateCheckinEndDate.setString(1, valueToChange);
+				prepUpdateCheckinEndDate.setDate(1, java.sql.Date.valueOf(valueToChange));
 				prepUpdateCheckinEndDate.setString(2, recordID);
 				prepUpdateCheckinEndDate.setString(3, recordID);
 				prepUpdateCheckinEndDate.executeUpdate();
@@ -2296,8 +2304,8 @@ public class WolfHospital {
 			endDate = scanner.nextLine();
 			System.out.print("\nEnter responsible doctor\n> ");
 			resDoc = scanner.nextLine();
-			manageTreatmentRecordAdd(recordID, pres, diag);
 			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
+			manageTreatmentRecordAdd(recordID, pres, diag);
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2362,8 +2370,8 @@ public class WolfHospital {
 			endDate = scanner.nextLine();
 			System.out.print("\nEnter responsible doctor\n> ");
 			resDoc = scanner.nextLine();
-			manageTestRecordAdd(recordID, testType, testResult);
 			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
+			manageTestRecordAdd(recordID, testType, testResult);
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -2428,8 +2436,8 @@ public class WolfHospital {
 			endDate = scanner.nextLine();
 			System.out.print("\nEnter responsible doctor\n> ");
 			resDoc = scanner.nextLine();
-			manageCheckinRecordAdd(recordID, wardNumber, bedNumber);
 			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
+			manageCheckinRecordAdd(recordID, wardNumber, bedNumber);
 		}
 		catch (Throwable err) {
 			error_handler(err);
@@ -3038,7 +3046,7 @@ public class WolfHospital {
             generatePreparedStatements();
 //          dropAllExistingTables();
 //          generateTables();
-//			
+//
 //			populateStaffTable();
 //			populatePatientsTable();
 //			populateWardsTable();
@@ -3063,31 +3071,31 @@ public class WolfHospital {
                     case CMD_MAIN:
                          // Check user's input (case insensitively)
                          switch (command.toUpperCase()) {
-                             //fhy
-                             case CMD_MEDICAL_RECORDS:
+							 case "1":
+								 // Tell the user their options in this new menu
+								 printCommands(CMD_INFORMATION_PROCESSING);
+								 // Remember what menu we're in
+								 currentMenu = CMD_INFORMATION_PROCESSING;
+								 break;
+                         	//fhy
+                             case "2":
                                  // Tell the user their options in this new menu
                                  printCommands(CMD_MEDICAL_RECORDS);
                                  // Remember what menu we're in
                                  currentMenu = CMD_MEDICAL_RECORDS;
                                  break;
                             //GG
-                           	case CMD_BILLING_ACCOUNTS: 
+                           	case "3":
                              	printCommands(CMD_BILLING_ACCOUNTS);
                              	currentMenu = CMD_BILLING_ACCOUNTS;
                              	break;
-                            case CMD_INFORMATION_PROCESSING:
-                                // Tell the user their options in this new menu
-                                printCommands(CMD_INFORMATION_PROCESSING);
-                                // Remember what menu we're in
-                                currentMenu = CMD_INFORMATION_PROCESSING;
-                                break;
-                            case CMD_REPORTS:
+                            case "4":
                                 // Tell the user their options in this new menu
                                 printCommands(CMD_REPORTS);
                                 // Remember what menu we're in
                                 currentMenu = CMD_REPORTS;
                                 break;                                
-                            case CMD_QUIT:
+                            case "5":
                                 quit = true;
                                 break;
                             default:
@@ -3101,43 +3109,43 @@ public class WolfHospital {
                     //fhy
                     case CMD_MEDICAL_RECORDS:
                         switch (command.toUpperCase()){
-                            case CMD_TREATMENT_ADD:
+                            case "1":
                             		userTreatmentAdd();
                                 break;
-                            case CMD_TREATMENT_GETALL:
+                            case "2":
                             		userTreatmentGetAll();
                                 break;
-                            case CMD_TREATMENT_GET:
+                            case "3":
                             		userTreatmentGet();
                                 break;
-                            case CMD_TREATMENT_UPDATE:
+                            case "4":
                             		userTreatmentUpdate();
                                 break;
-                            case CMD_TEST_ADD:
+                            case "5":
                             		userTestAdd();
                                 break;   
-                            case CMD_TEST_GETALL:
+                            case "6":
                             		userTestGetAll();
                                 break;   
-                            case CMD_TEST_GET:
+                            case "7":
                             		userTestGet();
                                 break;
-                            case CMD_TEST_UPDATE:
+                            case "8":
                             		userTestUpdate();
                                 break;
-                            case CMD_CHECKIN_ADD:
+                            case "9":
                             		userCheckinAdd();
                                 break;
-                            case CMD_CHECKIN_GETALL:
+                            case "10":
                             		userCheckinGetAll();
                                 break;
-                            case CMD_CHECKIN_GET:
+                            case "11":
                             		userCheckinGet();
                                 break;
-							case CMD_CHECKIN_UPDATE:
+							case "12":
 									userCheckinUpdate();
 								break;
-                            case CMD_QUIT:
+                            case "13":
                                 quit = true;
                                 break;
                             default:
