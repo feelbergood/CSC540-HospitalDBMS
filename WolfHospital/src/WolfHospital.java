@@ -636,10 +636,11 @@ public class WolfHospital {
 			prepDeleteWardInfo = connection.prepareStatement(sql);
 
 			// Check availability of wards
-			sql = "SELECT `ward number`, `bed number`, `patiendID` " +
+			sql = "SELECT Beds.`ward number`, Beds.`bed number`, Assigned.patientID, Wards.capacity " +
 					"FROM `Beds` LEFT JOIN `Assigned` ON " +
 					"Beds.`ward number`=Assigned.`ward number` AND "+
-					"Beds.`bed number`=Assigned.`bed number` AND ISNULL(patientID);";
+					"Beds.`bed number`=Assigned.`bed number` AND ISNULL(patientID) " +
+					"LEFT JOIN `Wards` ON Assigned.`ward number` = Wards.`ward number`;";
 			prepCheckWardAvailability = connection.prepareStatement(sql);
 
 			// Assign wards:
@@ -2764,8 +2765,9 @@ public class WolfHospital {
 			System.out.println("\nBelow is the list of available wards:");
 			while (rs.next()) {
 				String wardNumber = rs.getString("ward number");
-				String capacity = rs.getString("capacity");
-				System.out.println(capacity + "-bed Ward numbered " + wardNumber);
+				int capacity = rs.getInt("capacity");
+				System.out.print("\tcapacity : " + capacity + " | ");
+				System.out.println("Ward number : " + wardNumber);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
