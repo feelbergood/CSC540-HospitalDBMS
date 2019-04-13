@@ -2,7 +2,6 @@ import javax.xml.transform.Result;
 import java.sql.*;
 import java.util.Scanner;
 
-
 public class WolfHospital {
 	// Update your user info alone here
 	private static final String jdbcURL = "jdbc:mariadb://classdb2.csc.ncsu.edu:3306/yrao3"; // Using SERVICE_NAME
@@ -445,7 +444,7 @@ public class WolfHospital {
 			sql = "DELETE `Patients` p, `PersonInfo` i, `AgeInfo` a, `ContactInfo` con FROM p JOIN i ON p.SSN = i.SSN" +
 					" JOIN a ON i.DOB = a.DOB" +
 					" JOIN  con ON i.phone = con.phone" +
-					" WHERE patientID = ?;" ;
+					" WHERE patientID = ?;";
 			prepDeletePatients = connection.prepareStatement(sql);
 			// Enter basic information about wards
 			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)"
@@ -573,21 +572,26 @@ public class WolfHospital {
 			prepReportHistoryByPatient = connection.prepareStatement(sql);
 
 			// Report ward usage
-			sql = "SELECT `ward number`, " + "IF(patientID IS NULL, 'empty', 'not empty') AS `usage` "
-					+ "FROM Beds GROUP BY `ward number`;";
+			sql = "SELECT w.`ward number`, IF(a.patientID IS NULL, 'empty', 'not empty') " + 
+					"AS `usage` FROM `Assigned` a RIGHT JOIN `Wards` w ON a.`ward number`=w.`ward number` "+
+					"GROUP BY `ward number`;";
 			prepReportCurrentWardUsageStatus = connection.prepareStatement(sql);
 
 			// Report bed usage
-			sql = "SELECT *, " + "IF(patientID IS NULL, 'not used', 'used') AS `usage` " + "FROM Beds;";
+			sql = "SELECT b.`ward number`, b.`bed number`, IF(a.patientID IS NULL, 'not used', 'used') AS `usage` " +
+					"FROM `Assigned` a RIGHT JOIN `Beds` b ON a.`ward number`=b.`ward number` AND a.`bed number`=b.`bed number` " +
+					"ORDER BY b.`ward number`;";
 			prepReportCurrentBedUsageStatus = connection.prepareStatement(sql);
 
 			// Report number of patients per month
-			sql = "SELECT MONTH(startDate) AS `month`, " + "COUNT(*) AS `num` " + "FROM `Medical Records` "
-					+ "GROUP BY month;";
+			sql = "SELECT MONTH(startDate) AS `month`, " + "COUNT(*) AS `num` " + "FROM `Medical Records` " +
+					"GROUP BY month;";
 			prepReportNumberOfPatientsPerMonth = connection.prepareStatement(sql);
 
 			// Report ward usage percentage
-			sql = "SELECT 100*COUNT(patientID)/COUNT(*) " + "AS `usage percentage` " + "FROM Beds;";
+			sql = "SELECT 100*COUNT(a.patientID)/COUNT(*) " + "AS `usage percentage`" +
+					"FROM `Assigned` a RIGHT JOIN `Beds` b ON a.`ward number`=b.`ward number` AND a.`bed number`=b.`bed number` " +
+					"ORDER BY b.`ward number`;";
 			prepReportWardUsagePercentage = connection.prepareStatement(sql);
 
 			// Report doctor responsibility
@@ -595,7 +599,7 @@ public class WolfHospital {
 			prepReportDoctorResponsibility = connection.prepareStatement(sql);
 
 			// Report staff information
-			sql = "SELECT * FROM `Staff` " + "GROUP BY jobTitle;";
+			sql = "SELECT * FROM `Staff` " + "ORDER BY jobTitle;";
 			prepReportStaffInformation = connection.prepareStatement(sql);
 
 			// Create billing account
@@ -1738,7 +1742,7 @@ public class WolfHospital {
 			prepReportHistoryByTime.setDate(1, java.sql.Date.valueOf(date));
 			result = prepReportHistoryByTime.executeQuery();
 			result.beforeFirst();
-			if (result.next()) {
+			while (result.next()) {
 				System.out.print("\trecord ID : "+result.getString("recordID")+" | ");
 				System.out.print("patient ID : "+result.getString("patientID")+" | ");
 				System.out.print("startDate : "+result.getString("startDate")+" | ");
@@ -1758,7 +1762,7 @@ public class WolfHospital {
 			prepReportHistoryByPatient.setString(1, patientID);
 			result = prepReportHistoryByPatient.executeQuery();
 			result.beforeFirst();
-			if (result.next()) {
+			while (result.next()) {
 				System.out.print("\trecord ID : "+result.getString("recordID")+" | ");
 				System.out.print("patient ID : "+result.getString("patientID")+" | ");
 				System.out.print("startDate : "+result.getString("startDate")+" | ");
@@ -1778,9 +1782,8 @@ public class WolfHospital {
 		try {
 			result = prepReportCurrentWardUsageStatus.executeQuery();
 			result.beforeFirst();
-			if (result.next()) {
+			while (result.next()) {
 				System.out.print("\tward number : "+result.getString("ward number")+" | ");
-				System.out.print("bed number : "+result.getString("bed number")+" | ");
 				System.out.println("status : "+result.getString("usage"));
 			}
 			success = true;
@@ -1796,8 +1799,9 @@ public class WolfHospital {
 		try {
 			result = prepReportCurrentBedUsageStatus.executeQuery();
 			result.beforeFirst();
-			if (result.next()) {
+			while (result.next()) {
 				System.out.print("\tward number : "+result.getString("ward number")+" | ");
+				System.out.print("bed number : "+result.getString("bed number")+" | ");
 				System.out.println("status : "+result.getString("usage"));
 			}
 			success = true;
@@ -1814,7 +1818,7 @@ public class WolfHospital {
 		try {
 			result = prepReportNumberOfPatientsPerMonth.executeQuery();
 			result.beforeFirst();
-			if (result.next()) {
+			while (result.next()) {
 				System.out.print("\tmonth : "+result.getString("month")+" | ");
 				System.out.println("number of patients : "+result.getString("num"));
 			}
@@ -1832,7 +1836,7 @@ public class WolfHospital {
 		try {
 			result = prepReportWardUsagePercentage.executeQuery();
 			result.beforeFirst();
-			if (result.next()) {
+			while (result.next()) {
 				System.out.println("Ward usage percentage is: "+result.getString("usage percentage"));
 			}
 			success = true;
@@ -1843,17 +1847,35 @@ public class WolfHospital {
 	}
 
 	// Report doctor responsibility
+	public static boolean reportDoctorsIds() {
+		boolean success = false;
+		try {
+			result = statement.executeQuery("SELECT staffID FROM Staff WHERE jobTitle='Doctor';");
+			result.beforeFirst();
+			System.out.println("Staff IDs of all doctors:");
+			while (result.next()) {
+				System.out.println("\t--- " + result.getString("staffID"));
+			}
+			success = true;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return success;
+	}
+	
+	// Report doctor responsibility
 	public static boolean reportDoctorResponsibility(String doctorID) {
 		boolean success = false;
 		try {
 			prepReportDoctorResponsibility.setString(1, doctorID);
 			result = prepReportDoctorResponsibility.executeQuery();
 			result.beforeFirst();
-			System.out.println("\nDoctor("+doctorID+") is reponsible for: \n");
-			if (result.next()) {
+			System.out.println("\nDoctor("+doctorID+") is reponsible for:");
+			while (result.next()) {
 				System.out.print("\tpatient ID : " + result.getString("patientID")+" | ");
 				System.out.print("start date : " + result.getDate("startDate")+" | ");
-				System.out.println("patient ID : " + result.getString("endDate"));
+				System.out.println("end date : " + result.getString("endDate"));
 			}
 			success = true;
 		} catch (SQLException e) {
@@ -1869,16 +1891,32 @@ public class WolfHospital {
 		try {
 			result = prepReportStaffInformation.executeQuery();
 			result.beforeFirst();
+			String oldRole = "";
 			while (result.next()) {
-				System.out.print("staff ID :" + result.getString("staffID") + " | ");
-				System.out.print("name :" + result.getString("name") + " | ");
-				System.out.print("age :" + result.getInt("age") + " | ");
-				System.out.print("gender :" + result.getString("gender") + " | ");
-				System.out.print("job title :" + result.getString("jobTitle") + " | ");
-				System.out.print("professional title:" + result.getString("profTitle") + " | ");
-				System.out.print("department :" + result.getString("department") + " | ");
-				System.out.print("phone :" + result.getString("phone") + " | ");
-				System.out.println("address:" + result.getString("address"));
+				String newRole = result.getString("jobTitle");
+				if (oldRole.equals(newRole)) {
+					System.out.print("\tstaff ID : " + result.getString("staffID") + " | ");
+					System.out.print("name : " + result.getString("name") + " | ");
+					System.out.print("age : " + result.getInt("age") + " | ");
+					System.out.print("gender : " + result.getString("gender") + " | ");
+					String profTitle = result.getString("profTitle").equals("")?"null":result.getString("profTitle");
+					System.out.print("professional title : " + profTitle + " | ");
+					System.out.print("department : " + result.getString("department") + " | ");
+					System.out.print("phone : " + result.getString("phone") + " | ");
+					System.out.println("address : " + result.getString("address"));
+				} else {
+					System.out.println("Role : " + result.getString("jobTitle"));
+					System.out.print("\tstaff ID : " + result.getString("staffID") + " | ");
+					System.out.print("name : " + result.getString("name") + " | ");
+					System.out.print("age : " + result.getInt("age") + " | ");
+					System.out.print("gender : " + result.getString("gender") + " | ");
+					String profTitle = result.getString("profTitle").equals("")?"null":result.getString("profTitle");
+					System.out.print("professional title : " + profTitle + " | ");
+					System.out.print("department : " + result.getString("department") + " | ");
+					System.out.print("phone : " + result.getString("phone") + " | ");
+					System.out.println("address : " + result.getString("address"));
+					oldRole = newRole;
+				}
 			}
 			success = true;
 		} catch (SQLException e) {
@@ -2995,9 +3033,8 @@ public class WolfHospital {
             
             // Print welcome
             System.out.println("\nWelcome to Wolf Hospital Management System");
-            
-           
             connectToDatabase();
+//            DBConnection.connectToDatabase(connection, statement, result, jdbcURL, user, password);
             generatePreparedStatements();
 //          dropAllExistingTables();
 //          generateTables();
@@ -3303,7 +3340,6 @@ public class WolfHospital {
 
 	private static void userReportWardUsagePercentage() {
 		try {
-			System.out.print("\nReport ward usage percentage\n");
 			reportWardUsagePercentage();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -3314,6 +3350,7 @@ public class WolfHospital {
 		try {
 			System.out.print("\nReport doctors' responsibilities");
 			System.out.print("\nPlease input ID of the doctor whose responsibility you want to know:\n");
+			reportDoctorsIds();
 			String doctorID = scanner.nextLine();
 			reportDoctorResponsibility(doctorID);
 		} catch (Throwable e) {
