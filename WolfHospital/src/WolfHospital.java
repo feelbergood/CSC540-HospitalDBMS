@@ -2999,23 +2999,8 @@ public class WolfHospital {
            
             connectToDatabase();
             generatePreparedStatements();
-<<<<<<< HEAD
-    //        dropAllExistingTables();
-     //       generateTables();
-			
-			populateStaffTable();
-			populatePatientsTable();
-			populateWardsTable();
-			populateMedicalRecordsTable();
-			populateTreatmentTable();
-			populateTestTable();
-			populateCheckinTable();
-			populateBillingAccountsTable();
-			populateBedsTable();
-			populateAssignedTable();
-=======
-//            dropAllExistingTables();
-//            generateTables();
+//          dropAllExistingTables();
+//          generateTables();
 //			
 //			populateStaffTable();
 //			populatePatientsTable();
@@ -3027,7 +3012,6 @@ public class WolfHospital {
 //			populateBillingAccountsTable();
 //			populateBedsTable();
 //			populateAssignedTable();
->>>>>>> 7c9765b19ea5ae7213e6a00211993b35af999aa9
             
             // Print available commands
             printCommands(CMD_MAIN);
