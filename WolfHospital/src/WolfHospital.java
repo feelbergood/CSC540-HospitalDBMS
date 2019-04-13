@@ -344,20 +344,22 @@ public class WolfHospital {
           case CMD_REPORTS:
             System.out.println(CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT);
             System.out.println("\t- report medical history for a patient");
-						System.out.println(CMD_MEDICAL_HISTORY_BY_TIME_REPORT);
+			System.out.println(CMD_MEDICAL_HISTORY_BY_TIME_REPORT);
             System.out.println("\t- report medical history for a time period");
-    				System.out.println(CMD_WARD_USAGE_STATUS_REPORT);
+    		System.out.println(CMD_WARD_USAGE_STATUS_REPORT);
             System.out.println("\t- report ward usage status");
-						System.out.println(CMD_BED_USAGE_STATUS_REPORT);
+			System.out.println(CMD_BED_USAGE_STATUS_REPORT);
             System.out.println("\t- report bed usage status");
-    				System.out.println(CMD_NUMBER_PATIENTS_REPORT);
+    		System.out.println(CMD_NUMBER_PATIENTS_REPORT);
             System.out.println("\t- report number of patients per month");
-    				System.out.println(CMD_WARD_USAGE_PERCENT_REPORT);
+    		System.out.println(CMD_WARD_USAGE_PERCENT_REPORT);
             System.out.println("\t- report ward usage precentage");
-						System.out.println(CMD_DOCTOR_RESPONS_REPORT);
+			System.out.println(CMD_DOCTOR_RESPONS_REPORT);
             System.out.println("\t- report doctors' responsibility");
-						System.out.println(CMD_STAFF_INFO_REPORT);
+			System.out.println(CMD_STAFF_INFO_REPORT);
             System.out.println("\t- report staff information grouped by role");
+            System.out.println(CMD_QUIT);
+            System.out.println("\t- exit the program");
         }
     }
 
@@ -2997,19 +2999,19 @@ public class WolfHospital {
            
             connectToDatabase();
             generatePreparedStatements();
-            dropAllExistingTables();
-            generateTables();
-			
-			populateStaffTable();
-			populatePatientsTable();
-			populateWardsTable();
-			populateMedicalRecordsTable();
-			populateTreatmentTable();
-			populateTestTable();
-			populateCheckinTable();
-			populateBillingAccountsTable();
-			populateBedsTable();
-			populateAssignedTable();
+//          dropAllExistingTables();
+//          generateTables();
+//			
+//			populateStaffTable();
+//			populatePatientsTable();
+//			populateWardsTable();
+//			populateMedicalRecordsTable();
+//			populateTreatmentTable();
+//			populateTestTable();
+//			populateCheckinTable();
+//			populateBillingAccountsTable();
+//			populateBedsTable();
+//			populateAssignedTable();
             
             // Print available commands
             printCommands(CMD_MAIN);
@@ -3033,18 +3035,18 @@ public class WolfHospital {
                                  break;
                             //GG
                            	case CMD_BILLING_ACCOUNTS: 
-                             	startup_printAvailableCommands(CMD_BILLING_ACCOUNTS);
+                             	printCommands(CMD_BILLING_ACCOUNTS);
                              	currentMenu = CMD_BILLING_ACCOUNTS;
                              	break;
                             case CMD_INFORMATION_PROCESSING:
                                 // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_INFORMATION_PROCESSING);
+                                printCommands(CMD_INFORMATION_PROCESSING);
                                 // Remember what menu we're in
                                 currentMenu = CMD_INFORMATION_PROCESSING;
                                 break;
                             case CMD_REPORTS:
                                 // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_REPORTS);
+                                printCommands(CMD_REPORTS);
                                 // Remember what menu we're in
                                 currentMenu = CMD_REPORTS;
                                 break;                                
@@ -3054,7 +3056,7 @@ public class WolfHospital {
                             default:
                                 // Remind the user about what commands are available
                                 System.out.println("\nCommand not recognized");
-                                startup_printAvailableCommands(CMD_MAIN);
+                                printCommands(CMD_MAIN);
                                 break;
                         }
                         break;
@@ -3107,6 +3109,7 @@ public class WolfHospital {
                                 printCommands(CMD_MEDICAL_RECORDS);
                                 break;     
                         }
+                        break;
                     case CMD_BILLING_ACCOUNTS:
                     //GG
                     	switch (command.toUpperCase()){
@@ -3130,6 +3133,7 @@ public class WolfHospital {
                           	printCommands(CMD_BILLING_ACCOUNTS);
                           	break;
                       }
+                    	break;
                     case CMD_INFORMATION_PROCESSING:
                         switch (command.toUpperCase()) {
                             case CMD_STAFF_ADD:
@@ -3195,14 +3199,6 @@ public class WolfHospital {
 						break;
                     case CMD_REPORTS:
 						// Check user's input (case insensitively)
-						// private static final String CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT = "MEDICAL HISTORY I";
-						// private static final String CMD_MEDICAL_HISTORY_BY_TIME_REPORT = "MEDICAL HISTORY II";
-						// private static final String CMD_WARD_USAGE_STATUS_REPORT = "WARD USAGE STATUS";
-						// private static final String CMD_BED_USAGE_STATUS_REPORT = "BED USAGE STATUS";
-						// private static final String CMD_NUMBER_PATIENTS_REPORT = "NUMBER OF PATIENTS";
-						// private static final String CMD_WARD_USAGE_PERCENT_REPORT = "WARD USAGE PERCENTAGE";
-						// private static final String CMD_DOCTOR_RESPONS_REPORT = "DOCTOR REPONSIBLITIES";
-						// private static final String CMD_STAFF_INFO_REPORT = "STAFF INFORMATION";
                         switch (command.toUpperCase()) {
                             case CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT:
                                 userReportHistoryByPatient();
@@ -3230,7 +3226,7 @@ public class WolfHospital {
                                 break;
                             case CMD_MAIN:
                                 // Tell the user their options in this new menu
-                                startup_printAvailableCommands(CMD_MAIN);
+                                printCommands(CMD_MAIN);
                                 // Remember what menu we're in
                                 currentMenu = CMD_MAIN;
                                 break;
@@ -3240,7 +3236,7 @@ public class WolfHospital {
                             default:
                                 // Remind the user about what commands are available
                                 System.out.println("\nCommand not recognized");
-                                startup_printAvailableCommands(CMD_REPORTS);
+                                printCommands(CMD_REPORTS);
                                 break;
                         }
                         break;
@@ -3332,11 +3328,6 @@ public class WolfHospital {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		}
-	}
-
-	private static void startup_printAvailableCommands(String cmd) {
-		// TODO Auto-generated method stub
-		
 	}
 
 	public static void error_handler(Throwable error) {
