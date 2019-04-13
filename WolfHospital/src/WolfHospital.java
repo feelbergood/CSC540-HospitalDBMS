@@ -1,5 +1,7 @@
 import java.sql.*;
 import java.util.Scanner;
+import java.util.Date;
+import java.util.Calendar;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -636,11 +638,12 @@ public class WolfHospital {
 			prepDeleteWardInfo = connection.prepareStatement(sql);
 
 			// Check availability of wards
-			sql = "SELECT Beds.`ward number`, Beds.`bed number`, Assigned.patientID, Wards.capacity " +
-					"FROM `Beds` LEFT JOIN `Assigned` ON " +
-					"Beds.`ward number`=Assigned.`ward number` AND "+
-					"Beds.`bed number`=Assigned.`bed number` AND ISNULL(patientID) " +
-					"LEFT JOIN `Wards` ON Assigned.`ward number` = Wards.`ward number`;";
+			sql = "SELECT Wards.`ward number`, Wards.capacity, Beds.`bed number` " +
+					"FROM `Wards` LEFT JOIN `Beds` ON " +
+					"Beds.`ward number`=Wards.`ward number` " +
+					"WHERE NOT EXISTS (SELECT * FROM Assigned " +
+					"WHERE patientID IS NOT NULL AND Assigned.`bed number`=Beds.`bed number` " +
+					"AND Assigned.`ward number`=Beds.`ward number`);";
 			prepCheckWardAvailability = connection.prepareStatement(sql);
 
 			// Assign wards:
@@ -672,15 +675,26 @@ public class WolfHospital {
 			prepDeleteBedInfo = connection.prepareStatement(sql);
 
 			// Assign beds
-			sql = "UPDATE `Beds` SET `patientID` = ? WHERE `ward number` = ? AND `bed number` = ?; ";
+			sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " +
+					"VALUES (?, ?, ?, ?, ?); ";
 			prepAssignBed = connection.prepareStatement(sql);
 
 			// Check availability of beds
-			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID); ";
+			sql = "SELECT Beds.`ward number`, Beds.`bed number` " +
+					"FROM `Beds` LEFT JOIN `Wards` ON " +
+					"Beds.`ward number`=Wards.`ward number` " +
+					"WHERE NOT EXISTS (SELECT * FROM Assigned " +
+					"WHERE patientID IS NOT NULL AND Assigned.`bed number`=Beds.`bed number` " +
+					"AND Assigned.`ward number`=Beds.`ward number`);";
 			prepCheckBedAvailability = connection.prepareStatement(sql);
 
 			// Check availability of beds in an appointed ward
-			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID) AND `ward number ` = ?; ";
+			sql = "SELECT Beds.`ward number`, Beds.`bed number` " +
+					"FROM `Beds` LEFT JOIN `Wards` ON " +
+					"Beds.`ward number`=Wards.`ward number` " +
+					"WHERE Beds.`ward number` = ? AND NOT EXISTS (SELECT * FROM Assigned " +
+					"WHERE patientID IS NOT NULL AND Assigned.`bed number`=Beds.`bed number` " +
+					"AND Assigned.`ward number`=Beds.`ward number`);";
 			prepCheckBedinWardAvailability = connection.prepareStatement(sql);
 
 			// Reserve beds
@@ -690,7 +704,7 @@ public class WolfHospital {
 			// prepReserveBed = connection.prepareStatement(sql);
 
 			// Release beds
-			sql = "UPDATE `Beds` SET `patientID` = NULL WHERE `ward number` = ? AND `bed number` = ?; ";
+			sql = "DELETE FROM `Assigned` WHERE `ward number` = ? AND `bed number` = ?; ";
 			prepReleaseBed = connection.prepareStatement(sql);
 
 			// Create treatment records
@@ -2227,8 +2241,17 @@ public class WolfHospital {
 				prepAddAssigned.setString(1, patientID);
 				prepAddAssigned.setString(2, wardNum);
 				prepAddAssigned.setString(3, bedNum);
-				prepAddAssigned.setDate(4, java.sql.Date.valueOf(start));
-				prepAddAssigned.setDate(5, java.sql.Date.valueOf(end));
+				if(start.equals("")) {
+					java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+					prepAddAssigned.setTimestamp(4, date);
+				} else {
+					prepAddAssigned.setDate(4, java.sql.Date.valueOf(start));
+				}
+				if(end.equals("")) {
+					prepAddAssigned.setNull(5, java.sql.Types.DATE);
+				} else {
+					prepAddAssigned.setDate(5, java.sql.Date.valueOf(end));
+				}
 				prepAddAssigned.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
@@ -2766,8 +2789,10 @@ public class WolfHospital {
 			while (rs.next()) {
 				String wardNumber = rs.getString("ward number");
 				int capacity = rs.getInt("capacity");
+				String bedNumber = rs.getString("bed number");
 				System.out.print("\tcapacity : " + capacity + " | ");
-				System.out.println("Ward number : " + wardNumber);
+				System.out.print("Ward number : " + wardNumber + " | ");
+				System.out.println("Bed number : " + bedNumber + " | ");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -2785,7 +2810,8 @@ public class WolfHospital {
 			while (rs.next()) {
 				String wardNumber = rs.getString("ward number");
 				String bedNumber = rs.getString("bed number");
-				System.out.println("Bed numbered " + bedNumber + " in ward numbered " + wardNumber);
+				System.out.print("\tBed number : " + bedNumber + " | ");
+				System.out.println("Ward number : " + wardNumber);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -2804,30 +2830,37 @@ public class WolfHospital {
 		System.out.println("\nPlease enter the patient ID of the patient you are assigning a ward/bed for.\n");
 		String patientID = scanner.nextLine();
 		userWardCheck(); // should print the capacity of each ward
-		System.out.println("\nPlease select a ward according to your need from the above ward\n");
+		System.out.println("\nPlease enter a ward number according to your need from the above available wards\n");
 		String wardNumber = scanner.nextLine();
-		getWard(wardNumber);
+		//getWard(wardNumber);
 		String bedNumber;
 		try {
-			prepAddTreatmentRecord.setString(1, wardNumber);
+			prepCheckBedinWardAvailability.setString(1, wardNumber);
 			ResultSet rs = prepCheckBedinWardAvailability.executeQuery();
 			rs.beforeFirst();
 			System.out.println("\nBelow is the list of available beds in ward numbered " + wardNumber + ": ");
 			while (rs.next()) {
-				if (wardNumber != rs.getString("ward number")) {
-					System.out.println("Warning: a bed in wrong ward is skipped!");
+				String getWardNumber = rs.getString("ward number");
+				if (!wardNumber.equals(getWardNumber)) {
+					System.out.println("\tWarning: a bed in wrong ward is found!");
+					System.out.print("\tEntered ward number : " + wardNumber + " | ");
+					System.out.println("Retrieved ward number : " + getWardNumber);
 					continue;
 				}
 				bedNumber = rs.getString("bed number");
-				System.out.println("Bed numbered " + bedNumber);
+				System.out.print("\tBed number : " + bedNumber + " | ");
+				System.out.println("Ward number : " + wardNumber);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("\nPlease select a bed from the available bed list above\n");
+		System.out.println("\nPlease enter a bed number from the available beds above\n");
 		bedNumber = scanner.nextLine();
-		manageBedAssign(patientID, wardNumber, bedNumber);
-		System.out.println("\nPatient " + patientID + " got the bed numbered " + bedNumber + " in ward numbered"
+		//System.out.println("\nPlease enter the current date in format yyyy-mm-dd\n");
+		String startDate = "";
+		String endDate = "";
+		manageAssignedAdd(patientID, wardNumber, bedNumber, startDate, endDate);
+		System.out.println("\nPatient " + patientID + " got the bed numbered " + bedNumber + " in ward numbered "
 				+ wardNumber + " successfully.");
 	}
 
@@ -2846,7 +2879,7 @@ public class WolfHospital {
 		System.out.println("\nPlease enter the ward number of the bed to be released");
 		wardNum = scanner.nextLine();
 		manageBedRelease(wardNum, bedNum);
-		System.out.println("\nBed numbered " + bedNum + "in ward numbered " + wardNum + " is released");
+		System.out.println("\nBed numbered " + bedNum + " in ward numbered " + wardNum + " is released!");
 	}
 
 	// GG
