@@ -262,39 +262,44 @@ public class WolfHospital {
         switch (menu) {
           case CMD_MAIN:
               System.out.println(CMD_INFORMATION_PROCESSING);
-              System.out.println(CMD_MEDICAL_RECORDS);
-              System.out.println(CMD_BILLING_ACCOUNTS);
-              System.out.println(CMD_REPORTS);
-              System.out.println(CMD_QUIT);
-              break;
+			  System.out.println("1	- process information");
+			  System.out.println(CMD_MEDICAL_RECORDS);
+			  System.out.println("2	- manage medical records");
+			  System.out.println(CMD_BILLING_ACCOUNTS);
+			  System.out.println("3	- manage billing accounts");
+			  System.out.println(CMD_REPORTS);
+			  System.out.println("4	- generate reports");
+			  System.out.println(CMD_QUIT);
+			  System.out.println("5	- exit the program");
+			  break;
           case CMD_MEDICAL_RECORDS:
               //fhy      
               System.out.println(CMD_TREATMENT_ADD);
-              System.out.println("\t- add a new treatment record");
+              System.out.println("1	- add a new treatment record");
               System.out.println(CMD_TREATMENT_GETALL);
-              System.out.println("\t- retrieve all treatment records");
+              System.out.println("2	- retrieve all treatment records");
               System.out.println(CMD_TREATMENT_GET);
-              System.out.println("\t- retrieve a treatment record");
+              System.out.println("3	- retrieve a treatment record");
               System.out.println(CMD_TREATMENT_UPDATE);
-              System.out.println("\t- update treatment record");
+              System.out.println("4	- update treatment record");
               System.out.println(CMD_TEST_ADD);
-              System.out.println("\t- add a new test record");
+              System.out.println("5	- add a new test record");
               System.out.println(CMD_TEST_GETALL);
-              System.out.println("\t- retrieve all test records");
+              System.out.println("6	- retrieve all test records");
               System.out.println(CMD_TEST_GET);
-              System.out.println("\t- retrieve a test record");
+              System.out.println("7	- retrieve a test record");
               System.out.println(CMD_TEST_UPDATE);
-              System.out.println("\t- update test record");
+              System.out.println("8	- update test record");
               System.out.println(CMD_CHECKIN_ADD);
-              System.out.println("\t- add a check-in record");  
+              System.out.println("9	- add a check-in record");
               System.out.println(CMD_CHECKIN_GETALL);
-              System.out.println("\t- retrieve all check-in records");
+              System.out.println("10	- retrieve all check-in records");
               System.out.println(CMD_CHECKIN_GET);
-              System.out.println("\t- retrieve a check-in record");
+              System.out.println("11	- retrieve a check-in record");
 			  System.out.println(CMD_CHECKIN_UPDATE);
-			  System.out.println("\t- update check-in record");
+			  System.out.println("12	- update check-in record");
               System.out.println(CMD_QUIT);
-              System.out.println("\t- exit the program");
+              System.out.println("13	- exit the program");
               break;
           case CMD_BILLING_ACCOUNTS:
               //GG    
@@ -3029,31 +3034,31 @@ public class WolfHospital {
                     case CMD_MAIN:
                          // Check user's input (case insensitively)
                          switch (command.toUpperCase()) {
-                             //fhy
-                             case CMD_MEDICAL_RECORDS:
+							 case "1":
+								 // Tell the user their options in this new menu
+								 printCommands(CMD_INFORMATION_PROCESSING);
+								 // Remember what menu we're in
+								 currentMenu = CMD_INFORMATION_PROCESSING;
+								 break;
+                         	//fhy
+                             case "2":
                                  // Tell the user their options in this new menu
                                  printCommands(CMD_MEDICAL_RECORDS);
                                  // Remember what menu we're in
                                  currentMenu = CMD_MEDICAL_RECORDS;
                                  break;
                             //GG
-                           	case CMD_BILLING_ACCOUNTS: 
+                           	case "3":
                              	printCommands(CMD_BILLING_ACCOUNTS);
                              	currentMenu = CMD_BILLING_ACCOUNTS;
                              	break;
-                            case CMD_INFORMATION_PROCESSING:
-                                // Tell the user their options in this new menu
-                                printCommands(CMD_INFORMATION_PROCESSING);
-                                // Remember what menu we're in
-                                currentMenu = CMD_INFORMATION_PROCESSING;
-                                break;
-                            case CMD_REPORTS:
+                            case "4":
                                 // Tell the user their options in this new menu
                                 printCommands(CMD_REPORTS);
                                 // Remember what menu we're in
                                 currentMenu = CMD_REPORTS;
                                 break;                                
-                            case CMD_QUIT:
+                            case "5":
                                 quit = true;
                                 break;
                             default:
@@ -3067,43 +3072,43 @@ public class WolfHospital {
                     //fhy
                     case CMD_MEDICAL_RECORDS:
                         switch (command.toUpperCase()){
-                            case CMD_TREATMENT_ADD:
+                            case "1":
                             		userTreatmentAdd();
                                 break;
-                            case CMD_TREATMENT_GETALL:
+                            case "2":
                             		userTreatmentGetAll();
                                 break;
-                            case CMD_TREATMENT_GET:
+                            case "3":
                             		userTreatmentGet();
                                 break;
-                            case CMD_TREATMENT_UPDATE:
+                            case "4":
                             		userTreatmentUpdate();
                                 break;
-                            case CMD_TEST_ADD:
+                            case "5":
                             		userTestAdd();
                                 break;   
-                            case CMD_TEST_GETALL:
+                            case "6":
                             		userTestGetAll();
                                 break;   
-                            case CMD_TEST_GET:
+                            case "7":
                             		userTestGet();
                                 break;
-                            case CMD_TEST_UPDATE:
+                            case "8":
                             		userTestUpdate();
                                 break;
-                            case CMD_CHECKIN_ADD:
+                            case "9":
                             		userCheckinAdd();
                                 break;
-                            case CMD_CHECKIN_GETALL:
+                            case "10":
                             		userCheckinGetAll();
                                 break;
-                            case CMD_CHECKIN_GET:
+                            case "11":
                             		userCheckinGet();
                                 break;
-							case CMD_CHECKIN_UPDATE:
+							case "12":
 									userCheckinUpdate();
 								break;
-                            case CMD_QUIT:
+                            case "13":
                                 quit = true;
                                 break;
                             default:
