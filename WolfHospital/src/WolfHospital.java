@@ -2999,6 +2999,21 @@ public class WolfHospital {
            
             connectToDatabase();
             generatePreparedStatements();
+<<<<<<< HEAD
+    //        dropAllExistingTables();
+     //       generateTables();
+			
+			populateStaffTable();
+			populatePatientsTable();
+			populateWardsTable();
+			populateMedicalRecordsTable();
+			populateTreatmentTable();
+			populateTestTable();
+			populateCheckinTable();
+			populateBillingAccountsTable();
+			populateBedsTable();
+			populateAssignedTable();
+=======
 //            dropAllExistingTables();
 //            generateTables();
 //			
@@ -3012,6 +3027,7 @@ public class WolfHospital {
 //			populateBillingAccountsTable();
 //			populateBedsTable();
 //			populateAssignedTable();
+>>>>>>> 7c9765b19ea5ae7213e6a00211993b35af999aa9
             
             // Print available commands
             printCommands(CMD_MAIN);
@@ -3109,6 +3125,7 @@ public class WolfHospital {
                                 printCommands(CMD_MEDICAL_RECORDS);
                                 break;     
                         }
+                        break;
                     case CMD_BILLING_ACCOUNTS:
                     //GG
                     	switch (command.toUpperCase()){
@@ -3132,6 +3149,7 @@ public class WolfHospital {
                           	printCommands(CMD_BILLING_ACCOUNTS);
                           	break;
                       }
+                    	break;
                     case CMD_INFORMATION_PROCESSING:
                         switch (command.toUpperCase()) {
                             case CMD_STAFF_ADD:
