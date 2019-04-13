@@ -241,7 +241,7 @@ public class WolfHospital {
 		case CMD_MAIN:
 			System.out.println("1 - " + CMD_INFORMATION_PROCESSING);
 			System.out.println("\t-- process information");
-			System.out.println("2- " + CMD_MEDICAL_RECORDS);
+			System.out.println("2 - " + CMD_MEDICAL_RECORDS);
 			System.out.println("\t-- manage medical records");
 			System.out.println("3 - " + CMD_BILLING_ACCOUNTS);
 			System.out.println("\t-- manage billing accounts");
@@ -1303,13 +1303,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllTreatmentRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("prescription: " + result.getString("prescription") + " ");
-				System.out.println("diagnosis details: " + result.getString("diagnosisDetails") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("prescription: " + result.getString("prescription") + " | ");
+				System.out.println("diagnosis details: " + result.getString("diagnosisDetails"));
 
 			}
 			success = true;
@@ -1330,13 +1330,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowTreatmentRecord\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("prescription: " + result.getString("prescription") + " ");
-				System.out.println("diagnosis details: " + result.getString("diagnosisDetails") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("prescription: " + result.getString("prescription") + " | ");
+				System.out.println("diagnosis details: " + result.getString("diagnosisDetails"));
 			}
 			success = true;
 		} catch (Throwable err) {
@@ -1444,13 +1444,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllTestRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("test type: " + result.getString("testType") + " ");
-				System.out.println("test result: " + result.getString("testResult") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("test type: " + result.getString("testType") + " | ");
+				System.out.println("test result: " + result.getString("testResult"));
 			}
 			success = true;
 		} catch (Throwable err) {
@@ -1471,13 +1471,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowTestRecord\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("test type: " + result.getString("testType") + " ");
-				System.out.println("test result: " + result.getString("testResult") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("test type: " + result.getString("testType") + " | ");
+				System.out.println("test result: " + result.getString("testResult"));
 			}
 			success = true;
 		} catch (Throwable err) {
@@ -1557,13 +1557,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllCheckinRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("ward number: " + result.getString("wardNumber") + " ");
-				System.out.println("bed number: " + result.getString("bedNumber") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("ward number: " + result.getString("wardNumber") + " | ");
+				System.out.println("bed number: " + result.getString("bedNumber"));
 			}
 			success = true;
 		} catch (Throwable err) {
@@ -1584,13 +1584,13 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowCheckinRecord\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("ward number: " + result.getString("wardNumber") + " ");
-				System.out.println("bed number: " + result.getString("bedNumber") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("ward number: " + result.getString("wardNumber") + " | ");
+				System.out.println("bed number: " + result.getString("bedNumber"));
 			}
 			success = true;
 		} catch (Throwable err) {
@@ -1877,7 +1877,7 @@ public class WolfHospital {
 				System.out.print("Registration Fee :" + result.getString("registrationFee") + " | ");
 				System.out.print("Medication Prescribed :" + result.getString("medicationPrescribed") + " | ");
 				System.out.print("Accommandation Fee :" + result.getString("accommandationFee") + " | ");
-				System.out.print("Billing Address :" + result.getString("billingAddress") + " | ");
+				System.out.println("Billing Address :" + result.getString("billingAddress"));
 			}
 			success = true;
 			
