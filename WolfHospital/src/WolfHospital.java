@@ -1509,7 +1509,6 @@ public class WolfHospital {
 
 	}
 
-	// 4
 	public static void manageTestRecordAdd(String recordID, String testType, String testResult) {
 		try {
 
@@ -1533,7 +1532,6 @@ public class WolfHospital {
 		}
 	}
 
-	// 5
 	public static boolean showAllTestRecords(String patientID) {
 		boolean success = false;
 
@@ -1560,7 +1558,6 @@ public class WolfHospital {
 		return success;
 	}
 
-	// 6
 	public static boolean showTestRecord(String recordID) {
 		boolean success = false;
 
@@ -1587,7 +1584,6 @@ public class WolfHospital {
 		return success;
 	}
 
-	// 7
 	public static void manageTestUpdate(String recordID, String attributeToChange, String valueToChange) {
 		try {
 			connection.setAutoCommit(true);
@@ -1617,7 +1613,6 @@ public class WolfHospital {
 		}
 	}
 
-	// 8
 	public static void manageCheckinRecordAdd(String recordID, String wardNumber, String bedNumber) {
 		try {
 
@@ -1641,7 +1636,6 @@ public class WolfHospital {
 		}
 	}
 
-	// 9
 	public static boolean showAllCheckinRecords(String patientID) {
 		boolean success = false;
 
@@ -1668,7 +1662,6 @@ public class WolfHospital {
 		return success;
 	}
 
-	// 10
 	public static boolean showCheckinRecord(String recordID) {
 		boolean success = false;
 
