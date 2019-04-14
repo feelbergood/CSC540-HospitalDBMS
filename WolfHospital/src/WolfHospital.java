@@ -40,7 +40,18 @@ Function documentations:
 	main function: print welcome message, show available commands, listen to inputs and perform database CRUD, close and quit
 
 High-level/Design decisions:
-
+	1. Prepared Statement: We use prepared statements for SQL interactions with the database so that our program can achieve a better efficiency.
+	2. Uniqueness, primary key, and foreign key constraints: By applying these constraints, we ensure that our program maintain consistency and avoid redundancy in database.
+	3. Transactions: We implement transactions where there are multiple database modification steps within one function. This will ensure the integrity of data in database.
+	4. Hints and Codes of Options for UI: Although UI design is not graded, we design our application in an easier way for users to operate,
+	   such as showing all the options and coded those options numerically so that users can enter a number when choosing an option.
+	5. String parameters for DB-related functions: We let all the DB-related functions read all the parameters as String and further convert or
+	   parse it to the type or format desired for a SQL statement within the function. It is easier for us to build up the program based on this unity.
+	6. Check/Assertion in both SQL and Application Level: We would check or assert certain conditions in either SQL or application or both depends on the situation.
+	   For example, we check if a query statement return nothing in our application code with the help of “ResultSet” in JAVA while we make sure that the returned items
+	   satisfy constraints such as “patientID IS NOT NULL” in a SQL statement.
+	7. Unified name of functions and of variables: To develop the program by a four-member team, we make sure that it is easy for everyone to locate codes by
+	   naming most of the functions and variables in the same style, for example, function name starting with “user” indicates that the function will be interacting with users.
  */
 
 import java.sql.*;
