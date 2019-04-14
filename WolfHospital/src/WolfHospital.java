@@ -1,5 +1,9 @@
 import java.sql.*;
 import java.util.Scanner;
+import java.util.Date;
+import java.util.Calendar;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 public class WolfHospital {
 	// Update your user info alone here
@@ -9,14 +13,6 @@ public class WolfHospital {
 	private static final String user = "yrao3";
 	private static final String password = "200204773";
 
-	// Commands
-	// Operators: responsible for admitting patients, processing patient information
-	// and assigning beds.
-	// Billing staff: responsible for creating billing information.
-	// Doctors: treat, test patients and log medical records.
-	// Administrators: manage all operations of users above and process staff and
-	// hospital information.
-	// Patients: Retrieve own billing account, medical records, patient info
 	private static final String CMD_MAIN = "MAIN";
 	private static final String CMD_INFORMATION_PROCESSING = "INFORMATION PROCESSING"; // CWChen
 	private static final String CMD_MEDICAL_RECORDS = "MAINTAINING MEDICAL RECORDS"; // fhy
@@ -119,13 +115,15 @@ public class WolfHospital {
 	private static PreparedStatement prepAddPersonInfo;
 	private static PreparedStatement prepGetPatients;
 	private static PreparedStatement prepUpdatePatientsName;
-	private static PreparedStatement prepUpdatePatientsAge;
+	//private static PreparedStatement prepUpdatePatientsAge;
 	private static PreparedStatement prepUpdatePatientsPhone;
 	private static PreparedStatement prepUpdatePatientsAddress;
 	private static PreparedStatement prepUpdatePatientsTreatmentPlan; // To reflect what is showed in demo data
 	private static PreparedStatement prepUpdatePatientsInWard;
 	private static PreparedStatement prepUpdatePatientsStatus;
 	private static PreparedStatement prepDeletePatients;
+	private static PreparedStatement prepDeleteAgeInfo;
+	private static PreparedStatement prepCheckAgeInfo;
 
 	// fhy
 	private static PreparedStatement prepAddMedicalRecord;
@@ -186,7 +184,10 @@ public class WolfHospital {
 	// GG
 	// Basic Information - Wards(partial, the rest should be done by others)
 	private static PreparedStatement prepDeleteWardInfo;
-	private static PreparedStatement prep_checkWardAvailability;
+	private static PreparedStatement prepCheckWardAvailability;
+	// private static PreparedStatement prepAssignWard;
+	// private static PreparedStatement prepReserveWard;
+	// private static PreparedStatement prepReleaseWard;
 
 	// Basic Information - Beds
 	private static PreparedStatement prepAddBedInfo;
@@ -195,8 +196,9 @@ public class WolfHospital {
 
 	// Management - Beds
 	private static PreparedStatement prepAssignBed;
-	private static PreparedStatement prep_checkBedAvailability;
-	private static PreparedStatement prep_checkBedinWardAvailability;    
+	private static PreparedStatement prepCheckBedAvailability;
+	private static PreparedStatement prepCheckBedinWardAvailability;
+	// private static PreparedStatement prepReserveBed;
 	private static PreparedStatement prepReleaseBed;
 	private static PreparedStatement prepAddAssigned;
 
@@ -241,7 +243,7 @@ public class WolfHospital {
 		case CMD_MAIN:
 			System.out.println("1 - " + CMD_INFORMATION_PROCESSING);
 			System.out.println("\t-- process information");
-			System.out.println("2- " + CMD_MEDICAL_RECORDS);
+			System.out.println("2 - " + CMD_MEDICAL_RECORDS);
 			System.out.println("\t-- manage medical records");
 			System.out.println("3 - " + CMD_BILLING_ACCOUNTS);
 			System.out.println("\t-- manage billing accounts");
@@ -276,7 +278,9 @@ public class WolfHospital {
 			System.out.println("\t-- - retrieve a check-in record");
 			System.out.println("12 - " + CMD_CHECKIN_UPDATE);
 			System.out.println("\t-- - update check-in record");
-			System.out.println("13 - " + CMD_QUIT);
+			System.out.println("13 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("14 - " + CMD_QUIT);
 			System.out.println("\t-- exit the program");
 			break;
 		case CMD_BILLING_ACCOUNTS:
@@ -289,6 +293,10 @@ public class WolfHospital {
 			System.out.println("\t-- update billing account");
 			System.out.println("4 - " + CMD_BILLING_ACCT_DELETE);
 			System.out.println("\t-- delete billing account");
+			System.out.println("5 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("6 - " + CMD_QUIT);
+			System.out.println("\t-- exit the program");
 			break;
 		case CMD_INFORMATION_PROCESSING:
 			System.out.println("1 - " + CMD_STAFF_ADD);
@@ -325,7 +333,9 @@ public class WolfHospital {
 			System.out.println("\t-- release an ward");
 			System.out.println("17 - " + CMD_BED_RELEASE);
 			System.out.println("\t-- release a bed");
-			System.out.println("18 - " + CMD_QUIT);
+			System.out.println("18 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("19 - " + CMD_QUIT);
 			System.out.println("\t-- exit the program");
 			break;
 		case CMD_REPORTS:
@@ -345,7 +355,9 @@ public class WolfHospital {
 			System.out.println("\t-- report doctors' responsibility");
 			System.out.println("8 - " + CMD_STAFF_INFO_REPORT);
 			System.out.println("\t-- report staff information grouped by role");
-			System.out.println("9 - " + CMD_QUIT);
+			System.out.println("9 - " + CMD_MAIN);
+			System.out.println("\t-- go back to main menu");
+			System.out.println("10 - " + CMD_QUIT);
 			System.out.println("\t-- exit the program");
 		}
 	}
@@ -398,20 +410,25 @@ public class WolfHospital {
 			prepAddPersonInfo = connection.prepareStatement(sql);
 
 			// Retrieve basic information about patients
-			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN"
-					+ " JOIN `AgeInfo` a ON i.DOB = a.DOB" + " JOIN ContactInfo con ON i.phone = con.phone"
-					+ " WHERE patientID = ?;";
+			sql = "SELECT * FROM `Patients` p JOIN `PersonInfo` i ON p.SSN = i.SSN" +
+					" JOIN AgeInfo a ON i.DOB = a.DOB" +
+					" JOIN ContactInfo con ON i.phone = con.phone" +
+					" WHERE patientID = ?;";
 			prepGetPatients = connection.prepareStatement(sql);
+      
 			// Update basic information about patients
 			sql = "UPDATE `PersonInfo`" + " SET `name` = ?"
 					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prepUpdatePatientsName = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo`" + " SET `age` = ?"
-					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
-			prepUpdatePatientsAge = connection.prepareStatement(sql);
-			sql = "UPDATE `PersonInfo` p `ContactInfo` ci" + " SET p.phone=?, ci.phone=?"
-					+ " WHERE p.phone=ci.phone AND p.SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+
+			//sql = "UPDATE `PersonInfo`" + " SET `age` = ?"
+			//		+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
+			//prepUpdatePatientsAge = connection.prepareStatement(sql);
+			sql = "UPDATE `PersonInfo` p `ContactInfo` ci" +
+					" SET p.phone=?, ci.phone=?" +
+					" WHERE p.phone=ci.phone AND p.SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prepUpdatePatientsPhone = connection.prepareStatement(sql);
+      
 			sql = "UPDATE `ContactInfo`" + " SET `address` = ?"
 					+ " WHERE phone IN (SELECT phone FROM PersonInfo WHERE SSN"
 					+ " IN (SELECT SSN FROM Patients WHERE patientID = ?));";
@@ -426,22 +443,29 @@ public class WolfHospital {
 					+ " WHERE SSN IN (SELECT SSN FROM Patients WHERE patientID = ?);";
 			prepUpdatePatientsStatus = connection.prepareStatement(sql);
 			// Delete basic information about patients
-			sql = "DELETE `Patients` p, `PersonInfo` i, `AgeInfo` a, `ContactInfo` con FROM p JOIN i ON p.SSN = i.SSN"
-					+ " JOIN a ON i.DOB = a.DOB" + " JOIN  con ON i.phone = con.phone" + " WHERE patientID = ?;";
+			sql = "DELETE FROM `Patients`" + " WHERE patientID = ?;";
 			prepDeletePatients = connection.prepareStatement(sql);
+      
+			// Delete basic information about AgeInfo corresponding to patients
+			sql = "DELETE FROM `AgeInfo`" + " WHERE DOB = ?;";
+			prepDeleteAgeInfo = connection.prepareStatement(sql);
+			// Check if a AgeInfo tuple is not matched by parent table
+			sql = "SELECT AgeInfo.DOB from AgeInfo left outer join PersonInfo on (AgeInfo.DOB = PersonInfo.DOB) " +
+				"WHERE AgeInfo.DOB = ?;";
+			prepCheckAgeInfo = connection.prepareStatement(sql);
 			// Enter basic information about wards
 			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)"
 					+ " VALUES (?, ?, ?, ?);";
 			prepAddWards = connection.prepareStatement(sql);
 			// Retrieve basic information about wards
-			sql = "SELECT * FROM `Wards`" + " WHERE ward number = ?;";
+			sql = "SELECT * FROM `Wards` WHERE `ward number` = ?;";
 			prepGetWards = connection.prepareStatement(sql);
 			// Update basic information about wards
-			sql = "UPDATE `Wards`" + " SET `capacity` = ?" + " WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `capacity` = ?" + " WHERE `ward number` = ?;";
 			prepUpdateWardsCapacity = connection.prepareStatement(sql);
-			sql = "UPDATE `Wards`" + " SET `charges per day` = ?" + " WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `charges per day` = ?" + " WHERE `ward number` = ?;";
 			prepUpdateWardsCharge = connection.prepareStatement(sql);
-			sql = "UPDATE `Wards`" + " SET `responsible nurse` = ?" + " WHERE ward number = ?;";
+			sql = "UPDATE `Wards`" + " SET `responsible nurse` = ?" + " WHERE `ward number` = ?;";
 			prepUpdateWardsNurse = connection.prepareStatement(sql);
 			// fhy
 
@@ -606,9 +630,13 @@ public class WolfHospital {
 			prepDeleteWardInfo = connection.prepareStatement(sql);
 
 			// Check availability of wards
-			sql = "SELECT * FROM `Wards` WHERE `ward number` IN (SELECT DISTINCT `ward number` " + "FROM `Beds`"
-					+ "WHERE ISNULL(patientID)); ";
-			prep_checkWardAvailability = connection.prepareStatement(sql);
+			sql = "SELECT Wards.`ward number`, Wards.capacity, Beds.`bed number` " +
+					"FROM `Wards` LEFT JOIN `Beds` ON " +
+					"Beds.`ward number`=Wards.`ward number` " +
+					"WHERE NOT EXISTS (SELECT * FROM Assigned " +
+					"WHERE patientID IS NOT NULL AND Assigned.`bed number`=Beds.`bed number` " +
+					"AND Assigned.`ward number`=Beds.`ward number`);";
+			prepCheckWardAvailability = connection.prepareStatement(sql);
 
 			// Assign wards:
 			// sql = "SELECT COUNT(`bed number`) FROM `Beds` WHERE `ward number` = ?; ";
@@ -639,16 +667,27 @@ public class WolfHospital {
 			prepDeleteBedInfo = connection.prepareStatement(sql);
 
 			// Assign beds
-			sql = "UPDATE `Beds` SET `patientID` = ? WHERE `ward number` = ? AND `bed number` = ?; ";
+			sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`, `start-date`, `end-date`) " +
+					"VALUES (?, ?, ?, ?, ?); ";
 			prepAssignBed = connection.prepareStatement(sql);
 
 			// Check availability of beds
-			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID); ";
-			prep_checkBedAvailability = connection.prepareStatement(sql);
+			sql = "SELECT Beds.`ward number`, Beds.`bed number` " +
+					"FROM `Beds` LEFT JOIN `Wards` ON " +
+					"Beds.`ward number`=Wards.`ward number` " +
+					"WHERE NOT EXISTS (SELECT * FROM Assigned " +
+					"WHERE patientID IS NOT NULL AND Assigned.`bed number`=Beds.`bed number` " +
+					"AND Assigned.`ward number`=Beds.`ward number`);";
+			prepCheckBedAvailability = connection.prepareStatement(sql);
 
 			// Check availability of beds in an appointed ward
-			sql = "SELECT * FROM `Beds` " + "WHERE ISNULL(patientID) AND `ward number ` = ?; ";
-			prep_checkBedinWardAvailability = connection.prepareStatement(sql);
+			sql = "SELECT Beds.`ward number`, Beds.`bed number` " +
+					"FROM `Beds` LEFT JOIN `Wards` ON " +
+					"Beds.`ward number`=Wards.`ward number` " +
+					"WHERE Beds.`ward number` = ? AND NOT EXISTS (SELECT * FROM Assigned " +
+					"WHERE patientID IS NOT NULL AND Assigned.`bed number`=Beds.`bed number` " +
+					"AND Assigned.`ward number`=Beds.`ward number`);";
+			prepCheckBedinWardAvailability = connection.prepareStatement(sql);
 
 			// Reserve beds
 			// sql = "INSERT INTO `Assigned` (`patientID`, `ward number`, `bed number`,
@@ -657,7 +696,7 @@ public class WolfHospital {
 			// prepReserveBed = connection.prepareStatement(sql);
 
 			// Release beds
-			sql = "UPDATE `Beds` SET `patientID` = NULL WHERE `ward number` = ? AND `bed number` = ?; ";
+			sql = "DELETE FROM `Assigned` WHERE `ward number` = ? AND `bed number` = ?; ";
 			prepReleaseBed = connection.prepareStatement(sql);
 
 			// Create treatment records
@@ -684,7 +723,7 @@ public class WolfHospital {
 			}
 			statement.executeUpdate("SET FOREIGN_KEY_CHECKS=1;");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -694,83 +733,156 @@ public class WolfHospital {
 			connection.setAutoCommit(false);
 			try {
 				// Wayne: Staff, Patients, Wards:
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Staff` (" + "`staffID` VARCHAR(255) NOT NULL, "
-						+ "`name` VARCHAR(255) NOT NULL, " + "`age` INT(3) NOT NULL, "
-						+ "`gender` VARCHAR(255) NOT NULL, " + "`jobTitle` VARCHAR(255) NOT NULL, "
-						+ "`profTitle` VARCHAR(255) DEFAULT NULL, " + "`department` VARCHAR(255) NOT NULL, "
-						+ "`phone` VARCHAR(255) NOT NULL, " + "`address` VARCHAR(255) NOT NULL, "
-						+ "PRIMARY KEY (`staffID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `AgeInfo` (" + "`DOB` datetime NOT NULL, "
-						+ "`age` INT(2) NOT NULL, " + "PRIMARY KEY (`DOB`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ContactInfo` (" + "`phone` VARCHAR(255) NOT NULL, "
-						+ "`address` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`phone`)" + ");");
-				statement.executeUpdate(
-						"CREATE TABLE IF NOT EXISTS `Patients` (" + "`patientID` varchar(255) NOT NULL UNIQUE, "
-								+ "`SSN` varchar(255) NOT NULL UNIQUE, " + "PRIMARY KEY (`patientID`) " + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `PersonInfo` ("
-						+ "`SSN` varchar(255) NOT NULL UNIQUE, " + "`name` varchar(255) NOT NULL, "
-						+ "`DOB` datetime NOT NULL, " + "`gender` VARCHAR(255) NOT NULL, "
-						+ "`phone` VARCHAR(255) NOT NULL, " + "`processing treatment plan` VARCHAR(255) NOT NULL, "
-						+ "`in ward` BIT, " + "`completing treatment` BIT, " + "PRIMARY KEY (`SSN`), "
-						+ "FOREIGN KEY (`DOB`) REFERENCES AgeInfo(`DOB`), "
-						+ "FOREIGN KEY (`phone`) REFERENCES ContactInfo(`phone`)" + ");");
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Staff` (" 
+						+ "`staffID` VARCHAR(255) NOT NULL, "
+						+ "`name` VARCHAR(255) NOT NULL, " 
+						+ "`age` INT(3) NOT NULL, "
+						+ "`gender` VARCHAR(255) NOT NULL, " 
+						+ "`jobTitle` VARCHAR(255) NOT NULL, "
+						+ "`profTitle` VARCHAR(255) DEFAULT NULL, " 
+						+ "`department` VARCHAR(255) NOT NULL, "
+						+ "`phone` VARCHAR(255) NOT NULL, " 
+						+ "`address` VARCHAR(255) NOT NULL, "
+						+ "PRIMARY KEY (`staffID`));");
 
-				// GG
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `AgeInfo` (" 
+						+ "`DOB` datetime NOT NULL, "
+						+ "`age` INT(2) NOT NULL, " 
+						+ "PRIMARY KEY (`DOB`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ContactInfo` (" 
+						+ "`phone` VARCHAR(255) NOT NULL, "
+						+ "`address` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`phone`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Staff` (" 
+						+ "`staffID` VARCHAR(255) NOT NULL, " 
+						+ "`name` VARCHAR(255) NOT NULL, " 
+						+ "`age` INT(3) NOT NULL, " 
+						+ "`gender` VARCHAR(255) NOT NULL, " 
+						+ "`jobTitle` VARCHAR(255) NOT NULL, " 
+						+ "`profTitle` VARCHAR(255) DEFAULT NULL, " 
+						+ "`department` VARCHAR(255) NOT NULL, " 
+						+ "`phone` VARCHAR(255) NOT NULL, " 
+						+ "`address` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`staffID`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Patients` (" 
+						+ "`patientID` varchar(255) NOT NULL UNIQUE, " 
+						+ "`SSN` varchar(255) NOT NULL UNIQUE, " 
+						+ "PRIMARY KEY (`patientID`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `PersonInfo` (" 
+						+ "`SSN` varchar(255) NOT NULL UNIQUE, " 
+						+ "`name` varchar(255) NOT NULL, " 
+						+ "`DOB` datetime NOT NULL, " 
+						+ "`gender` VARCHAR(255) NOT NULL, " 
+						+ "`phone` VARCHAR(255) NOT NULL UNIQUE, " 
+						+ "`processing treatment plan` VARCHAR(255) NOT NULL, " 
+						+ "`in ward` VARCHAR(255) NOT NULL, " 
+						+ "`completing treatment` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`SSN`), " 
+						+ "CONSTRAINT fk_patientSSN FOREIGN KEY (`SSN`) "
+						+ "REFERENCES Patients(`SSN`) ON DELETE CASCADE);");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `AgeInfo` (" 
+						+ "`DOB` datetime NOT NULL, " 
+						+ "`age` INT(2) NOT NULL, "
+						+ "PRIMARY KEY (`DOB`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ContactInfo` (" 
+						+ "`phone` VARCHAR(255) NOT NULL, " 
+						+ "`address` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`phone`), " 
+						+ "CONSTRAINT fk_personInfoPhone FOREIGN KEY (`phone`) "
+						+"REFERENCES PersonInfo(`phone`) ON DELETE CASCADE);");
+
 				// Wards
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Wards` (" + "`ward number` VARCHAR(255) NOT NULL UNIQUE, "
-						+ "`capacity` INT NOT NULL, " + "`charges per day` INT NOT NULL, "
-						+ "`responsible nurse` VARCHAR(255) DEFAULT NULL, " + "PRIMARY KEY (`ward number`), "
-						+ "CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) REFERENCES Staff(`staffID`) "
-						+ "ON DELETE SET NULL" + ");");
-				// fhy: Medical Records, Treatment, Test, Check-ins
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Medical Records` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE, " + "`patientID` VARCHAR(255) NOT NULL, "
-						+ "`startDate` DATETIME NOT NULL, " + "`endDate` DATETIME DEFAULT NULL, "
-						+ "`responsibleDoctor` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`recordID`), "
-						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`), "
-						+ "FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Treatment` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`prescription` VARCHAR(255) NOT NULL,"
-						+ "`diagnosisDetails` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`recordID`), "
-						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" + ");");
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Wards` (" 
+						+ "`ward number` VARCHAR(255) NOT NULL UNIQUE, " 
+						+ "`capacity` INT NOT NULL, " 
+						+ "`charges per day` INT NOT NULL, " 
+						+ "`responsible nurse` VARCHAR(255) DEFAULT NULL, " 
+						+ "PRIMARY KEY (`ward number`), " 
+						+ "CONSTRAINT fk_ward FOREIGN KEY (`responsible nurse`) "
+						+ "REFERENCES Staff(`staffID`));");
+
+				//fhy: Medical Records, Treatment, Test, Check-ins
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Medical Records` (" 
+						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE, " 
+						+ "`patientID` VARCHAR(255) NOT NULL, " 
+						+ "`startDate` DATETIME NOT NULL, " 
+						+ "`endDate` DATETIME DEFAULT NULL, " 
+						+ "`responsibleDoctor` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`recordID`), " 
+						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`), " 
+						+ "FOREIGN KEY (`responsibleDoctor`) REFERENCES Staff(`staffID`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Treatment` (" 
+						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," 
+						+ "`prescription` VARCHAR(255) NOT NULL," 
+						+ "`diagnosisDetails` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`recordID`), " 
+						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`));");
+
 				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Test` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`testType` VARCHAR(255) NOT NULL,"
-						+ "`testResult` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`recordID`), "
-						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`)" + ");");
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Check-ins` ("
-						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE," + "`wardNumber` VARCHAR(255) DEFAULT NULL,"
-						+ "`bedNumber` VARCHAR(255) DEFAULT NULL," + "PRIMARY KEY (`recordID`), "
+						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE,"
+						+ "`testType` VARCHAR(255) NOT NULL,"
+						+ "`testResult` VARCHAR(255) NOT NULL, "
+						+ "PRIMARY KEY (`recordID`), "
+						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`));");
+
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Check-ins` (" 
+						+ "`recordID` VARCHAR(255) NOT NULL UNIQUE,"
+						+ "`wardNumber` VARCHAR(255) DEFAULT NULL,"
+						+ "`bedNumber` VARCHAR(255) DEFAULT NULL,"
+						+ "PRIMARY KEY (`recordID`), "
 						+ "FOREIGN KEY (`recordID`) REFERENCES `Medical Records`(`recordID`), "
-						+ "FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`)" + ");");
+						+ "FOREIGN KEY (`wardNumber`) REFERENCES Wards(`ward number`));");
 
 				// Yudong
 				// Billing accounts && PayerInfo
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `PayerInfo` ( " + "`SSN` VARCHAR(255) NOT NULL UNIQUE, "
-						+ "`billingAddress` VARCHAR(255) NOT NULL, " + "PRIMARY KEY (`SSN`) " + ");");
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `PayerInfo` ( " 
+						+ "`SSN` VARCHAR(255) NOT NULL UNIQUE, "
+						+ "`billingAddress` VARCHAR(255) NOT NULL, " 
+						+ "PRIMARY KEY (`SSN`));");
 
 				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Billing Accounts` ("
-						+ "`accountID` VARCHAR(255) NOT NULL UNIQUE," + "`patientID` VARCHAR(255) NOT NULL,"
-						+ "`visitDate` datetime NOT NULL," + "`payerSSN` VARCHAR(255) NOT NULL,"
-						+ "`paymentMethod` VARCHAR(255) NOT NULL," + "`cardNumber` VARCHAR(255) DEFAULT NULL,"
-						+ "`registrationFee` DOUBLE NOT NULL," + "`medicationPrescribed` BIT DEFAULT NULL,"
-						+ "`accommandationFee` DOUBLE NOT NULL," + " PRIMARY KEY (`accountID`),"
+						+ "`accountID` VARCHAR(255) NOT NULL UNIQUE," 
+						+ "`patientID` VARCHAR(255) NOT NULL,"
+						+ "`visitDate` datetime NOT NULL," 
+						+ "`payerSSN` VARCHAR(255) NOT NULL,"
+						+ "`paymentMethod` VARCHAR(255) NOT NULL," 
+						+ "`cardNumber` VARCHAR(255) DEFAULT NULL,"
+						+ "`registrationFee` DOUBLE NOT NULL," 
+						+ "`medicationPrescribed` BIT DEFAULT NULL,"
+						+ "`accommandationFee` DOUBLE NOT NULL," 
+						+ " PRIMARY KEY (`accountID`),"
 						+ "FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`),"
-						+ "FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`)" + ");");
+						+ "FOREIGN KEY (`payerSSN`) REFERENCES PayerInfo(`SSN`));");
 
 				// GG
 				// Beds
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Beds` (" + "`ward number` VARCHAR(255) NOT NULL,"
-						+ "`bed number` VARCHAR(255) NOT NULL," + "PRIMARY KEY (`ward number`, `bed number`), "
-						+ "CONSTRAINT `fk_bedwn` FOREIGN KEY (`ward number`) REFERENCES Wards(`ward number`) ON DELETE CASCADE"
-						+ ");");
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Beds` (" 
+						+ "`ward number` VARCHAR(255) NOT NULL,"
+						+ "`bed number` VARCHAR(255) NOT NULL," 
+						+ "PRIMARY KEY (`ward number`, `bed number`), "
+						+ "CONSTRAINT `fk_bedwn` FOREIGN KEY (`ward number`) "
+						+ "REFERENCES Wards(`ward number`) ON DELETE CASCADE);");
+
 				// Assigned
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Assigned` (" + "`patientID` VARCHAR(255) NOT NULL,"
-						+ "`ward number` VARCHAR(255) NOT NULL," + "`bed number` VARCHAR(255) NOT NULL,"
-						+ "`start-date` DATETIME NOT NULL," + "`end-date` DATETIME DEFAULT NULL,"
+				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Assigned` (" 
+						+ "`patientID` VARCHAR(255) NOT NULL,"
+						+ "`ward number` VARCHAR(255) NOT NULL," 
+						+ "`bed number` VARCHAR(255) NOT NULL,"
+						+ "`start-date` DATETIME NOT NULL," 
+						+ "`end-date` DATETIME DEFAULT NULL,"
 						+ "CONSTRAINT pkAssign PRIMARY KEY (`patientID`, `ward number`, `bed number`),"
-						+ "CONSTRAINT `fkAssignpi` FOREIGN KEY (`patientID`) REFERENCES Patients(`patientID`) ON DELETE CASCADE, "
-						+ "CONSTRAINT `fkAssginwb` FOREIGN KEY (`ward number`, `bed number`) REFERENCES Beds(`ward number`, `bed number`) "
-						+ "ON DELETE CASCADE" + ");");
+						+ "CONSTRAINT `fkAssignpi` FOREIGN KEY (`patientID`) "
+						+ "REFERENCES Patients(`patientID`) ON DELETE CASCADE, "
+						+ "CONSTRAINT `fkAssginwb` FOREIGN KEY (`ward number`, `bed number`) "
+						+ "REFERENCES Beds(`ward number`, `bed number`) "
+						+ "ON DELETE CASCADE);");
 
 				connection.commit();
 				System.out.println("Tables created!");
@@ -900,7 +1012,6 @@ public class WolfHospital {
 					+ ", job title: " + jobTitle + ", professional title: " + profTitle + ", department: " + department
 					+ ", phone: " + phone + ", address: " + address);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -915,8 +1026,8 @@ public class WolfHospital {
 			String DOB = rs.getDate("DOB").toString();
 			int age = rs.getInt("age");
 			String processing = rs.getString("processing treatment plan");
-			String completing = rs.getString("completing treatment").equals("true") ? "yes" : "no";
-			String inWard = rs.getString("in ward").equals("true") ? "yes" : "no";
+			String completing = rs.getString("completing treatment");
+			String inWard = rs.getString("in ward");
 			String phone = rs.getString("phone");
 			String address = rs.getString("address");
 			System.out.println("Patient ID: " + patientID + ", SSN: " + SSN + ", name: " + name + ", date of birth: "
@@ -924,7 +1035,6 @@ public class WolfHospital {
 					+ address + ", processing treatment plan: " + processing + ", in ward: " + inWard
 					+ ", completing treatment: " + completing + phone + "\t" + address + "\t");
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -940,7 +1050,6 @@ public class WolfHospital {
 			System.out.println("Ward number: " + wardNumber + ", capacity: " + capacity + ", charges per day: "
 					+ dayCharge + ", responsible nurse: " + nurse);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -971,7 +1080,6 @@ public class WolfHospital {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// do we need another way to handle an exception?
 		}
 	}
 
@@ -1091,15 +1199,15 @@ public class WolfHospital {
 				prepAddPersonInfo.setString(4, gender);
 				prepAddPersonInfo.setString(5, phone);
 				prepAddPersonInfo.setString(6, processing);
-				prepAddPersonInfo.setBoolean(7, inWard.equals("yes") ? true : false);
-				prepAddPersonInfo.setBoolean(8, completing.equals("yes") ? true : false);
+				prepAddPersonInfo.setString(7, inWard);
+				prepAddPersonInfo.setString(8, completing);
 
 				// To-do: make use of variable treatmentPlan and wardNum. By calling
 				// prepAddTreatmentRecord and prepAssignWard here?
 				prepAddPatients.executeUpdate();
+				prepAddPersonInfo.executeUpdate();
 				prepAddAgeInfo.executeUpdate();
 				prepAddContactInfo.executeUpdate();
-				prepAddPersonInfo.executeUpdate();
 				connection.commit();
 			} catch (SQLException e) {
 				connection.rollback();
@@ -1109,7 +1217,6 @@ public class WolfHospital {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// To do: do we need another way to handle an exception?
 		}
 	}
 
@@ -1132,47 +1239,45 @@ public class WolfHospital {
 			connection.setAutoCommit(true);
 			try {
 				switch (attributeChanged.toUpperCase()) {
-
-				case "NAME":
-					prepUpdatePatientsName.setString(1, newValue);
-					prepUpdatePatientsName.setString(2, patientID);
-					prepUpdatePatientsName.executeUpdate();
-					break;
-				case "AGE":
-					prepUpdatePatientsAge.setInt(1, Integer.parseInt(newValue));
-					prepUpdatePatientsAge.setString(2, patientID);
-					prepUpdatePatientsAge.executeUpdate();
-					break;
-				case "ADDRESS":
-					prepUpdatePatientsAddress.setString(1, newValue);
-					prepUpdatePatientsAddress.setString(2, patientID);
-					prepUpdatePatientsAddress.executeUpdate();
-					break;
-				case "PHONE":
-					prepUpdatePatientsPhone.setString(1, newValue);
-					prepUpdatePatientsPhone.setString(2, newValue);
-					prepUpdatePatientsPhone.setString(3, patientID);
-					prepUpdatePatientsPhone.executeUpdate();
-					break;
-				case "PROCESSING TREATMENT PLAN":
-					prepUpdatePatientsTreatmentPlan.setString(1, newValue);
-					prepUpdatePatientsTreatmentPlan.setString(2, patientID);
-					prepUpdatePatientsTreatmentPlan.executeUpdate();
-					break;
-				case "IN WARD":
-					prepUpdatePatientsInWard.setBoolean(1, newValue.equals("yes") ? true : false);
-					prepUpdatePatientsInWard.setString(2, patientID);
-					prepUpdatePatientsInWard.executeUpdate();
-					break;
-				case "COMPLETING TREATMENT":
-					prepUpdatePatientsStatus.setBoolean(1, newValue.equals("yes") ? true : false);
-					prepUpdatePatientsStatus.setString(2, patientID);
-					prepUpdatePatientsStatus.executeUpdate();
-					break;
-				default:
-					System.out.println(
-							"Cannot update the field " + attributeChanged + " for patient " + patientID + " .");
-					break;
+					case "NAME":
+						prepUpdatePatientsName.setString(1, newValue);
+						prepUpdatePatientsName.setString(2, patientID);
+						prepUpdatePatientsName.executeUpdate();
+						break;
+					//case "AGE":
+					//	prepUpdatePatientsAge.setInt(1, Integer.parseInt(newValue));
+					//	prepUpdatePatientsAge.setString(2, patientID);
+					//	prepUpdatePatientsAge.executeUpdate();
+					//	break;
+					case "ADDRESS":
+						prepUpdatePatientsAddress.setString(1, newValue);
+						prepUpdatePatientsAddress.setString(2, patientID);
+						prepUpdatePatientsAddress.executeUpdate();
+						break;
+					case "PHONE":
+						prepUpdatePatientsPhone.setString(1, newValue);
+						prepUpdatePatientsPhone.setString(2, newValue);
+						prepUpdatePatientsPhone.setString(3, patientID);
+						prepUpdatePatientsPhone.executeUpdate();
+						break;
+					case "PROCESSING TREATMENT PLAN":
+						prepUpdatePatientsTreatmentPlan.setString(1, newValue);
+						prepUpdatePatientsTreatmentPlan.setString(2, patientID);
+						prepUpdatePatientsTreatmentPlan.executeUpdate();
+						break;
+					case "IN WARD":
+						prepUpdatePatientsInWard.setString(1, newValue);
+						prepUpdatePatientsInWard.setString(2, patientID);
+						prepUpdatePatientsInWard.executeUpdate();
+						break;
+					case "COMPLETING TREATMENT":
+						prepUpdatePatientsStatus.setString(1, newValue);
+						prepUpdatePatientsStatus.setString(2, patientID);
+						prepUpdatePatientsStatus.executeUpdate();
+						break;
+					default:
+						System.out.println("Cannot update the field " + attributeChanged + " for patient " + patientID + " .");
+						break;
 				}
 				connection.commit();
 			} catch (SQLException e) {
@@ -1191,11 +1296,28 @@ public class WolfHospital {
 		try {
 			connection.setAutoCommit(false);
 			try {
+				String DOB = "";
+				ResultSet rs;
+				prepGetPatients.setString(1, patientID);
+				rs = prepGetPatients.executeQuery();
+				if (rs.next()) {
+					DOB = rs.getDate("DOB").toString();
+				} else {
+					System.out.println("No such Patient");
+				}
 				prepDeletePatients.setString(1, patientID);
 				// To-do: need to consider the effect on everything related to this patient?
 				// e.g. release bed, update record, etc.
 				prepDeletePatients.executeUpdate();
 				connection.commit();
+				prepCheckAgeInfo.setDate(1, java.sql.Date.valueOf(DOB));
+				rs = prepCheckAgeInfo.executeQuery();
+				rs.beforeFirst();
+				if(!rs.next()) {
+					prepDeleteAgeInfo.setDate(1, java.sql.Date.valueOf(DOB));
+					prepDeleteAgeInfo.executeUpdate();
+					connection.commit();
+				}
 			} catch (SQLException e) {
 				connection.rollback();
 				e.printStackTrace();
@@ -1226,7 +1348,6 @@ public class WolfHospital {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			// To-do: do we need another way to handle an exception?
 		}
 	}
 
@@ -1234,7 +1355,7 @@ public class WolfHospital {
 	public static void getWard(String wardNumber) {
 		try {
 			prepGetWards.setString(1, wardNumber);
-			// To-do: need to get all the patients' SSN too?!
+			// Todo: need to get all the patients' SSN too?!
 			ResultSet rs = prepGetWards.executeQuery();
 			if (rs.next()) {
 				printWardsRow(rs);
@@ -1266,10 +1387,8 @@ public class WolfHospital {
 					prepUpdateWardsNurse.setString(2, wardNumber);
 					prepUpdateWardsNurse.executeUpdate();
 					break;
-				// TODO: how to update patients' IDs
 				default:
-					System.out
-							.println("Cannot update the field " + attributeChanged + " for ward " + wardNumber + " .");
+					System.out.println("Cannot update the field " + attributeChanged + " for ward " + wardNumber + " .");
 					break;
 				}
 				connection.commit();
@@ -1293,18 +1412,17 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllTreatmentRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("prescription: " + result.getString("prescription") + " ");
-				System.out.println("diagnosis details: " + result.getString("diagnosisDetails") + " ");
-
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("prescription: " + result.getString("prescription") + " | ");
+				System.out.println("diagnosis details: " + result.getString("diagnosisDetails"));
 			}
 			success = true;
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 
 		return success;
@@ -1320,17 +1438,17 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowTreatmentRecord\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("prescription: " + result.getString("prescription") + " ");
-				System.out.println("diagnosis details: " + result.getString("diagnosisDetails") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("prescription: " + result.getString("prescription") + " | ");
+				System.out.println("diagnosis details: " + result.getString("diagnosisDetails"));
 			}
 			success = true;
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 
 		return success;
@@ -1380,14 +1498,12 @@ public class WolfHospital {
 				connection.commit();
 			} catch (Exception e) {
 				connection.rollback();
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} finally {
 				// Restore normal auto-commit mode
 				connection.setAutoCommit(true);
 			}
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -1407,19 +1523,13 @@ public class WolfHospital {
 				prepAddTestRecord.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
-
-				// Handle error
-				// error_handler(err);
-
-				// Roll back the entire transaction
+				err.printStackTrace();
 				connection.rollback();
-
 			} finally {
-				// Restore normal auto-commit mode
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -1434,17 +1544,17 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllTestRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("test type: " + result.getString("testType") + " ");
-				System.out.println("test result: " + result.getString("testResult") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("test type: " + result.getString("testType") + " | ");
+				System.out.println("test result: " + result.getString("testResult"));
 			}
 			success = true;
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 
 		return success;
@@ -1461,17 +1571,17 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowTestRecord\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("test type: " + result.getString("testType") + " ");
-				System.out.println("test result: " + result.getString("testResult") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("test type: " + result.getString("testType") + " | ");
+				System.out.println("test result: " + result.getString("testResult"));
 			}
 			success = true;
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 
 		return success;
@@ -1503,7 +1613,7 @@ public class WolfHospital {
 				break;
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -1520,19 +1630,14 @@ public class WolfHospital {
 				prepAddCheckinRecord.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
-
-				// Handle error
-				// error_handler(err);
-
-				// Roll back the entire transaction
+				err.printStackTrace();
 				connection.rollback();
-
 			} finally {
 				// Restore normal auto-commit mode
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -1547,17 +1652,17 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowAllCheckinRecords\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("ward number: " + result.getString("wardNumber") + " ");
-				System.out.println("bed number: " + result.getString("bedNumber") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("ward number: " + result.getString("wardNumber") + " | ");
+				System.out.println("bed number: " + result.getString("bedNumber"));
 			}
 			success = true;
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 
 		return success;
@@ -1574,17 +1679,17 @@ public class WolfHospital {
 			result.beforeFirst();
 			System.out.println("\nshowCheckinRecord\n");
 			while (result.next()) {
-				System.out.println("\t record ID: " + result.getString("recordID") + " ");
-				System.out.println("patient ID: " + result.getString("patientID") + " ");
-				System.out.println("start date: " + result.getString("startDate") + " ");
-				System.out.println("end date: " + result.getString("endDate") + " ");
-				System.out.println("responsible doctor: " + result.getString("responsibleDoctor") + " ");
-				System.out.println("ward number: " + result.getString("wardNumber") + " ");
-				System.out.println("bed number: " + result.getString("bedNumber") + " ");
+				System.out.print("\t record ID: " + result.getString("recordID") + " | ");
+				System.out.print("patient ID: " + result.getString("patientID") + " | ");
+				System.out.print("start date: " + result.getString("startDate") + " | ");
+				System.out.print("end date: " + result.getString("endDate") + " | ");
+				System.out.print("responsible doctor: " + result.getString("responsibleDoctor") + " | ");
+				System.out.print("ward number: " + result.getString("wardNumber") + " | ");
+				System.out.println("bed number: " + result.getString("bedNumber"));
 			}
 			success = true;
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 
 		return success;
@@ -1617,7 +1722,7 @@ public class WolfHospital {
 				break;
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -1673,7 +1778,6 @@ public class WolfHospital {
 			}
 			success = true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return success;
@@ -1691,7 +1795,6 @@ public class WolfHospital {
 			}
 			success = true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return success;
@@ -1709,7 +1812,6 @@ public class WolfHospital {
 			}
 			success = true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return success;
@@ -1743,7 +1845,6 @@ public class WolfHospital {
 			}
 			success = true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return success;
@@ -1764,7 +1865,6 @@ public class WolfHospital {
 			}
 			success = true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return success;
@@ -1807,7 +1907,6 @@ public class WolfHospital {
 			}
 			success = true;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return success;
@@ -1831,21 +1930,19 @@ public class WolfHospital {
 				prepAddBillingAccount.setString(5, paymentMethod);
 				prepAddBillingAccount.setString(6, cardNumber);
 				prepAddBillingAccount.setDouble(7, Double.parseDouble(registrationFee));
+				prepAddBillingAccount.setBoolean(8, medicationPrescribed.equals("yes")?true :false);
 				prepAddBillingAccount.setBoolean(8, medicationPrescribed.equals("yes") ? true : false);
 				prepAddBillingAccount.setDouble(9, Double.parseDouble(accommandationFee));
 				prepAddBillingAccount.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
-				// Roll back the entire transaction
 				err.printStackTrace();
 				connection.rollback();
 			} finally {
-				// Restore normal auto-commit mode
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
 			err.printStackTrace();
-			error_handler(err);
 		}
 	}
 
@@ -1856,7 +1953,6 @@ public class WolfHospital {
 			prepGetBillingAccount.setString(1, accountID);
 			result = prepGetBillingAccount.executeQuery();
 			result.beforeFirst();
-			// Process resultSet
 			while (result.next()) {
 				System.out.print("Account ID :" + result.getString("accountID") + " | ");
 				System.out.print("Patient ID :" + result.getString("patientID") + " | ");
@@ -1867,7 +1963,7 @@ public class WolfHospital {
 				System.out.print("Registration Fee :" + result.getString("registrationFee") + " | ");
 				System.out.print("Medication Prescribed :" + result.getString("medicationPrescribed") + " | ");
 				System.out.print("Accommandation Fee :" + result.getString("accommandationFee") + " | ");
-				System.out.print("Billing Address :" + result.getString("billingAddress") + " | ");
+				System.out.println("Billing Address :" + result.getString("billingAddress"));
 			}
 			success = true;
 			
@@ -1922,7 +2018,6 @@ public class WolfHospital {
 					break;
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
 			err.printStackTrace();
 		}
 
@@ -1931,23 +2026,19 @@ public class WolfHospital {
 	// Delete billing account
 	public static void deleteBillingAccount(String accountID) {
 		try {
-			// Start transaction
 			connection.setAutoCommit(false);
 			try {
 				prepDeleteBillingAccount.setString(1, accountID);
 				prepDeleteBillingAccount.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
-				// Handle error
-				// error_handler(err);
-				// Roll back the entire transaction
+				err.printStackTrace();
 				connection.rollback();
 			} finally {
-				// Restore normal auto-commit mode
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -1959,9 +2050,7 @@ public class WolfHospital {
 	 * 
 	 */
 	public static void manageWardDelete(String wardNum) {
-
 		try {
-
 			connection.setAutoCommit(false);
 			try {
 				prepDeleteWardInfo.setString(1, wardNum);
@@ -1973,7 +2062,7 @@ public class WolfHospital {
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -1998,7 +2087,7 @@ public class WolfHospital {
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2010,7 +2099,7 @@ public class WolfHospital {
 
 		boolean success = false;
 		try {
-			result = prep_checkWardAvailability.executeQuery();
+			result = prepCheckWardAvailability.executeQuery();
 			if (result.next()) {
 				success = true;
 				result.beforeFirst();
@@ -2030,7 +2119,7 @@ public class WolfHospital {
 
 		boolean success = false;
 		try {
-			result = prep_checkBedAvailability.executeQuery();
+			result = prepCheckBedAvailability.executeQuery();
 			if (result.next()) {
 				success = true;
 				result.beforeFirst();
@@ -2044,7 +2133,6 @@ public class WolfHospital {
 
 	// Create bed information
 	public static void manageBedAdd(String wardNum, String bedNum) {
-
 		try {
 			connection.setAutoCommit(false);
 			try {
@@ -2058,13 +2146,12 @@ public class WolfHospital {
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
 	// Get bed information
 	public static boolean showBedInfo(String wardNum, String bedNum) {
-
 		boolean success = false;
 		try {
 			prepGetBedInfo.setString(1, wardNum);
@@ -2084,7 +2171,6 @@ public class WolfHospital {
 
 	// Assign bed to patient
 	public static void manageBedAssign(String patientID, String wardNum, String bedNum) {
-
 		try {
 			connection.setAutoCommit(true);
 			prepAssignBed.setString(1, patientID);
@@ -2092,7 +2178,7 @@ public class WolfHospital {
 			prepAssignBed.setString(3, bedNum);
 			prepAssignBed.executeUpdate();
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2100,14 +2186,13 @@ public class WolfHospital {
 
 	// Release bed
 	public static void manageBedRelease(String wardNum, String bedNum) {
-
 		try {
 			connection.setAutoCommit(true);
 			prepReleaseBed.setString(1, wardNum);
 			prepReleaseBed.setString(2, bedNum);
 			prepReleaseBed.executeUpdate();
 		} catch (Throwable err) {
-			// error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2121,8 +2206,17 @@ public class WolfHospital {
 				prepAddAssigned.setString(1, patientID);
 				prepAddAssigned.setString(2, wardNum);
 				prepAddAssigned.setString(3, bedNum);
-				prepAddAssigned.setDate(4, java.sql.Date.valueOf(start));
-				prepAddAssigned.setDate(5, java.sql.Date.valueOf(end));
+				if(start.equals("")) {
+					java.sql.Timestamp date = new java.sql.Timestamp(new java.util.Date().getTime());
+					prepAddAssigned.setTimestamp(4, date);
+				} else {
+					prepAddAssigned.setDate(4, java.sql.Date.valueOf(start));
+				}
+				if(end.equals("")) {
+					prepAddAssigned.setNull(5, java.sql.Types.DATE);
+				} else {
+					prepAddAssigned.setDate(5, java.sql.Date.valueOf(end));
+				}
 				prepAddAssigned.executeUpdate();
 				connection.commit();
 			} catch (Throwable err) {
@@ -2133,7 +2227,6 @@ public class WolfHospital {
 			}
 		} catch (Throwable err) {
 			err.printStackTrace();
-			error_handler(err);
 		}
 
 	}
@@ -2156,7 +2249,7 @@ public class WolfHospital {
 				connection.setAutoCommit(true);
 			}
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2181,7 +2274,7 @@ public class WolfHospital {
 			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
 			manageTreatmentRecordAdd(recordID, pres, diag);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
   
@@ -2192,7 +2285,7 @@ public class WolfHospital {
 			patientID = scanner.nextLine();
 			showAllTreatmentRecords(patientID);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
   
@@ -2203,7 +2296,7 @@ public class WolfHospital {
 			recordID = scanner.nextLine();
 			showTreatmentRecord(recordID);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2218,7 +2311,7 @@ public class WolfHospital {
 			valueToChange = scanner.nextLine();
 			manageTreatmentUpdate(recordID, attributeToChange, valueToChange);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2242,7 +2335,7 @@ public class WolfHospital {
 			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
 			manageTestRecordAdd(recordID, testType, testResult);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2253,7 +2346,7 @@ public class WolfHospital {
 			patientID = scanner.nextLine();
 			showAllTestRecords(patientID);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2264,7 +2357,7 @@ public class WolfHospital {
 			recordID = scanner.nextLine();
 			showTestRecord(recordID);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2279,7 +2372,7 @@ public class WolfHospital {
 			valueToChange = scanner.nextLine();
 			manageTestUpdate(recordID, attributeToChange, valueToChange);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2303,7 +2396,7 @@ public class WolfHospital {
 			addMedicalRecord(recordID, patientID, startDate, endDate, resDoc);
 			manageCheckinRecordAdd(recordID, wardNumber, bedNumber);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2314,7 +2407,7 @@ public class WolfHospital {
 			patientID = scanner.nextLine();
 			showAllCheckinRecords(patientID);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2325,7 +2418,7 @@ public class WolfHospital {
 			recordID = scanner.nextLine();
 			showCheckinRecord(recordID);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2340,7 +2433,7 @@ public class WolfHospital {
 			valueToChange = scanner.nextLine();
 			manageCheckinUpdate(recordID, attributeToChange, valueToChange);
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2394,7 +2487,7 @@ public class WolfHospital {
 			addStaff(staffID, name, age, gender, jobTitle, profTitle, department, phone, address);
 			System.out.println("A new staff is added successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2415,10 +2508,9 @@ public class WolfHospital {
 			System.out.println("\nThe staff information you have chosen:\n");
 			getStaff(staffID);
 
-			// Get attribute to change
-			// Print all possible attributes can be changed
-			System.out.println(
-					"\nPlease select the attribute you wish to update[NAME, AGE, GENDER, JOBTITLE, PROFESSIONAL TITLE, DEPARTMENT, PHONE, ADDRESS]:\n");
+			//Get attribute to change
+			//Print all possible attributes can be changed
+			System.out.println("\nPlease select the attribute you wish to update[NAME, AGE, GENDER, JOB TITLE, PROFESSIONAL TITLE, DEPARTMENT, PHONE, ADDRESS]:\n");
 			attrToChange = scanner.nextLine();
 			// Get value to change
 			System.out.println("\nEnter the new value:\n");
@@ -2427,7 +2519,7 @@ public class WolfHospital {
 			updateStaff(staffID, attrToChange, valueToChange);
 			System.out.println("The staff is updated successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2448,7 +2540,7 @@ public class WolfHospital {
 			deleteStaff(staffID);
 			System.out.println("The staff is deleted successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2507,7 +2599,7 @@ public class WolfHospital {
 					CompletingTreatment);
 			System.out.println("A new patient is added successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2528,14 +2620,9 @@ public class WolfHospital {
 			System.out.println("\nThe patient information you have chosen:\n");
 			getPatient(patientID);
 
-			// Get attribute to change
-			// Print all possible attributes can be changed
-			System.out
-					.println("\nPlease select the attribute you wish to update[NAME, AGE, ADDRESS, PHONE, STATUS]:\n"); // need
-																														// treatmentPlan
-																														// and
-																														// inWard
-																														// too
+			//Get attribute to change
+			//Print all possible attributes can be changed
+			System.out.println("\nPlease select the attribute you wish to update[NAME, ADDRESS, PHONE, STATUS]:\n"); // need treatmentPlan and inWard too
 			attrToChange = scanner.nextLine();
 			// Get value to change
 			System.out.println("\nEnter the new value:\n");
@@ -2544,7 +2631,7 @@ public class WolfHospital {
 			updatePatient(patientID, attrToChange, valueToChange);
 			System.out.println("The patient is updated successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2565,7 +2652,7 @@ public class WolfHospital {
 			deletePatient(patientID);
 			System.out.println("The patient is deleted successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2594,7 +2681,7 @@ public class WolfHospital {
 			addWard(wardNumber, capacity, dayCharge, responsibleNurse);
 			System.out.println("A new ward is added successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2630,7 +2717,7 @@ public class WolfHospital {
 			updateWard(wardNumber, attrToChange, valueToChange);
 			System.out.println("The ward is updated successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2651,7 +2738,7 @@ public class WolfHospital {
 			manageWardDelete(wardNumber);
 			System.out.println("The ward is deleted successfully!");
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2660,13 +2747,16 @@ public class WolfHospital {
 	 */
 	public static void userWardCheck() {
 		try {
-			ResultSet rs = prep_checkWardAvailability.executeQuery();
+			ResultSet rs = prepCheckWardAvailability.executeQuery();
 			rs.beforeFirst();
 			System.out.println("\nBelow is the list of available wards:");
 			while (rs.next()) {
 				String wardNumber = rs.getString("ward number");
-				String capacity = rs.getString("capacity");
-				System.out.println(capacity + "-bed Ward numbered " + wardNumber);
+				int capacity = rs.getInt("capacity");
+				String bedNumber = rs.getString("bed number");
+				System.out.print("\tcapacity : " + capacity + " | ");
+				System.out.print("Ward number : " + wardNumber + " | ");
+				System.out.println("Bed number : " + bedNumber + " | ");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -2678,13 +2768,14 @@ public class WolfHospital {
 	 */
 	public static void userBedCheck() {
 		try {
-			ResultSet rs = prep_checkBedAvailability.executeQuery();
+			ResultSet rs = prepCheckBedAvailability.executeQuery();
 			rs.beforeFirst();
 			System.out.println("\nBelow is the list of available beds:");
 			while (rs.next()) {
 				String wardNumber = rs.getString("ward number");
 				String bedNumber = rs.getString("bed number");
-				System.out.println("Bed numbered " + bedNumber + " in ward numbered " + wardNumber);
+				System.out.print("\tBed number : " + bedNumber + " | ");
+				System.out.println("Ward number : " + wardNumber);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -2703,30 +2794,37 @@ public class WolfHospital {
 		System.out.println("\nPlease enter the patient ID of the patient you are assigning a ward/bed for.\n");
 		String patientID = scanner.nextLine();
 		userWardCheck(); // should print the capacity of each ward
-		System.out.println("\nPlease select a ward according to your need from the above ward\n");
+		System.out.println("\nPlease enter a ward number according to your need from the above available wards\n");
 		String wardNumber = scanner.nextLine();
-		getWard(wardNumber);
+		//getWard(wardNumber);
 		String bedNumber;
 		try {
-			prepAddTreatmentRecord.setString(1, wardNumber);
-			ResultSet rs = prep_checkBedinWardAvailability.executeQuery();
+			prepCheckBedinWardAvailability.setString(1, wardNumber);
+			ResultSet rs = prepCheckBedinWardAvailability.executeQuery();
 			rs.beforeFirst();
 			System.out.println("\nBelow is the list of available beds in ward numbered " + wardNumber + ": ");
 			while (rs.next()) {
-				if (wardNumber != rs.getString("ward number")) {
-					System.out.println("Warning: a bed in wrong ward is skipped!");
+				String getWardNumber = rs.getString("ward number");
+				if (!wardNumber.equals(getWardNumber)) {
+					System.out.println("\tWarning: a bed in wrong ward is found!");
+					System.out.print("\tEntered ward number : " + wardNumber + " | ");
+					System.out.println("Retrieved ward number : " + getWardNumber);
 					continue;
 				}
 				bedNumber = rs.getString("bed number");
-				System.out.println("Bed numbered " + bedNumber);
+				System.out.print("\tBed number : " + bedNumber + " | ");
+				System.out.println("Ward number : " + wardNumber);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		System.out.println("\nPlease select a bed from the available bed list above\n");
+		System.out.println("\nPlease enter a bed number from the available beds above\n");
 		bedNumber = scanner.nextLine();
-		manageBedAssign(patientID, wardNumber, bedNumber);
-		System.out.println("\nPatient " + patientID + " got the bed numbered " + bedNumber + " in ward numbered"
+		//System.out.println("\nPlease enter the current date in format yyyy-mm-dd\n");
+		String startDate = "";
+		String endDate = "";
+		manageAssignedAdd(patientID, wardNumber, bedNumber, startDate, endDate);
+		System.out.println("\nPatient " + patientID + " got the bed numbered " + bedNumber + " in ward numbered "
 				+ wardNumber + " successfully.");
 	}
 
@@ -2745,7 +2843,7 @@ public class WolfHospital {
 		System.out.println("\nPlease enter the ward number of the bed to be released");
 		wardNum = scanner.nextLine();
 		manageBedRelease(wardNum, bedNum);
-		System.out.println("\nBed numbered " + bedNum + "in ward numbered " + wardNum + " is released");
+		System.out.println("\nBed numbered " + bedNum + " in ward numbered " + wardNum + " is released!");
 	}
 
 	// GG
@@ -2803,7 +2901,7 @@ public class WolfHospital {
 					medPrescribed, accomFee, address);
 
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2824,7 +2922,7 @@ public class WolfHospital {
 			showBillingAccount(accountID);
 
 		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -2867,7 +2965,6 @@ public class WolfHospital {
 	}
 
 	public static void userBillingAcctDelete() {
-
 		try {
 			// Declare local variables
 			String accountID;
@@ -2884,277 +2981,7 @@ public class WolfHospital {
 			// Call method that interacts with the Database
 			deleteBillingAccount(accountID);
 		} catch (Throwable err) {
-			error_handler(err);
-		}
-	}
-
-	public static void main(String[] args) {
-		try {
-
-			// Declare local variables
-			boolean quit = false;
-			String command;
-
-			// Print welcome
-			System.out.println("\nWelcome to Wolf Hospital Management System");
-			connectToDatabase();
-			// DBConnection.connectToDatabase(connection, statement, result, jdbcURL, user,
-			// password);
-			generatePreparedStatements();
-			// dropAllExistingTables();
-			// generateTables();
-			//
-			// populateStaffTable();
-			// populatePatientsTable();
-			// populateWardsTable();
-			// populateMedicalRecordsTable();
-			// populateTreatmentTable();
-			// populateTestTable();
-			// populateCheckinTable();
-			// populateBillingAccountsTable();
-			// populateBedsTable();
-			// populateAssignedTable();
-
-			// Print available commands
-			printCommands(CMD_MAIN);
-
-			// Watch for user input
-			currentMenu = CMD_MAIN;
-			scanner = new Scanner(System.in);
-			while (quit == false) {
-				System.out.print("user > ");
-				command = scanner.nextLine();
-				switch (currentMenu) {
-				case CMD_MAIN:
-					// Check user's input (case insensitively)
-					switch (command.toUpperCase()) {
-					case "1":
-						// Tell the user their options in this new menu
-						printCommands(CMD_INFORMATION_PROCESSING);
-						// Remember what menu we're in
-						currentMenu = CMD_INFORMATION_PROCESSING;
-						break;
-					// fhy
-					case "2":
-						// Tell the user their options in this new menu
-						printCommands(CMD_MEDICAL_RECORDS);
-						// Remember what menu we're in
-						currentMenu = CMD_MEDICAL_RECORDS;
-						break;
-					// GG
-					case "3":
-						printCommands(CMD_BILLING_ACCOUNTS);
-						currentMenu = CMD_BILLING_ACCOUNTS;
-						break;
-					case "4":
-						// Tell the user their options in this new menu
-						printCommands(CMD_REPORTS);
-						// Remember what menu we're in
-						currentMenu = CMD_REPORTS;
-						break;
-					case "5":
-						quit = true;
-						break;
-					default:
-						// Remind the user about what commands are available
-						System.out.println("\nCommand not recognized");
-						printCommands(CMD_MAIN);
-						break;
-					}
-					break;
-
-				// fhy
-				case CMD_MEDICAL_RECORDS:
-					switch (command.toUpperCase()) {
-					case "1":
-						userTreatmentAdd();
-						break;
-					case "2":
-						userTreatmentGetAll();
-						break;
-					case "3":
-						userTreatmentGet();
-						break;
-					case "4":
-						userTreatmentUpdate();
-						break;
-					case "5":
-						userTestAdd();
-						break;
-					case "6":
-						userTestGetAll();
-						break;
-					case "7":
-						userTestGet();
-						break;
-					case "8":
-						userTestUpdate();
-						break;
-					case "9":
-						userCheckinAdd();
-						break;
-					case "10":
-						userCheckinGetAll();
-						break;
-					case "11":
-						userCheckinGet();
-						break;
-					case "12":
-						userCheckinUpdate();
-						break;
-					case "13":
-						quit = true;
-						break;
-					default:
-						// Remind the user about what commands are available
-						System.out.println("\nCommand not recognized");
-						printCommands(CMD_MEDICAL_RECORDS);
-						break;
-					}
-					break;
-				case CMD_BILLING_ACCOUNTS:
-					// GG
-					switch (command.toUpperCase()) {
-					case CMD_BILLING_ACCT_ADD:
-						userBillingAcctAdd();
-						break;
-					case CMD_BILLING_ACCT_GET:
-						userBillingAcctGet();
-						break;
-					case CMD_BILLING_ACCT_UPDATE:
-						userBillingAcctUpdate();
-						break;
-					case CMD_BILLING_ACCT_DELETE:
-						userBillingAcctDelete();
-						break;
-					case CMD_QUIT:
-						quit = true;
-						break;
-					default:
-						System.out.println("\nCommand not recognized");
-						printCommands(CMD_BILLING_ACCOUNTS);
-						break;
-					}
-					break;
-				case CMD_INFORMATION_PROCESSING:
-					switch (command.toUpperCase()) {
-					case CMD_STAFF_ADD:
-						userStaffAdd();
-						break;
-					case CMD_STAFF_UPDATE:
-						userStaffUpdate();
-						break;
-					case CMD_STAFF_DELETE:
-						userStaffDelete();
-						break;
-					case CMD_PATIENT_ADD:
-						userPatientAdd();
-						break;
-					case CMD_PATIENT_UPDATE:
-						userPatientUpdate();
-						break;
-					case CMD_PATIENT_DELETE:
-						userPatientDelete();
-						break;
-					case CMD_WARD_ADD:
-						userWardAdd();
-						break;
-					case CMD_WARD_UPDATE:
-						userWardUpdate();
-						break;
-					case CMD_WARD_DELETE:
-						userWardDelete();
-						break;
-					case CMD_WARD_CHECK:
-						userWardCheck();
-						break;
-					case CMD_BED_CHECK:
-						userBedCheck();
-						break;
-					// Assumption: we assume that when assigning a bed to a patient, a ward is
-					// assigned to
-					// the patient too, so there is no need to have a separate operation of
-					// assigning a ward
-					case CMD_WARD_ASSIGN:
-						userBedAssign();
-						break;
-					case CMD_BED_ASSIGN:
-						userBedAssign();
-						break;
-					case CMD_WARD_RESERVE:
-						userBedAssign();
-						break;
-					case CMD_BED_RESERVE:
-						userBedAssign();
-						break;
-					// Assumption: we assume that when releasing a bed from a patient, a ward is
-					// released from
-					// the patient too, so there is no need to have a separate operation for
-					// releasing ward.
-					case CMD_WARD_RELEASE:
-						userBedRelease();
-						break;
-					case CMD_BED_RELEASE:
-						userBedRelease();
-						break;
-					default:
-						System.out.println("\nCommand not found");
-						printCommands(CMD_INFORMATION_PROCESSING);
-						break;
-					}
-					break;
-				case CMD_REPORTS:
-					// Check user's input (case insensitively)
-					switch (command.toUpperCase()) {
-					case CMD_MEDICAL_HISTORY_BY_PATIENT_REPORT:
-						userReportHistoryByPatient();
-						break;
-					case CMD_MEDICAL_HISTORY_BY_TIME_REPORT:
-						userReportHistoryByTime();
-						break;
-					case CMD_WARD_USAGE_STATUS_REPORT:
-						userReportWardUsageStatus();
-						break;
-					case CMD_BED_USAGE_STATUS_REPORT:
-						userReportBedUsageStatus();
-						break;
-					case CMD_NUMBER_PATIENTS_REPORT:
-						userReportNumberOfPatients();
-						break;
-					case CMD_WARD_USAGE_PERCENT_REPORT:
-						userReportWardUsagePercentage();
-						break;
-					case CMD_DOCTOR_RESPONS_REPORT:
-						userReportDoctorResponse();
-						break;
-					case CMD_STAFF_INFO_REPORT:
-						userReportStaffInfo();
-						break;
-					case CMD_MAIN:
-						// Tell the user their options in this new menu
-						printCommands(CMD_MAIN);
-						// Remember what menu we're in
-						currentMenu = CMD_MAIN;
-						break;
-					case CMD_QUIT:
-						quit = true;
-						break;
-					default:
-						// Remind the user about what commands are available
-						System.out.println("\nCommand not recognized");
-						printCommands(CMD_REPORTS);
-						break;
-					}
-					break;
-				default:
-					break;
-				}
-			}
-			// Connection
-			connection.close();
-
-		} catch (Throwable err) {
-			error_handler(err);
+			err.printStackTrace();
 		}
 	}
 
@@ -3234,8 +3061,289 @@ public class WolfHospital {
 		}
 	}
 
-	public static void error_handler(Throwable error) {
+	public static void main(String[] args) {
+		try {
+			// Declare local variables
+			boolean quit = false;
+			String command;
 
+			// Print welcome
+			System.out.println("\nWelcome to Wolf Hospital Management System");
+			connectToDatabase();
+			// DBConnection.connectToDatabase(connection, statement, result, jdbcURL, user,
+			// password);
+			generatePreparedStatements();
+			// dropAllExistingTables();
+			// generateTables();
+			//
+			// populateStaffTable();
+			// populatePatientsTable();
+			// populateWardsTable();
+			// populateMedicalRecordsTable();
+			// populateTreatmentTable();
+			// populateTestTable();
+			// populateCheckinTable();
+			// populateBillingAccountsTable();
+			// populateBedsTable();
+			// populateAssignedTable();
+
+			// Print available commands
+			printCommands(CMD_MAIN);
+
+			// Watch for user input
+			currentMenu = CMD_MAIN;
+			scanner = new Scanner(System.in);
+			while (quit == false) {
+				System.out.print("user > ");
+				command = scanner.nextLine();
+				switch (currentMenu) {
+				case CMD_MAIN:
+					// Check user's input (case insensitively)
+					switch (command.toUpperCase()) {
+					case "1":
+						// Tell the user their options in this new menu
+						printCommands(CMD_INFORMATION_PROCESSING);
+						// Remember what menu we're in
+						currentMenu = CMD_INFORMATION_PROCESSING;
+						break;
+					// fhy
+					case "2":
+						// Tell the user their options in this new menu
+						printCommands(CMD_MEDICAL_RECORDS);
+						// Remember what menu we're in
+						currentMenu = CMD_MEDICAL_RECORDS;
+						break;
+					// GG
+					case "3":
+						printCommands(CMD_BILLING_ACCOUNTS);
+						currentMenu = CMD_BILLING_ACCOUNTS;
+						break;
+					case "4":
+						// Tell the user their options in this new menu
+						printCommands(CMD_REPORTS);
+						// Remember what menu we're in
+						currentMenu = CMD_REPORTS;
+						break;
+					case "5":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "6":
+						quit = true;
+						break;
+					default:
+						// Remind the user about what commands are available
+						System.out.println("\nCommand not recognized");
+						printCommands(CMD_MAIN);
+						break;
+					}
+					break;
+
+				// fhy
+				case CMD_MEDICAL_RECORDS:
+					switch (command.toUpperCase()) {
+					case "1":
+						userTreatmentAdd();
+						break;
+					case "2":
+						userTreatmentGetAll();
+						break;
+					case "3":
+						userTreatmentGet();
+						break;
+					case "4":
+						userTreatmentUpdate();
+						break;
+					case "5":
+						userTestAdd();
+						break;
+					case "6":
+						userTestGetAll();
+						break;
+					case "7":
+						userTestGet();
+						break;
+					case "8":
+						userTestUpdate();
+						break;
+					case "9":
+						userCheckinAdd();
+						break;
+					case "10":
+						userCheckinGetAll();
+						break;
+					case "11":
+						userCheckinGet();
+						break;
+					case "12":
+						userCheckinUpdate();
+						break;
+					case "13":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "14":
+						quit = true;
+						break;
+					default:
+						// Remind the user about what commands are available
+						System.out.println("\nCommand not recognized");
+						printCommands(CMD_MEDICAL_RECORDS);
+						break;
+					}
+					break;
+				case CMD_BILLING_ACCOUNTS:
+					// GG
+					switch (command.toUpperCase()) {
+					case "1":
+						userBillingAcctAdd();
+						break;
+					case "2":
+						userBillingAcctGet();
+						break;
+					case "3":
+						userBillingAcctUpdate();
+						break;
+					case "4":
+						userBillingAcctDelete();
+						break;
+					case "5":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "6":
+						quit = true;
+						break;
+					default:
+						System.out.println("\nCommand not recognized");
+						printCommands(CMD_BILLING_ACCOUNTS);
+						break;
+					}
+					break;
+				case CMD_INFORMATION_PROCESSING:
+					switch (command.toUpperCase()) {
+					case "1":
+						userStaffAdd();
+						break;
+					case "2":
+						userStaffUpdate();
+						break;
+					case "3":
+						userStaffDelete();
+						break;
+					case "4":
+						userPatientAdd();
+						break;
+					case "5":
+						userPatientUpdate();
+						break;
+					case "6":
+						userPatientDelete();
+						break;
+					case "7":
+						userWardAdd();
+						break;
+					case "8":
+						userWardUpdate();
+						break;
+					case "9":
+						userWardDelete();
+						break;
+					case "10":
+						userWardCheck();
+						break;
+					case "11":
+						userBedCheck();
+						break;
+					// Assumption: we assume that when assigning a bed to a patient, a ward is
+					// assigned to
+					// the patient too, so there is no need to have a separate operation of
+					// assigning a ward
+					case "12":
+						userBedAssign();
+						break;
+					case "13":
+						userBedAssign();
+						break;
+					case "14":
+						userBedAssign();
+						break;
+					case "15":
+						userBedAssign();
+						break;
+					// Assumption: we assume that when releasing a bed from a patient, a ward is
+					// released from
+					// the patient too, so there is no need to have a separate operation for
+					// releasing ward.
+					case "16":
+						userBedRelease();
+						break;
+					case "17":
+						userBedRelease();
+						break;
+					case "18":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "19":
+						quit = true;
+						break;
+					default:
+						System.out.println("\nCommand not found");
+						printCommands(CMD_INFORMATION_PROCESSING);
+						break;
+					}
+					break;
+				case CMD_REPORTS:
+					// Check user's input (case insensitively)
+					switch (command.toUpperCase()) {
+					case "1":
+						userReportHistoryByPatient();
+						break;
+					case "2":
+						userReportHistoryByTime();
+						break;
+					case "3":
+						userReportWardUsageStatus();
+						break;
+					case "4":
+						userReportBedUsageStatus();
+						break;
+					case "5":
+						userReportNumberOfPatients();
+						break;
+					case "6":
+						userReportWardUsagePercentage();
+						break;
+					case "7":
+						userReportDoctorResponse();
+						break;
+					case "8":
+						userReportStaffInfo();
+						break;
+					case "9":
+						printCommands(CMD_MAIN);
+						currentMenu = CMD_MAIN;
+						break;
+					case "10":
+						quit = true;
+						break;
+					default:
+						System.out.println("\nCommand not recognized");
+						printCommands(CMD_REPORTS);
+						break;
+					}
+					break;
+				default:
+					break;
+				}
+			}
+			// Connection
+			connection.close();
+
+		} catch (Throwable err) {
+			err.printStackTrace();
+		}
 	}
 
 	static void close(Connection connection) {
