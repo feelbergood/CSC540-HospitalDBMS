@@ -1,3 +1,48 @@
+/*
+CSC540 Project Report #3
+Team E
+
+Hongyi Fan
+Unity ID: hfan4
+Yudong RAO
+Unity ID: yrao3
+Ge GAO
+Unity ID: ggao5
+ChuWen Chen
+Unity ID: cchen31
+
+After program starts, it create tables in the database and populate them with demo data
+User interface:
+1 - INFORMATION PROCESSING
+	-- process information
+2 - MAINTAINING MEDICAL RECORDS
+	-- manage medical records
+3 - MAINTAINING BILLING ACCOUNTS
+	-- manage billing accounts
+4 - REPORTS
+	-- generate reports
+5 - QUIT
+	-- exit the program
+Select numbers to perform corresponding operations.
+
+Function documentations:
+
+	connectToDatabase function: establish connection
+
+	printCommands function: show available commands
+
+	generate... functions: generate prepared statements and tables
+
+	dropAllExistingTables function: clear the existing db
+
+	populate... functions: populate db tables when the program starts
+
+	main function: print welcome message, show available commands, listen to inputs and perform database CRUD, close and quit
+
+High-level/Design decisions:
+
+ */
+
 import java.sql.*;
 import java.util.Scanner;
 import java.util.Date;
