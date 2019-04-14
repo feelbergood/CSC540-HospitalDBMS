@@ -51,32 +51,28 @@ import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
 public class WolfHospital {
-	// Update your user info alone here
-	private static final String jdbcURL = "jdbc:mariadb://classdb2.csc.ncsu.edu:3306/yrao3"; // Using SERVICE_NAME
-
-	// Update your user and password info here!
+	// Information for database authentication
+	private static final String jdbcURL = "jdbc:mariadb://classdb2.csc.ncsu.edu:3306/yrao3";
 	private static final String user = "yrao3";
 	private static final String password = "200204773";
 
+	// Strings for designing user menu
 	private static final String CMD_MAIN = "MAIN";
-	private static final String CMD_INFORMATION_PROCESSING = "INFORMATION PROCESSING"; // CWChen
-	private static final String CMD_MEDICAL_RECORDS = "MAINTAINING MEDICAL RECORDS"; // fhy
-	private static final String CMD_BILLING_ACCOUNTS = "MAINTAINING BILLING ACCOUNTS"; // GG
-	private static final String CMD_REPORTS = "REPORTS"; // ryd
+	private static final String CMD_INFORMATION_PROCESSING = "INFORMATION PROCESSING";
+	private static final String CMD_MEDICAL_RECORDS = "MAINTAINING MEDICAL RECORDS";
+	private static final String CMD_BILLING_ACCOUNTS = "MAINTAINING BILLING ACCOUNTS";
+	private static final String CMD_REPORTS = "REPORTS";
 	private static final String CMD_QUIT = "QUIT";
 
 	private static final String CMD_STAFF_ADD = "ADD STAFF";
-	private static final String CMD_STAFF_GET = "RETRIEVE STAFF";
 	private static final String CMD_STAFF_UPDATE = "UPDATE STAFF";
 	private static final String CMD_STAFF_DELETE = "DELETE STAFF";
 
 	private static final String CMD_PATIENT_ADD = "ADD PATIENT";
-	private static final String CMD_PATIENT_GET = "RETRIEVE PATIENT";
 	private static final String CMD_PATIENT_UPDATE = "UPDATE PATIENT";
 	private static final String CMD_PATIENT_DELETE = "DELETE PATIENT";
 
 	private static final String CMD_WARD_ADD = "ADD WARD";
-	private static final String CMD_WARD_GET = "RETRIEVE WARD";
 	private static final String CMD_WARD_UPDATE = "UPDATE WARD";
 	private static final String CMD_WARD_DELETE = "DELETE WARD";
 	private static final String CMD_WARD_CHECK = "CHECK AVAILABLE WARD";
