@@ -48,10 +48,10 @@ High-level/Design decisions:
 	5. String parameters for DB-related functions: We let all the DB-related functions read all the parameters as String and further convert or
 	   parse it to the type or format desired for a SQL statement within the function. It is easier for us to build up the program based on this unity.
 	6. Check/Assertion in both SQL and Application Level: We would check or assert certain conditions in either SQL or application or both depends on the situation.
-	   For example, we check if a query statement return nothing in our application code with the help of "ResultSet” in JAVA while we make sure that the returned items
-	   satisfy constraints such as "patientID IS NOT NULL” in a SQL statement.
+	   For example, we check if a query statement return nothing in our application code with the help of "ResultSet" in JAVA while we make sure that the returned items
+	   satisfy constraints such as "patientID IS NOT NULL" in a SQL statement.
 	7. Unified name of functions and of variables: To develop the program by a four-member team, we make sure that it is easy for everyone to locate codes by
-	   naming most of the functions and variables in the same style, for example, function name starting with "user” indicates that the function will be interacting with users.
+	   naming most of the functions and variables in the same style, for example, function name starting with "user" indicates that the function will be interacting with users.
  */
 
 import java.sql.*;
