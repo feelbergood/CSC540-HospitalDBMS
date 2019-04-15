@@ -139,8 +139,8 @@ public class WolfHospital {
 			"`Check-ins`", "`ContactInfo`", "`Medical Records`", "`Patients`", "`PayerInfo`", "`PersonInfo`", "`Staff`",
 			"`Test`", "`Treatment`", "`Wards`" };
 
-	// Prepared Statements pre-declared
-	// TO-DO 1: instantiate preparedStatements
+	// Prepared Statements pre-declared.
+	// Instantiate preparedStatements.
 	// cchen31
 	// Staff
 	private static PreparedStatement prepAddStaff;
@@ -155,15 +155,11 @@ public class WolfHospital {
 	private static PreparedStatement prepUpdateStaffAddress;
 	private static PreparedStatement prepDeleteStaff;
 	// Wards
-	// TODO: prepUpdateWardsPatientsID
 	private static PreparedStatement prepAddWards;
 	private static PreparedStatement prepGetWards;
 	private static PreparedStatement prepUpdateWardsCapacity;
 	private static PreparedStatement prepUpdateWardsCharge;
 	private static PreparedStatement prepUpdateWardsNurse;
-	private static PreparedStatement prepUpdateWardsPatientsID; // To reflect what is showed in demo data, but how?
-	private static PreparedStatement prepDeleteWards;
-	private static PreparedStatement prepDeleteWardInformation;
 	// Patients
 	private static PreparedStatement prepAddPatients;
 	private static PreparedStatement prepAddAgeInfo;
@@ -174,7 +170,7 @@ public class WolfHospital {
 	//private static PreparedStatement prepUpdatePatientsAge;
 	private static PreparedStatement prepUpdatePatientsPhone;
 	private static PreparedStatement prepUpdatePatientsAddress;
-	private static PreparedStatement prepUpdatePatientsTreatmentPlan; // To reflect what is showed in demo data
+	private static PreparedStatement prepUpdatePatientsTreatmentPlan;
 	private static PreparedStatement prepUpdatePatientsInWard;
 	private static PreparedStatement prepUpdatePatientsStatus;
 	private static PreparedStatement prepDeletePatients;
@@ -418,7 +414,7 @@ public class WolfHospital {
 		}
 	}
 
-	// TO-DO 2: assign instantiated prepared statements
+	// Assign instantiated prepared statements
 	public static void generatePreparedStatements() {
 		try {
 			String sql;
@@ -506,8 +502,8 @@ public class WolfHospital {
 			sql = "DELETE FROM `AgeInfo`" + " WHERE DOB = ?;";
 			prepDeleteAgeInfo = connection.prepareStatement(sql);
 			// Check if a AgeInfo tuple is not matched by parent table
-			sql = "SELECT AgeInfo.DOB from AgeInfo left outer join PersonInfo on (AgeInfo.DOB = PersonInfo.DOB) " +
-				"WHERE AgeInfo.DOB = ?;";
+			sql = "SELECT AgeInfo.DOB from AgeInfo WHERE NOT EXISTS (SELECT PersonInfo.DOB FROM PersonInfo) " +
+				"AND AgeInfo.DOB = ?;";
 			prepCheckAgeInfo = connection.prepareStatement(sql);
 			// Enter basic information about wards
 			sql = "INSERT INTO `Wards` (`ward number`, `capacity`, `charges per day`, `responsible nurse`)"
@@ -769,7 +765,7 @@ public class WolfHospital {
 		}
 	}
 
-	// 04/09 drop all existing tables before populating tables
+	// Drop all existing tables before populating tables
 	public static void dropAllExistingTables() {
 		try {
 			statement.executeUpdate("SET FOREIGN_KEY_CHECKS=0;");
@@ -783,7 +779,7 @@ public class WolfHospital {
 		}
 	}
 
-	// TO-DO 3: create tables
+	// Create tables
 	public static void generateTables() {
 		try {
 			connection.setAutoCommit(false);
@@ -799,28 +795,6 @@ public class WolfHospital {
 						+ "`department` VARCHAR(255) NOT NULL, "
 						+ "`phone` VARCHAR(255) NOT NULL, " 
 						+ "`address` VARCHAR(255) NOT NULL, "
-						+ "PRIMARY KEY (`staffID`));");
-
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `AgeInfo` (" 
-						+ "`DOB` datetime NOT NULL, "
-						+ "`age` INT(2) NOT NULL, " 
-						+ "PRIMARY KEY (`DOB`));");
-
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `ContactInfo` (" 
-						+ "`phone` VARCHAR(255) NOT NULL, "
-						+ "`address` VARCHAR(255) NOT NULL, " 
-						+ "PRIMARY KEY (`phone`));");
-
-				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Staff` (" 
-						+ "`staffID` VARCHAR(255) NOT NULL, " 
-						+ "`name` VARCHAR(255) NOT NULL, " 
-						+ "`age` INT(3) NOT NULL, " 
-						+ "`gender` VARCHAR(255) NOT NULL, " 
-						+ "`jobTitle` VARCHAR(255) NOT NULL, " 
-						+ "`profTitle` VARCHAR(255) DEFAULT NULL, " 
-						+ "`department` VARCHAR(255) NOT NULL, " 
-						+ "`phone` VARCHAR(255) NOT NULL, " 
-						+ "`address` VARCHAR(255) NOT NULL, " 
 						+ "PRIMARY KEY (`staffID`));");
 
 				statement.executeUpdate("CREATE TABLE IF NOT EXISTS `Patients` (" 
@@ -953,7 +927,7 @@ public class WolfHospital {
 		}
 	}
 
-	// TO-DO 4: define and implement table population tables
+	// Populate tables with specified data
 	public static void populateStaffTable() {
 		addStaff("100", "Mary", "40", "Female", "Doctor", "senior", "Neurology", "654", "90 ABC St , Raleigh NC 27");
 		addStaff("101", "John", "45", "Male", "Billing Staff", "", "Office", "564", "798 XYZ St , Rochester NY 54");
@@ -978,7 +952,6 @@ public class WolfHospital {
 	}
 
 	public static void populateWardsTable() {
-		// TODO: how to add multiple patients' IDs?
 		addWard("001", "4", "50", "102");
 		addWard("002", "4", "50", "102");
 		addWard("003", "2", "100", "106");
@@ -1050,9 +1023,11 @@ public class WolfHospital {
 				"yes", "400", "10 TBC St. Raleigh NC 27730");
 	}
 
-	// TO-DO 5: define and implement other functions
+	// Define and implement other functions other than UI functions
 	// cchen31
-	// Show an appointed row of Staff
+	/*
+	 * Show an appointed row of Staff
+	 **/
 	private static void printStaffRow(ResultSet rs) {
 		try {
 			String staffID = rs.getString("staffID");
@@ -1072,7 +1047,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Show an appointed row of patient
+	/*
+	 * Show an appointed row of patient
+	 **/
 	private static void printPatientsRow(ResultSet rs) {
 		try {
 			String patientID = rs.getString("patientID");
@@ -1095,10 +1072,11 @@ public class WolfHospital {
 		}
 	}
 
-	// Show an appointed row of wards
+	/*
+	 * Show an appointed row of wards
+	 **/
 	private static void printWardsRow(ResultSet rs) {
 		try {
-			// TODO: print patients' IDs too
 			String wardNumber = rs.getString("ward number");
 			int capacity = rs.getInt("capacity");
 			int dayCharge = rs.getInt("charges per day");
@@ -1110,8 +1088,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Add a new staff
-	// need to deal with duplicate add?
+	/*
+	 * Add a new staff
+	 **/
 	public static void addStaff(String staffID, String name, String age, String gender, String jobTitle,
 			String profTitle, String department, String phone, String address) {
 		try {
@@ -1139,7 +1118,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Get staff info
+	/*
+	 * Get staff info
+	 **/
 	public static void getStaff(String staffID) {
 		try {
 			prepGetStaff.setString(1, staffID);
@@ -1152,7 +1133,9 @@ public class WolfHospital {
 		}
 	}
 
-	// update the value of an appointed field of an staff
+	/*
+	 * update the value of an appointed field of an staff
+	 **/
 	public static void updateStaff(String staffID, String attributeToChange, String newValue) {
 		try {
 			connection.setAutoCommit(false);
@@ -1215,7 +1198,9 @@ public class WolfHospital {
 		}
 	}
 
-	// delete an appointed staff
+	/*
+	 * delete an appointed staff
+	 **/
 	public static void deleteStaff(String staffID) {
 		try {
 			connection.setAutoCommit(false);
@@ -1234,7 +1219,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Add a new patient
+	/*
+	 * Add a new patient
+	 **/
 	public static void addPatient(String patientID, String SSN, String name, String DOB, String gender, String age,
 			String phone, String address, String processing, String inWard, String completing) {
 		try {
@@ -1258,8 +1245,6 @@ public class WolfHospital {
 				prepAddPersonInfo.setString(7, inWard);
 				prepAddPersonInfo.setString(8, completing);
 
-				// To-do: make use of variable treatmentPlan and wardNum. By calling
-				// prepAddTreatmentRecord and prepAssignWard here?
 				prepAddPatients.executeUpdate();
 				prepAddPersonInfo.executeUpdate();
 				prepAddAgeInfo.executeUpdate();
@@ -1276,7 +1261,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Get patient info
+	/*
+	 * Get patient info
+	 **/
 	public static void getPatient(String patientID) {
 		try {
 			prepGetPatients.setString(1, patientID);
@@ -1289,7 +1276,9 @@ public class WolfHospital {
 		}
 	}
 
-	// update the value of an appointed field of a patient
+	/*
+	 * update the value of an appointed field of a patient
+	 **/
 	public static void updatePatient(String patientID, String attributeChanged, String newValue) {
 		try {
 			connection.setAutoCommit(true);
@@ -1347,7 +1336,9 @@ public class WolfHospital {
 		}
 	}
 
-	// delete an appointed patient
+	/*
+	 * delete an appointed patient
+	 **/
 	public static void deletePatient(String patientID) {
 		try {
 			connection.setAutoCommit(false);
@@ -1362,15 +1353,13 @@ public class WolfHospital {
 					System.out.println("No such Patient");
 				}
 				prepDeletePatients.setString(1, patientID);
-				// To-do: need to consider the effect on everything related to this patient?
-				// e.g. release bed, update record, etc.
 				prepDeletePatients.executeUpdate();
 				connection.commit();
 				prepCheckAgeInfo.setDate(1, java.sql.Date.valueOf(DOB));
 				rs = prepCheckAgeInfo.executeQuery();
 				rs.beforeFirst();
 				if(!rs.next()) {
-					prepDeleteAgeInfo.setDate(1, java.sql.Date.valueOf(DOB));
+					prepDeleteAgeInfo.setString(1, DOB);
 					prepDeleteAgeInfo.executeUpdate();
 					connection.commit();
 				}
@@ -1385,7 +1374,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Add a new ward
+	/*
+	 * Add a new ward
+	 **/
 	public static void addWard(String wardNumber, String capacity, String daycharge, String responsibleNurse) {
 		try {
 			connection.setAutoCommit(false);
@@ -1407,7 +1398,9 @@ public class WolfHospital {
 		}
 	}
 
-	// Get ward info
+	/*
+	 * Get ward info
+	 **/
 	public static void getWard(String wardNumber) {
 		try {
 			prepGetWards.setString(1, wardNumber);
@@ -1421,7 +1414,9 @@ public class WolfHospital {
 		}
 	}
 
-	// update the value of an appointed field of a ward
+	/*
+	 * update the value of an appointed field of a ward
+	 **/
 	public static void updateWard(String wardNumber, String attributeChanged, String newValue) {
 		try {
 			connection.setAutoCommit(true);
@@ -2302,6 +2297,9 @@ public class WolfHospital {
 		}
 	}
 
+	/*
+	 * Below are user-interaction functions
+	 */
 	//fhy
 	public static void userTreatmentAdd(){
 		try {
@@ -2485,10 +2483,6 @@ public class WolfHospital {
 			err.printStackTrace();
 		}
 	}
-
-	/*
-	 * begin user-interaction methods
-	 */
 
 	/*
 	 * ChuWen - Information Processing Enter information for a new staff
@@ -2699,7 +2693,7 @@ public class WolfHospital {
 			getPatient(patientID);
 			// Call method that interacts with the Database
 			deletePatient(patientID);
-			System.out.println("The patient is deleted successfully!");
+			System.out.println("\nThe patient is deleted successfully!");
 		} catch (Throwable err) {
 			err.printStackTrace();
 		}
@@ -3122,19 +3116,19 @@ public class WolfHospital {
 			// DBConnection.connectToDatabase(connection, statement, result, jdbcURL, user,
 			// password);
 			generatePreparedStatements();
-			// dropAllExistingTables();
-			// generateTables();
-			//
-			// populateStaffTable();
-			// populatePatientsTable();
-			// populateWardsTable();
-			// populateMedicalRecordsTable();
-			// populateTreatmentTable();
-			// populateTestTable();
-			// populateCheckinTable();
-			// populateBillingAccountsTable();
-			// populateBedsTable();
-			// populateAssignedTable();
+			/*dropAllExistingTables();
+			generateTables();
+
+			populateStaffTable();
+			populatePatientsTable();
+			populateWardsTable();
+			populateMedicalRecordsTable();
+			populateTreatmentTable();
+			populateTestTable();
+			populateCheckinTable();
+			populateBillingAccountsTable();
+			populateBedsTable();
+			populateAssignedTable();*/
 
 			// Print available commands
 			printCommands(CMD_MAIN);
