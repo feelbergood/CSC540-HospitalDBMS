@@ -1066,7 +1066,7 @@ public class WolfHospital {
 			System.out.println("Patient ID: " + patientID + ", SSN: " + SSN + ", name: " + name + ", date of birth: "
 					+ DOB + ", gender: " + gender + ", age: " + age + ", phone number: " + phone + ", address: "
 					+ address + ", processing treatment plan: " + processing + ", in ward: " + inWard
-					+ ", completing treatment: " + completing + phone + "\t" + address + "\t");
+					+ ", completing treatment: " + completing);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -2665,7 +2665,8 @@ public class WolfHospital {
 
 			//Get attribute to change
 			//Print all possible attributes can be changed
-			System.out.println("\nPlease select the attribute you wish to update[NAME, ADDRESS, PHONE, STATUS]:\n"); // need treatmentPlan and inWard too
+			System.out.println("\nPlease select the attribute you wish to update[NAME, ADDRESS, " +
+					"PHONE, PROCESSING TREATMENT PLAN, IN WARD, COMPLETING TREATMENT]:\n"); // need treatmentPlan and inWard too
 			attrToChange = scanner.nextLine();
 			// Get value to change
 			System.out.println("\nEnter the new value:\n");
